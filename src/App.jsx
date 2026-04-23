@@ -440,17 +440,22 @@ export default function AuryMoney() {
   // Saldo faltante do mês atual (quanto precisa de renda extra pra fechar no zero)
   const faltando = tm.saldo < 0 ? Math.abs(tm.saldo) : 0
 
-  // ── 6-month window: 3 meses atrás + atual + 2 futuros ────────────────────────
+  // ── Janela dinâmica: do primeiro ao último mês com registros ─────────────────
   const hist6 = useMemo(()=>{
-    return Array.from({length:6},(_,i)=>{
-      const ym  = addMonths(thisMonth, i-3)  // -3,-2,-1,0,+1,+2
-      const rs  = records.filter(r => r.date?.startsWith(ym))
+    if(records.length===0) return []
+    const dates = records.map(r=>r.date?.slice(0,7)).filter(Boolean).sort()
+    const first = dates[0]
+    const last  = dates[dates.length-1]
+    const result = []
+    let ym = first
+    while(ym <= last){
+      const rs  = records.filter(r=>r.date?.startsWith(ym))
       const rec = rs.filter(r=>r.type==="receita").reduce((a,b)=>a+Number(b.value||0),0)
       const exp = rs.filter(r=>r.type==="despesa").reduce((a,b)=>a+Number(b.value||0),0)
-      const isCurrent = ym === thisMonth
-      const isFuture  = ym > thisMonth
-      return { ym, label:monthShort(ym), rec, exp, saldo:rec-exp, isCurrent, isFuture }
-    })
+      result.push({ ym, label:monthShort(ym), rec, exp, saldo:rec-exp, isCurrent:ym===thisMonth, isFuture:ym>thisMonth })
+      ym = addMonths(ym,1)
+    }
+    return result
   },[records])
 
   // ── Projection: next 4 months ──────────────────────────────────────────────
