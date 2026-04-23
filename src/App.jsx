@@ -458,30 +458,26 @@ export default function AuryMoney() {
     return result
   },[records])
 
-  // ── Projection: next 4 months ──────────────────────────────────────────────
+  // ── Projection: do mês seguinte ao atual até o último mês com registro ───────
   const projection = useMemo(()=>{
-    // Recorrentes = todos os registros marcados como recorrente
-    const recorrentes = records.filter(r=>r.type==="despesa"&&r.recorrente)
-    const recorrenteRec = records.filter(r=>r.type==="receita"&&r.recorrente)
+    if(records.length===0) return []
+    const fixedExp = records.filter(r=>r.type==="despesa"&&r.recorrente).reduce((a,b)=>a+Number(b.value||0),0)
+    const fixedRec = records.filter(r=>r.type==="receita"&&r.recorrente).reduce((a,b)=>a+Number(b.value||0),0)
 
-    // Média de avulsos nos últimos 3 meses com dados
-    const last3 = [1,2,3].map(i=>{
-      const ym = addMonths(thisMonth,-i)
-      return records.filter(r=>r.date?.startsWith(ym)&&r.type==="despesa"&&!r.recorrente).reduce((a,b)=>a+Number(b.value||0),0)
-    }).filter(v=>v>0)
-    const avgAvulso = last3.length>0 ? last3.reduce((a,b)=>a+b,0)/last3.length : 0
-
-    const fixedExp = recorrentes.reduce((a,b)=>a+Number(b.value||0),0)
-    const fixedRec = recorrenteRec.reduce((a,b)=>a+Number(b.value||0),0)
-
-    return Array.from({length:4},(_,i)=>{
-      const ym  = addMonths(thisMonth,i+1)
-      // Use real data if exists, else project
-      const real = getMonthData(ym)
-      const projExp = real.exp > 0 ? real.exp : fixedExp + avgAvulso
-      const projRec = real.rec > 0 ? real.rec : fixedRec
-      return { ym, label:monthLabel(ym), projExp, projRec, saldo:projRec-projExp, hasReal:real.count>0 }
-    })
+    const lastMonth = records.map(r=>r.date?.slice(0,7)).filter(Boolean).sort().reverse()[0]
+    const result = []
+    let ym = addMonths(thisMonth,1)
+    while(ym <= lastMonth){
+      const rs      = records.filter(r=>r.date?.startsWith(ym))
+      const realExp = rs.filter(r=>r.type==="despesa").reduce((a,b)=>a+Number(b.value||0),0)
+      const realRec = rs.filter(r=>r.type==="receita").reduce((a,b)=>a+Number(b.value||0),0)
+      const hasReal = rs.length>0
+      const projExp = hasReal ? realExp : fixedExp
+      const projRec = hasReal ? realRec : fixedRec
+      result.push({ ym, label:monthLabel(ym), projExp, projRec, saldo:projRec-projExp, hasReal })
+      ym = addMonths(ym,1)
+    }
+    return result
   },[records])
 
   // ── Card balances ──────────────────────────────────────────────────────────
@@ -744,7 +740,7 @@ Para REGISTRAR responda SOMENTE com JSON:
 
           {/* Projeção próximos meses */}
           <div className="card" style={{background:"linear-gradient(135deg,#14142a,#1a0f30)",border:"1px solid rgba(167,139,250,.15)"}}>
-            <div className="sec">Projeção — próximos 4 meses</div>
+            <div className="sec">Projeção — até o último registro</div>
             {projection.map((p,i)=>{
               const maxVal = Math.max(...projection.map(x=>x.projExp),totalRec,1)
               const pct    = Math.min((p.projExp/maxVal)*100,100)
@@ -771,7 +767,7 @@ Para REGISTRAR responda SOMENTE com JSON:
               )
             })}
             <div style={{fontSize:10,color:"var(--mt)",marginTop:8,lineHeight:1.5}}>
-              * Projeção usa recorrentes + média de avulsos dos últimos 3 meses. Meses com dados reais são exibidos como registrado.
+              * Meses com registros exibem valores exatos. Meses sem registro usam apenas os recorrentes cadastrados.
             </div>
           </div>
 
