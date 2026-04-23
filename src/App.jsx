@@ -687,9 +687,24 @@ Para REGISTRAR responda SOMENTE com JSON:
                 <span style={{width:8,height:8,borderRadius:"50%",background:"var(--rd)",display:"inline-block"}}/>Despesas
               </span>
             </div>
+            {/* Linha total despesas */}
+            <div style={{marginTop:12,paddingTop:12,borderTop:"1px solid var(--bd)"}}>
+              <div style={{fontSize:9,color:"var(--rd)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:6,fontWeight:700}}>Total de Despesas / Mês</div>
+              <LineChart points={hist6.map(m=>({value:m.exp,label:m.label}))} color="#F87171" height={56}/>
+              <div style={{display:"flex",justifyContent:"space-between",marginTop:3}}>
+                {hist6.map(m=>(
+                  <div key={m.ym} style={{flex:1,textAlign:"center",fontSize:8,color:"rgba(255,255,255,.3)"}}>{m.label}</div>
+                ))}
+              </div>
+              <div style={{display:"flex",justifyContent:"space-between",marginTop:6}}>
+                {hist6.map(m=>(
+                  <div key={m.ym} style={{flex:1,textAlign:"center",fontSize:8,color:m.exp>0?"var(--rd)":"rgba(255,255,255,.2)",fontWeight:600}}>{m.exp>0?fmt(m.exp).replace("R$","").trim():"-"}</div>
+                ))}
+              </div>
+            </div>
             {/* Saldo mensal linha */}
-            <div style={{marginTop:12}}>
-              <div style={{fontSize:9,color:"var(--mt)",marginBottom:4}}>SALDO MENSAL</div>
+            <div style={{marginTop:12,paddingTop:12,borderTop:"1px solid var(--bd)"}}>
+              <div style={{fontSize:9,color:"var(--pu)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:6,fontWeight:700}}>Saldo Mensal</div>
               <LineChart points={hist6.map(m=>({value:m.saldo,label:m.label}))} color="var(--pu)" height={50}/>
               <div style={{display:"flex",justifyContent:"space-between",marginTop:3}}>
                 {hist6.map(m=>(
