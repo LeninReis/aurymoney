@@ -110,20 +110,24 @@ function useIsMobile() {
 
 // ── Charts ────────────────────────────────────────────────────────────────────
 function BarPair({ data }) {
-  // data: [{label, rec, exp}]
   const max = Math.max(...data.flatMap(d => [d.rec, d.exp]), 1)
   return (
     <div style={{ display:"flex", gap:4, alignItems:"flex-end", height:90 }}>
-      {data.map((d,i) => (
-        <div key={i} style={{ flex:1, display:"flex", gap:2, alignItems:"flex-end" }}>
-          <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
-            <div style={{ width:"100%", background:"#34D399", borderRadius:"3px 3px 0 0", height:`${(d.rec/max)*78}px`, minHeight:d.rec>0?3:0, transition:"height .7s cubic-bezier(.34,1.56,.64,1)" }}/>
+      {data.map((d,i) => {
+        const opacity = d.isFuture ? 0.4 : 1
+        const glow    = d.isCurrent ? "0 0 8px rgba(167,139,250,.5)" : "none"
+        return (
+          <div key={i} style={{ flex:1, display:"flex", gap:2, alignItems:"flex-end", position:"relative" }}>
+            {d.isCurrent && <div style={{ position:"absolute", top:-14, left:"50%", transform:"translateX(-50%)", fontSize:7, color:"var(--pu)", fontWeight:700, whiteSpace:"nowrap" }}>HOJE</div>}
+            <div style={{ flex:1 }}>
+              <div style={{ width:"100%", background:"#34D399", opacity, borderRadius:"3px 3px 0 0", height:`${(d.rec/max)*78}px`, minHeight:d.rec>0?3:0, transition:"height .7s cubic-bezier(.34,1.56,.64,1)", boxShadow:glow }}/>
+            </div>
+            <div style={{ flex:1 }}>
+              <div style={{ width:"100%", background:"#F87171", opacity, borderRadius:"3px 3px 0 0", height:`${(d.exp/max)*78}px`, minHeight:d.exp>0?3:0, transition:"height .7s cubic-bezier(.34,1.56,.64,1)", boxShadow:glow }}/>
+            </div>
           </div>
-          <div style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:2 }}>
-            <div style={{ width:"100%", background:"#F87171", borderRadius:"3px 3px 0 0", height:`${(d.exp/max)*78}px`, minHeight:d.exp>0?3:0, transition:"height .7s cubic-bezier(.34,1.56,.64,1)" }}/>
-          </div>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
@@ -132,7 +136,7 @@ function BarLabels({ data }) {
   return (
     <div style={{ display:"flex", gap:4 }}>
       {data.map((d,i) => (
-        <div key={i} style={{ flex:1, textAlign:"center", fontSize:8, color:"rgba(255,255,255,.3)", paddingTop:3 }}>
+        <div key={i} style={{ flex:1, textAlign:"center", fontSize:8, color: d.isCurrent ? "var(--pu)" : d.isFuture ? "rgba(255,255,255,.25)" : "rgba(255,255,255,.4)", paddingTop:3, fontWeight: d.isCurrent ? 700 : 400 }}>
           {d.label}
         </div>
       ))}
@@ -416,16 +420,16 @@ export default function AuryMoney() {
   const setF = (k,v) => setForm(f=>({...f,[k]:v}))
 
   // ── Core financials (casal conjunto) ────────────────────────────────────────
-  const totalRec = useMemo(()=>records.filter(r=>r.type==="receita").reduce((a,b)=>a+b.value,0),[records])
-  const totalExp = useMemo(()=>records.filter(r=>r.type==="despesa").reduce((a,b)=>a+b.value,0),[records])
+  const totalRec = useMemo(()=>records.filter(r=>r.type==="receita").reduce((a,b)=>a+Number(b.value||0),0),[records])
+  const totalExp = useMemo(()=>records.filter(r=>r.type==="despesa").reduce((a,b)=>a+Number(b.value||0),0),[records])
   const saldo    = totalRec - totalExp
   const savePct  = totalRec>0 ? Math.min(100,Math.max(0,Math.round((saldo/totalRec)*100))) : 0
 
   // ── Month helpers ────────────────────────────────────────────────────────────
   const getMonthData = ym => {
     const rs  = records.filter(r=>r.date?.startsWith(ym))
-    const rec = rs.filter(r=>r.type==="receita").reduce((a,b)=>a+b.value,0)
-    const exp = rs.filter(r=>r.type==="despesa").reduce((a,b)=>a+b.value,0)
+    const rec = rs.filter(r=>r.type==="receita").reduce((a,b)=>a+Number(b.value||0),0)
+    const exp = rs.filter(r=>r.type==="despesa").reduce((a,b)=>a+Number(b.value||0),0)
     return { rec, exp, saldo:rec-exp, count:rs.length }
   }
 
@@ -436,16 +440,17 @@ export default function AuryMoney() {
   // Saldo faltante do mês atual (quanto precisa de renda extra pra fechar no zero)
   const faltando = tm.saldo < 0 ? Math.abs(tm.saldo) : 0
 
-  // ── 6-month history: abril (atual) na esquerda → novembro na direita ─────────
+  // ── 6-month window: 3 meses atrás + atual + 2 futuros ────────────────────────
   const hist6 = useMemo(()=>{
     return Array.from({length:6},(_,i)=>{
-      const ym = addMonths(thisMonth, -i)   // i=0=atual, i=1=mês anterior, etc
-      const rs = records.filter(r=>r.date?.startsWith(ym))
-      const rec = rs.filter(r=>r.type==="receita").reduce((a,b)=>a+b.value,0)
-      const exp = rs.filter(r=>r.type==="despesa").reduce((a,b)=>a+b.value,0)
-      return { ym, label:monthShort(ym), rec, exp, saldo:rec-exp }
+      const ym  = addMonths(thisMonth, i-3)  // -3,-2,-1,0,+1,+2
+      const rs  = records.filter(r => r.date?.startsWith(ym))
+      const rec = rs.filter(r=>r.type==="receita").reduce((a,b)=>a+Number(b.value||0),0)
+      const exp = rs.filter(r=>r.type==="despesa").reduce((a,b)=>a+Number(b.value||0),0)
+      const isCurrent = ym === thisMonth
+      const isFuture  = ym > thisMonth
+      return { ym, label:monthShort(ym), rec, exp, saldo:rec-exp, isCurrent, isFuture }
     })
-    // NÃO revertemos: i=0 (atual/abril) fica na esquerda
   },[records])
 
   // ── Projection: next 4 months ──────────────────────────────────────────────
@@ -457,12 +462,12 @@ export default function AuryMoney() {
     // Média de avulsos nos últimos 3 meses com dados
     const last3 = [1,2,3].map(i=>{
       const ym = addMonths(thisMonth,-i)
-      return records.filter(r=>r.date?.startsWith(ym)&&r.type==="despesa"&&!r.recorrente).reduce((a,b)=>a+b.value,0)
+      return records.filter(r=>r.date?.startsWith(ym)&&r.type==="despesa"&&!r.recorrente).reduce((a,b)=>a+Number(b.value||0),0)
     }).filter(v=>v>0)
     const avgAvulso = last3.length>0 ? last3.reduce((a,b)=>a+b,0)/last3.length : 0
 
-    const fixedExp = recorrentes.reduce((a,b)=>a+b.value,0)
-    const fixedRec = recorrenteRec.reduce((a,b)=>a+b.value,0)
+    const fixedExp = recorrentes.reduce((a,b)=>a+Number(b.value||0),0)
+    const fixedRec = recorrenteRec.reduce((a,b)=>a+Number(b.value||0),0)
 
     return Array.from({length:4},(_,i)=>{
       const ym  = addMonths(thisMonth,i+1)
@@ -476,7 +481,7 @@ export default function AuryMoney() {
 
   // ── Card balances ──────────────────────────────────────────────────────────
   const cardFaturaMonth = (cardKey, ym) =>
-    records.filter(r=>r.date?.startsWith(ym)&&r.type==="despesa"&&(r.card===cardKey||r.bank===cardKey)).reduce((a,b)=>a+b.value,0)
+    records.filter(r=>r.date?.startsWith(ym)&&r.type==="despesa"&&(r.card===cardKey||r.bank===cardKey)).reduce((a,b)=>a+Number(b.value||0),0)
 
   // ── Alerts ─────────────────────────────────────────────────────────────────
   const alerts = useMemo(()=>{
@@ -496,11 +501,13 @@ export default function AuryMoney() {
   },[records,thisMonth,totalRec,totalExp,savePct,faltando])
 
   // ── Filtered records ───────────────────────────────────────────────────────
-  const filtered = useMemo(()=>records.filter(r=>
-    (fType==="todos"||r.type===fType)&&
-    (fCard==="todos"||r.card===fCard)&&
-    (fCat ==="todos"||r.category===fCat)
-  ),[records,fType,fCard,fCat])
+  const filtered = useMemo(()=>records.filter(r=>{
+    const cardKey  = r.card || r.bank || ""
+    const bankName = CARDS[cardKey]?.name || ""
+    const owner    = CARDS[cardKey]?.owner || ""
+    const bankMatch  = fCard==="todos" || bankName===fCard || owner===fCard
+    return (fType==="todos"||r.type===fType) && bankMatch && (fCat==="todos"||r.category===fCat)
+  }),[records,fType,fCard,fCat])
 
   // ── CRUD ───────────────────────────────────────────────────────────────────
   async function handleSave() {
@@ -680,7 +687,7 @@ Para REGISTRAR responda SOMENTE com JSON:
 
           {/* Evolução 6 meses */}
           <div className="card">
-            <div className="sec">Evolução 6 meses</div>
+            <div className="sec">Visão 6 meses — 3 passados · atual · 2 futuros</div>
             <BarPair data={hist6}/>
             <BarLabels data={hist6}/>
             <div style={{display:"flex",gap:14,marginTop:8}}>
@@ -883,10 +890,18 @@ Para REGISTRAR responda SOMENTE com JSON:
             {[["todos","Todos"],["receita","Receitas"],["despesa","Despesas"]].map(([v,l])=>(
               <button key={v} className={`fb ${fType===v?"on":""}`} onClick={()=>setFType(v)}>{l}</button>
             ))}
-            {Object.entries(CARDS).map(([k,c])=>(
-              <button key={k} className={`fb ${fCard===k?"on":""}`}
-                style={fCard===k?{background:c.color,borderColor:"transparent"}:{}}
-                onClick={()=>setFCard(fCard===k?"todos":k)}>{c.name} ({c.owner})</button>
+            {["Nubank","Inter","Mercado Pago","PicPay"].map(name=>{
+              const color = Object.values(CARDS).find(c=>c.name===name)?.color
+              return (
+                <button key={name} className={`fb ${fCard===name?"on":""}`}
+                  style={fCard===name?{background:color,borderColor:"transparent"}:{}}
+                  onClick={()=>setFCard(fCard===name?"todos":name)}>{name}</button>
+              )
+            })}
+            {["Lenin","Evelyn"].map(owner=>(
+              <button key={owner} className={`fb ${fCard===owner?"on":""}`}
+                style={fCard===owner?{background:owner==="Lenin"?"#A78BFA":"#F472B6",borderColor:"transparent"}:{}}
+                onClick={()=>setFCard(fCard===owner?"todos":owner)}>{owner}</button>
             ))}
             {[...CATS.despesa,...CATS.receita].map(c=>(
               <button key={c.id} className={`fb ${fCat===c.id?"on":""}`} onClick={()=>setFCat(fCat===c.id?"todos":c.id)}>{c.emoji} {c.label.split("/")[0]}</button>
@@ -896,7 +911,7 @@ Para REGISTRAR responda SOMENTE com JSON:
           :filtered.length===0?<div className="empty"><div style={{fontSize:32,marginBottom:8}}>📭</div>Nenhum registro</div>
           :<>
             {filtered.filter(r=>r.recorrente).length>0&&<>
-              <div className="rgl">↻ Recorrentes — {fmt(filtered.filter(r=>r.recorrente).reduce((a,b)=>a+b.value,0))}</div>
+              <div className="rgl">↻ Recorrentes — {fmt(filtered.filter(r=>r.recorrente).reduce((a,b)=>a+Number(b.value||0),0))}</div>
               {filtered.filter(r=>r.recorrente).map(r=><RecItem key={r.id} r={r}/>)}
             </>}
             {filtered.filter(r=>!r.recorrente).length>0&&<>
