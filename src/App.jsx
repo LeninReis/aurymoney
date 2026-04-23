@@ -698,30 +698,42 @@ Para REGISTRAR responda SOMENTE com JSON:
                 <span style={{width:8,height:8,borderRadius:"50%",background:"var(--rd)",display:"inline-block"}}/>Despesas
               </span>
             </div>
-            {/* Linha total despesas */}
+            {/* Linha total despesas — começa do primeiro mês com dados */}
             <div style={{marginTop:12,paddingTop:12,borderTop:"1px solid var(--bd)"}}>
               <div style={{fontSize:9,color:"var(--rd)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:6,fontWeight:700}}>Total de Despesas / Mês</div>
-              <LineChart points={hist6.map(m=>({value:m.exp,label:m.label}))} color="#F87171" height={56}/>
-              <div style={{display:"flex",justifyContent:"space-between",marginTop:3}}>
-                {hist6.map(m=>(
-                  <div key={m.ym} style={{flex:1,textAlign:"center",fontSize:8,color:"rgba(255,255,255,.3)"}}>{m.label}</div>
-                ))}
-              </div>
-              <div style={{display:"flex",justifyContent:"space-between",marginTop:6}}>
-                {hist6.map(m=>(
-                  <div key={m.ym} style={{flex:1,textAlign:"center",fontSize:8,color:m.exp>0?"var(--rd)":"rgba(255,255,255,.2)",fontWeight:600}}>{m.exp>0?fmt(m.exp).replace("R$","").trim():"-"}</div>
-                ))}
-              </div>
+              {(()=>{
+                const withData = hist6.filter(m=>m.exp>0)
+                if(withData.length===0) return <div style={{fontSize:11,color:"var(--mt)"}}>Nenhuma despesa registrada ainda</div>
+                return(<>
+                  <LineChart points={withData.map(m=>({value:m.exp,label:m.label}))} color="#F87171" height={56}/>
+                  <div style={{display:"flex",justifyContent:"space-between",marginTop:3}}>
+                    {withData.map(m=>(
+                      <div key={m.ym} style={{flex:1,textAlign:"center",fontSize:8,color:m.isCurrent?"var(--pu)":m.isFuture?"rgba(255,255,255,.25)":"rgba(255,255,255,.4)",fontWeight:m.isCurrent?700:400}}>{m.label}</div>
+                    ))}
+                  </div>
+                  <div style={{display:"flex",justifyContent:"space-between",marginTop:4}}>
+                    {withData.map(m=>(
+                      <div key={m.ym} style={{flex:1,textAlign:"center",fontSize:8,color:"var(--rd)",fontWeight:600}}>{fmt(m.exp).replace("R$\u00a0","").replace("R$ ","").trim()}</div>
+                    ))}
+                  </div>
+                </>)
+              })()}
             </div>
-            {/* Saldo mensal linha */}
+            {/* Saldo mensal linha — começa do primeiro mês com dados */}
             <div style={{marginTop:12,paddingTop:12,borderTop:"1px solid var(--bd)"}}>
               <div style={{fontSize:9,color:"var(--pu)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:6,fontWeight:700}}>Saldo Mensal</div>
-              <LineChart points={hist6.map(m=>({value:m.saldo,label:m.label}))} color="var(--pu)" height={50}/>
-              <div style={{display:"flex",justifyContent:"space-between",marginTop:3}}>
-                {hist6.map(m=>(
-                  <div key={m.ym} style={{flex:1,textAlign:"center",fontSize:8,color:"rgba(255,255,255,.3)"}}>{m.label}</div>
-                ))}
-              </div>
+              {(()=>{
+                const withData = hist6.filter(m=>m.rec>0||m.exp>0)
+                if(withData.length===0) return <div style={{fontSize:11,color:"var(--mt)"}}>Nenhum dado ainda</div>
+                return(<>
+                  <LineChart points={withData.map(m=>({value:m.saldo,label:m.label}))} color="var(--pu)" height={50}/>
+                  <div style={{display:"flex",justifyContent:"space-between",marginTop:3}}>
+                    {withData.map(m=>(
+                      <div key={m.ym} style={{flex:1,textAlign:"center",fontSize:8,color:m.isCurrent?"var(--pu)":m.isFuture?"rgba(255,255,255,.25)":"rgba(255,255,255,.4)",fontWeight:m.isCurrent?700:400}}>{m.label}</div>
+                    ))}
+                  </div>
+                </>)
+              })()}
             </div>
           </div>
 
