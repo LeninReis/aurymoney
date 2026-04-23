@@ -436,15 +436,16 @@ export default function AuryMoney() {
   // Saldo faltante do mês atual (quanto precisa de renda extra pra fechar no zero)
   const faltando = tm.saldo < 0 ? Math.abs(tm.saldo) : 0
 
-  // ── 6-month history (oldest → newest = left → right) ─────────────────────
+  // ── 6-month history: abril (atual) na esquerda → novembro na direita ─────────
   const hist6 = useMemo(()=>{
-    // i=0 = mês atual (abril) na esquerda, i=5 = 5 meses atrás na direita
     return Array.from({length:6},(_,i)=>{
-      const ym = addMonths(thisMonth, -i)
-      const d  = getMonthData(ym)
-      return { ym, label:monthShort(ym), ...d }
-    }).reverse() // mais antigo → mais recente (esq → dir), mas queremos atual na esquerda
-    // então NÃO revertemos: i=0 é atual (esquerda), i=5 é mais antigo (direita)
+      const ym = addMonths(thisMonth, -i)   // i=0=atual, i=1=mês anterior, etc
+      const rs = records.filter(r=>r.date?.startsWith(ym))
+      const rec = rs.filter(r=>r.type==="receita").reduce((a,b)=>a+b.value,0)
+      const exp = rs.filter(r=>r.type==="despesa").reduce((a,b)=>a+b.value,0)
+      return { ym, label:monthShort(ym), rec, exp, saldo:rec-exp }
+    })
+    // NÃO revertemos: i=0 (atual/abril) fica na esquerda
   },[records])
 
   // ── Projection: next 4 months ──────────────────────────────────────────────
