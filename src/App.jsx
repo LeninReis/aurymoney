@@ -438,11 +438,13 @@ export default function AuryMoney() {
 
   // ── 6-month history (oldest → newest = left → right) ─────────────────────
   const hist6 = useMemo(()=>{
+    // i=0 = mês atual (abril) na esquerda, i=5 = 5 meses atrás na direita
     return Array.from({length:6},(_,i)=>{
-      const ym  = addMonths(thisMonth, i-5)
-      const d   = getMonthData(ym)
+      const ym = addMonths(thisMonth, -i)
+      const d  = getMonthData(ym)
       return { ym, label:monthShort(ym), ...d }
-    })
+    }).reverse() // mais antigo → mais recente (esq → dir), mas queremos atual na esquerda
+    // então NÃO revertemos: i=0 é atual (esquerda), i=5 é mais antigo (direita)
   },[records])
 
   // ── Projection: next 4 months ──────────────────────────────────────────────
@@ -473,7 +475,7 @@ export default function AuryMoney() {
 
   // ── Card balances ──────────────────────────────────────────────────────────
   const cardFaturaMonth = (cardKey, ym) =>
-    records.filter(r=>r.date?.startsWith(ym)&&r.type==="despesa"&&r.card===cardKey).reduce((a,b)=>a+b.value,0)
+    records.filter(r=>r.date?.startsWith(ym)&&r.type==="despesa"&&(r.card===cardKey||r.bank===cardKey)).reduce((a,b)=>a+b.value,0)
 
   // ── Alerts ─────────────────────────────────────────────────────────────────
   const alerts = useMemo(()=>{
@@ -559,7 +561,8 @@ Para REGISTRAR responda SOMENTE com JSON:
 
   // ── RecItem ────────────────────────────────────────────────────────────────
   function RecItem({r}){
-    const card=CARDS[r.card], cat=CAT_MAP[r.category]
+    const cardKey = r.card || r.bank
+    const card=CARDS[cardKey], cat=CAT_MAP[r.category]
     return(
       <div className="ri">
         <div className="ric" style={{background:r.type==="receita"?"rgba(52,211,153,.1)":"rgba(248,113,113,.1)"}}>{cat?.emoji||"📌"}</div>
