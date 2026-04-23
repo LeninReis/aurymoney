@@ -408,13 +408,19 @@ export default function AuryMoney() {
     return onSnapshot(q, snap => { setRecs(snap.docs.map(d=>({id:d.id,...d.data()}))); setLoad(false) })
   }, [])
 
-  // Auto-fill description when card+date changes
+  // Auto-fill descrição apenas quando trocar cartão ou data (não interfere com digitação)
+  const prevCardRef = useRef(form.card)
+  const prevDateRef = useRef(form.date)
   useEffect(() => {
-    if (form.type === "despesa" && form.category === "cartao" && form.card && form.date) {
+    const cardChanged = form.card !== prevCardRef.current
+    const dateChanged = form.date !== prevDateRef.current
+    prevCardRef.current = form.card
+    prevDateRef.current = form.date
+    if ((cardChanged || dateChanged) && form.type === "despesa" && form.category === "cartao") {
       const desc = autoDesc(form.card, form.date)
       if (desc) setForm(f => ({...f, desc}))
     }
-  }, [form.card, form.date, form.category, form.type])
+  }, [form.card, form.date])
 
   const showToast = m => { setToast(m); setTimeout(()=>setToast(""),2200) }
   const setF = (k,v) => setForm(f=>({...f,[k]:v}))
@@ -603,10 +609,9 @@ Para REGISTRAR responda SOMENTE com JSON:
     {id:"chat",     lbl:"Aury IA",ico:"✦"},
   ]
 
-  // ── Content renderer ───────────────────────────────────────────────────────
-  function Content(){
-    return(
-      <div className={`content${isMobile?"":" with-sidebar"}`}>
+  // ── Content JSX ────────────────────────────────────────────────────────────
+  const contentJSX = (
+    <>
 
         {/* ── DASHBOARD ── */}
         {tab==="dashboard"&&(loading?<div className="ld"><div className="sp"/>Carregando...</div>:<>
@@ -1026,32 +1031,8 @@ Para REGISTRAR responda SOMENTE com JSON:
           </div>
         </>}
 
-      </div>
-    )
-  }
-
-  // ── Desktop sidebar ────────────────────────────────────────────────────────
-  function Sidebar(){
-    return(
-      <div className="sidebar">
-        <div style={{fontSize:16,fontWeight:800,background:"linear-gradient(135deg,var(--pu),var(--pk))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",marginBottom:16,paddingLeft:14}}>Aury Money</div>
-        {TABS.map(t=>(
-          <button key={t.id} className={`sb-btn ${tab===t.id?"on":""}`} onClick={()=>{setTab(t.id);if(t.id!=="adicionar")setEditId(null)}}>
-            <span className="sb-ico">{t.ico}</span>{t.lbl}
-          </button>
-        ))}
-        <div style={{marginTop:"auto",paddingLeft:14,paddingTop:20}}>
-          <div style={{fontSize:9,color:"var(--mt)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:6}}>Financeiro</div>
-          <div style={{fontSize:12,color:saldo>=0?"var(--gn)":"var(--rd)",fontWeight:700}}>{fmt(saldo)}</div>
-          <div style={{fontSize:9,color:"var(--mt)"}}>saldo total</div>
-          {faltando>0&&<>
-            <div style={{fontSize:12,color:"var(--rd)",fontWeight:700,marginTop:8}}>{fmt(faltando)}</div>
-            <div style={{fontSize:9,color:"var(--mt)"}}>faltam este mês</div>
-          </>}
-        </div>
-      </div>
-    )
-  }
+    </>
+  )
 
   return(
     <>
@@ -1080,8 +1061,28 @@ Para REGISTRAR responda SOMENTE com JSON:
           </div>
         </header>
 
-        {!isMobile&&<Sidebar/>}
-        <Content/>
+        {!isMobile&&(
+          <div className="sidebar">
+            <div style={{fontSize:16,fontWeight:800,background:"linear-gradient(135deg,var(--pu),var(--pk))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",marginBottom:16,paddingLeft:14}}>Aury Money</div>
+            {TABS.map(t=>(
+              <button key={t.id} className={`sb-btn ${tab===t.id?"on":""}`} onClick={()=>{setTab(t.id);if(t.id!=="adicionar")setEditId(null)}}>
+                <span className="sb-ico">{t.ico}</span>{t.lbl}
+              </button>
+            ))}
+            <div style={{marginTop:"auto",paddingLeft:14,paddingTop:20}}>
+              <div style={{fontSize:9,color:"var(--mt)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:6}}>Financeiro</div>
+              <div style={{fontSize:12,color:saldo>=0?"var(--gn)":"var(--rd)",fontWeight:700}}>{fmt(saldo)}</div>
+              <div style={{fontSize:9,color:"var(--mt)"}}>saldo total</div>
+              {faltando>0&&<>
+                <div style={{fontSize:12,color:"var(--rd)",fontWeight:700,marginTop:8}}>{fmt(faltando)}</div>
+                <div style={{fontSize:9,color:"var(--mt)"}}>faltam este mês</div>
+              </>}
+            </div>
+          </div>
+        )}
+        <div className={`content${isMobile?"":" with-sidebar"}`}>
+          {contentJSX}
+        </div>
 
         {isMobile&&(
           <nav className="nav">
