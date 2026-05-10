@@ -639,23 +639,23 @@ export default function AuryMoney() {
 
           {/* Hero saldo */}
           <div className="hero">
-            <div className="h-lbl">Saldo do Casal</div>
-            <div className={`h-val ${saldo>0?"pos":saldo<0?"neg":"warn"}`}>{fmt(saldo)}</div>
+            <div className="h-lbl">Saldo Acumulado · {monthLabel(thisMonth)}</div>
+            <div className={`h-val ${agSaldoAcumulado>0?"pos":agSaldoAcumulado<0?"neg":"warn"}`}>{fmt(agSaldoAcumulado)}</div>
             <div style={{marginTop:10,display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
-              <span style={{fontSize:10,color:"var(--mt)"}}>Poupança atual:</span>
-              <span style={{fontSize:12,fontWeight:700,color:savePct>=20?"var(--gn)":savePct>=10?"var(--yw)":"var(--rd)"}}>{savePct}%</span>
-              <span style={{fontSize:10,color:"var(--mt)",marginLeft:"auto"}}>Meta: 20%</span>
+              <span style={{fontSize:10,color:"var(--mt)"}}>Saldo do mês:</span>
+              <span style={{fontSize:12,fontWeight:700,color:tm.saldo>=0?"var(--gn)":"var(--rd)"}}>{fmt(tm.saldo)}</span>
+              <span style={{fontSize:10,color:"var(--mt)",marginLeft:"auto"}}>Acumulado até hoje</span>
             </div>
             <div className="pbar">
-              <div className="pfill" style={{width:`${savePct}%`,background:savePct>=20?"linear-gradient(90deg,var(--gn),#059669)":savePct>=10?"linear-gradient(90deg,var(--yw),#d97706)":"linear-gradient(90deg,var(--rd),#dc2626)"}}/>
+              <div className="pfill" style={{width:`${Math.min(100,Math.abs(agSaldoAcumulado/50))}%`,background:agSaldoAcumulado>=0?"linear-gradient(90deg,var(--gn),#059669)":"linear-gradient(90deg,var(--rd),#dc2626)"}}/>
             </div>
           </div>
 
-          {/* Totais */}
+          {/* Totais do mês */}
           <div className="g3">
-            <div className="mc"><div className="ml">↑ Receitas</div><div className="mv" style={{color:"var(--gn)"}}>{fmt(totalRec)}</div></div>
-            <div className="mc"><div className="ml">↓ Despesas</div><div className="mv" style={{color:"var(--rd)"}}>{fmt(totalExp)}</div></div>
-            <div className="mc"><div className="ml">Saldo</div><div className="mv" style={{color:saldo>=0?"var(--gn)":"var(--rd)"}}>{fmt(saldo)}</div></div>
+            <div className="mc"><div className="ml">↑ Receitas</div><div className="mv" style={{color:"var(--gn)"}}>{fmt(tm.rec)}</div></div>
+            <div className="mc"><div className="ml">↓ Despesas</div><div className="mv" style={{color:"var(--rd)"}}>{fmt(tm.exp)}</div></div>
+            <div className="mc"><div className="ml">Saldo do Mês</div><div className="mv" style={{color:tm.saldo>=0?"var(--gn)":"var(--rd)"}}>{fmt(tm.saldo)}</div></div>
           </div>
 
           {/* Mês atual com saldo faltante */}
@@ -1040,361 +1040,274 @@ export default function AuryMoney() {
           {editId&&<button className="cbtn" onClick={()=>{setEditId(null);setForm({type:"despesa",desc:"",value:"",category:"cartao",date:todayStr(),card:"nubank_l",shared:false,recorrente:false})}}>Cancelar</button>}
         </>}
 
-        {/* ── JARDIM DA PROSPERIDADE ── */}
-        {tab==="jardim"&&<>
-          <div style={{marginBottom:16}}>
-            <div className="pt">🌸 Jardim da Prosperidade</div>
-            <div style={{fontSize:11,color:"var(--mt)",lineHeight:1.6}}>
-              Seu jardim cresce conforme seu saldo aumenta! Quanto mais você economiza, mais flores, borboletas e pássaros aparecem 🦋
+// 🌸 JARDIM DA PROSPERIDADE - VERSÃO MÁGICA/COZY
+// Cole este código no lugar da seção {tab==="jardim"&&<>...</>} no seu App.jsx
+
+{tab==="jardim"&&<>
+  <div style={{marginBottom:16}}>
+    <div className="pt">🌸 Jardim da Prosperidade</div>
+    <div style={{fontSize:11,color:"var(--mt)",lineHeight:1.6}}>
+      Seu jardim cresce conforme você economiza neste mês! Cada real guardado floresce em magia ✨
+    </div>
+  </div>
+
+  {/* Sistema baseado no SALDO DO MÊS ATUAL (tm.saldo) */}
+  {(()=>{
+    // Níveis mágicos com cores místicas
+    const niveis = [
+      {min:-999999,max:0,nome:"Terra Árida 🏜️",desc:"Aguardando a primeira economia",cor1:"#8B4513",cor2:"#A0522D",bg:"linear-gradient(180deg,#D4A574 0%,#C9A876 60%,#8B7355 100%)"},
+      {min:0,max:400,nome:"Semente Plantada 🌱",desc:"Um broto de esperança surge",cor1:"#7CB342",cor2:"#AED581",bg:"linear-gradient(180deg,#B4E1FF 0%,#E1F5FE 40%,#C8E6C9 100%)"},
+      {min:400,max:1000,nome:"Jardim Florescente 🌿",desc:"A vida começa a desabrochar",cor1:"#00C853",cor2:"#69F0AE",bg:"linear-gradient(180deg,#81D4FA 0%,#B3E5FC 40%,#A5D6A7 100%)"},
+      {min:1000,max:2000,nome:"Prado Encantado 🌺",desc:"Flores mágicas iluminam",cor1:"#E91E63",cor2:"#F06292",bg:"linear-gradient(180deg,#90CAF9 0%,#CE93D8 50%,#F48FB1 100%)"},
+      {min:2000,max:3500,nome:"Bosque Místico 🌳",desc:"Árvores ancestrais trazem sabedoria",cor1:"#7B1FA2",cor2:"#BA68C8",bg:"linear-gradient(180deg,#9FA8DA 0%,#B39DDB 50%,#CE93D8 100%)"},
+      {min:3500,max:5500,nome:"Santuário Celestial ✨",desc:"Magia pura permeia o ar",cor1:"#304FFE",cor2:"#7C4DFF",bg:"linear-gradient(180deg,#7986CB 0%,#9575CD 50%,#BA68C8 100%)"},
+      {min:5500,max:999999,nome:"Éden Etéreo 🌌",desc:"Perfeição absoluta alcançada",cor1:"#FFD700",cor2:"#FFB74D",bg:"linear-gradient(180deg,#FFE082 0%,#FFCC80 50%,#FFAB91 100%)"}
+    ]
+    
+    const saldoMes = Math.max(0, tm.saldo) // SALDO DO MÊS ATUAL!!
+    const nivel = niveis.find(n=>saldoMes>=n.min&&saldoMes<n.max)||niveis[niveis.length-1]
+    const nIdx = niveis.indexOf(nivel)
+    const prog = nivel.max===999999?100:Math.min(100,Math.max(0,((saldoMes-nivel.min)/(nivel.max-nivel.min))*100))
+    const prox = nIdx<niveis.length-1?niveis[nIdx+1]:null
+    
+    // Elementos baseados no saldo do mês
+    const flores = Math.min(30,Math.max(0,Math.floor(saldoMes/80)))
+    const borboletas = Math.min(15,Math.max(0,Math.floor((saldoMes-400)/200)))
+    const vagalumes = Math.min(35,Math.max(0,Math.floor((saldoMes-200)/60)))
+    const arvores = Math.min(8,Math.max(0,Math.floor((saldoMes-1000)/500)))
+    const cascata = saldoMes>=3000
+    const arcoiris = saldoMes>=4500
+    
+    return(<>
+      {/* Card de Nível */}
+      <div style={{background:`linear-gradient(135deg,${nivel.cor1}20,${nivel.cor2}30)`,border:`2px solid ${nivel.cor1}50`,borderRadius:20,padding:20,position:"relative",overflow:"hidden",marginBottom:16}}>
+        {/* Partículas mágicas */}
+        <div style={{position:"absolute",inset:0,opacity:.2,pointerEvents:"none"}}>
+          {Array.from({length:12}).map((_,i)=>(
+            <div key={i} style={{position:"absolute",width:3+Math.random()*5,height:3+Math.random()*5,background:`radial-gradient(circle,${nivel.cor2},transparent)`,borderRadius:"50%",left:`${Math.random()*100}%`,top:`${Math.random()*100}%`,animation:`sparkle ${2+Math.random()*3}s ease-in-out infinite`,animationDelay:`${Math.random()*2}s`,filter:"blur(.5px)"}}/>
+          ))}
+        </div>
+
+        <div style={{position:"relative",zIndex:1}}>
+          <div style={{fontSize:10,color:"rgba(255,255,255,.7)",marginBottom:4,letterSpacing:1.5}}>NÍVEL ATUAL · {monthLabel(thisMonth).toUpperCase()}</div>
+          <div style={{fontSize:26,fontWeight:800,marginBottom:4,background:`linear-gradient(135deg,${nivel.cor1},${nivel.cor2})`,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>{nivel.nome}</div>
+          <div style={{fontSize:12,color:"rgba(255,255,255,.8)",marginBottom:16}}>{nivel.desc}</div>
+          
+          <div style={{marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <span style={{fontSize:11,color:"rgba(255,255,255,.7)"}}>{prox?`Próximo: ${prox.nome}`:"✨ Nível Máximo!"}</span>
+            <span style={{fontSize:13,fontWeight:700,color:nivel.cor2}}>{Math.round(prog)}%</span>
+          </div>
+          
+          <div style={{background:"rgba(0,0,0,.25)",borderRadius:99,height:14,overflow:"hidden",position:"relative",boxShadow:"inset 0 2px 4px rgba(0,0,0,.2)"}}>
+            <div style={{background:`linear-gradient(90deg,${nivel.cor1},${nivel.cor2})`,height:"100%",width:`${prog}%`,borderRadius:99,transition:"width 1.2s cubic-bezier(.34,1.56,.64,1)",boxShadow:`0 0 20px ${nivel.cor2}60`,position:"relative",overflow:"hidden"}}>
+              <div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent)",animation:"shimmer 2s infinite"}}/>
             </div>
           </div>
+          
+          {prox&&<div style={{fontSize:10,color:"rgba(255,255,255,.6)",marginTop:8,textAlign:"center"}}>Faltam {fmt(Math.max(0,prox.min-saldoMes))} para {prox.nome}</div>}
+        </div>
+      </div>
 
-          {/* Barra de Progresso de Nível */}
-          {(()=>{
-            const niveis = [
-              {min:0,max:500,nome:"Semente 🌱",desc:"Começando a plantar"},
-              {min:500,max:1500,nome:"Broto 🌿",desc:"Primeiros sinais de vida"},
-              {min:1500,max:3000,nome:"Jardim Jovem 🌻",desc:"Crescendo firme"},
-              {min:3000,max:5000,nome:"Jardim Florido 🌺",desc:"Beleza em expansão"},
-              {min:5000,max:8000,nome:"Paraíso Verde 🌳",desc:"Prosperidade abundante"},
-              {min:8000,max:15000,nome:"Oásis Mágico ✨",desc:"Riqueza florescendo"},
-              {min:15000,max:999999999,nome:"Éden Dourado 👑",desc:"Fartura máxima alcançada!"}
-            ]
-            
-            const saldoTotal = Math.max(0, saldo)
-            const nivelAtual = niveis.find(n=>saldoTotal>=n.min&&saldoTotal<n.max)||niveis[niveis.length-1]
-            const nivelIndex = niveis.indexOf(nivelAtual)
-            const progresso = nivelAtual.max===999999999 ? 100 : Math.min(100,((saldoTotal-nivelAtual.min)/(nivelAtual.max-nivelAtual.min))*100)
-            const proximo = nivelIndex<niveis.length-1?niveis[nivelIndex+1]:null
-            
-            return(<>
-              <div className="hero" style={{background:"linear-gradient(135deg,#0d3b2e,#1a5f4a)",border:"1px solid rgba(52,211,153,.2)"}}>
-                <div style={{position:"relative",zIndex:1}}>
-                  <div style={{fontSize:11,color:"rgba(255,255,255,.6)",marginBottom:4}}>NÍVEL ATUAL</div>
-                  <div style={{fontSize:22,fontWeight:800,marginBottom:2}}>{nivelAtual.nome}</div>
-                  <div style={{fontSize:11,color:"rgba(255,255,255,.7)",marginBottom:12}}>{nivelAtual.desc}</div>
-                  
-                  <div style={{marginBottom:6,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                    <span style={{fontSize:10,color:"rgba(255,255,255,.6)"}}>
-                      {proximo?`Próximo: ${proximo.nome}`:"Nível Máximo Alcançado! 🎉"}
-                    </span>
-                    <span style={{fontSize:11,fontWeight:700,color:"var(--gn)"}}>{Math.round(progresso)}%</span>
-                  </div>
-                  
-                  <div style={{background:"rgba(0,0,0,.3)",borderRadius:99,height:12,overflow:"hidden",position:"relative"}}>
-                    <div style={{
-                      background:"linear-gradient(90deg,var(--gn),#10b981,#6ee7b7)",
-                      height:"100%",
-                      width:`${progresso}%`,
-                      borderRadius:99,
-                      transition:"width 1s ease",
-                      boxShadow:"0 0 12px rgba(52,211,153,.5)"
-                    }}/>
-                  </div>
-                  
-                  {proximo&&<div style={{fontSize:10,color:"rgba(255,255,255,.5)",marginTop:6}}>
-                    Faltam {fmt(Math.max(0,proximo.min-saldoTotal))} para o próximo nível
-                  </div>}
-                </div>
-              </div>
-            </>)
-          })()}
-
-          {/* Jardim Animado */}
-          <div style={{
-            position:"relative",
-            background:"linear-gradient(180deg,#87CEEB 0%,#E0F6FF 40%,#90EE90 100%)",
-            borderRadius:18,
-            padding:20,
-            minHeight:400,
-            overflow:"hidden",
-            marginTop:16,
-            border:"2px solid rgba(52,211,153,.3)"
-          }}>
-            
-            {/* Sol */}
-            <div style={{
-              position:"absolute",
-              top:20,
-              right:30,
-              width:60,
-              height:60,
-              background:"radial-gradient(circle,#FFD700,#FFA500)",
-              borderRadius:"50%",
-              boxShadow:"0 0 30px rgba(255,215,0,.6)",
-              animation:"pulse 3s ease-in-out infinite"
-            }}/>
-
-            {/* Nuvens */}
-            {[1,2,3].map(i=>(
-              <div key={`nuvem${i}`} style={{
-                position:"absolute",
-                top:30+i*20,
-                left:`${i*30}%`,
-                width:80,
-                height:30,
-                background:"rgba(255,255,255,.7)",
-                borderRadius:"50%",
-                animation:`float ${4+i}s ease-in-out infinite`,
-                animationDelay:`${i*0.5}s`
-              }}>
-                <div style={{position:"absolute",width:50,height:30,background:"rgba(255,255,255,.7)",borderRadius:"50%",left:20,top:5}}/>
-                <div style={{position:"absolute",width:40,height:25,background:"rgba(255,255,255,.7)",borderRadius:"50%",left:45,top:8}}/>
-              </div>
-            ))}
-
-            {/* Grama no fundo */}
-            <div style={{
-              position:"absolute",
-              bottom:0,
-              left:0,
-              right:0,
-              height:"30%",
-              background:"linear-gradient(180deg,rgba(34,139,34,.6),#228B22)",
-              borderRadius:"0 0 18px 18px"
-            }}/>
-
-            {/* Flores - quantidade baseada no saldo */}
-            {Array.from({length:Math.min(20,Math.floor(saldo/200)+1)}).map((_,i)=>{
-              const cores=["#FF69B4","#FF1493","#FFB6C1","#FF69B4","#FFC0CB","#DA70D6","#BA55D3"]
-              const cor=cores[i%cores.length]
-              const left=15+((i*37)%(100-20))
-              const size=20+Math.random()*15
-              const delay=i*0.3
-              
-              return(
-                <div key={`flor${i}`} style={{
-                  position:"absolute",
-                  bottom:80+Math.random()*100,
-                  left:`${left}%`,
-                  animation:`sway ${2+Math.random()}s ease-in-out infinite`,
-                  animationDelay:`${delay}s`
-                }}>
-                  {/* Caule */}
-                  <div style={{width:3,height:40,background:"#2d5016",margin:"0 auto",borderRadius:2}}/>
-                  {/* Flor */}
-                  <div style={{
-                    width:size,
-                    height:size,
-                    background:cor,
-                    borderRadius:"50%",
-                    position:"relative",
-                    top:-20,
-                    left:"50%",
-                    transform:"translateX(-50%)",
-                    boxShadow:`0 0 10px ${cor}`,
-                  }}>
-                    <div style={{position:"absolute",width:"100%",height:"100%",top:0,left:0}}>
-                      {[0,72,144,216,288].map(ang=>(
-                        <div key={ang} style={{
-                          position:"absolute",
-                          width:"60%",
-                          height:"60%",
-                          background:cor,
-                          borderRadius:"50%",
-                          top:"50%",
-                          left:"50%",
-                          transform:`translate(-50%,-50%) rotate(${ang}deg) translateY(-40%)`
-                        }}/>
-                      ))}
-                    </div>
-                    {/* Centro amarelo */}
-                    <div style={{
-                      position:"absolute",
-                      width:"40%",
-                      height:"40%",
-                      background:"#FFD700",
-                      borderRadius:"50%",
-                      top:"50%",
-                      left:"50%",
-                      transform:"translate(-50%,-50%)",
-                      zIndex:2
-                    }}/>
-                  </div>
-                </div>
-              )
-            })}
-
-            {/* Borboletas - aparecem a partir de R$ 1000 */}
-            {saldo>=1000&&Array.from({length:Math.min(8,Math.floor(saldo/1000))}).map((_,i)=>{
-              const cores=[
-                ["#FF1493","#FF69B4"],
-                ["#9370DB","#BA55D3"],
-                ["#FF6347","#FF7F50"],
-                ["#00CED1","#48D1CC"],
-                ["#FFD700","#FFA500"]
-              ]
-              const [cor1,cor2]=cores[i%cores.length]
-              const startX=Math.random()*80
-              const startY=20+Math.random()*150
-              const duration=8+Math.random()*4
-              
-              return(
-                <div key={`borb${i}`} style={{
-                  position:"absolute",
-                  left:`${startX}%`,
-                  top:startY,
-                  animation:`butterfly ${duration}s linear infinite`,
-                  animationDelay:`${i*1.2}s`
-                }}>
-                  <div style={{position:"relative",width:20,height:20,animation:"flutter .3s ease-in-out infinite"}}>
-                    {/* Asa esquerda */}
-                    <div style={{
-                      position:"absolute",
-                      width:10,
-                      height:15,
-                      background:`linear-gradient(135deg,${cor1},${cor2})`,
-                      borderRadius:"50% 0 50% 0",
-                      left:0,
-                      transformOrigin:"right center",
-                      boxShadow:`0 0 8px ${cor1}`
-                    }}/>
-                    {/* Asa direita */}
-                    <div style={{
-                      position:"absolute",
-                      width:10,
-                      height:15,
-                      background:`linear-gradient(135deg,${cor1},${cor2})`,
-                      borderRadius:"0 50% 0 50%",
-                      right:0,
-                      transformOrigin:"left center",
-                      boxShadow:`0 0 8px ${cor2}`
-                    }}/>
-                    {/* Corpo */}
-                    <div style={{
-                      position:"absolute",
-                      width:3,
-                      height:18,
-                      background:"#1a1a1a",
-                      left:"50%",
-                      top:"50%",
-                      transform:"translate(-50%,-50%)",
-                      borderRadius:99
-                    }}/>
-                  </div>
-                </div>
-              )
-            })}
-
-            {/* Pássaros - aparecem a partir de R$ 3000 */}
-            {saldo>=3000&&Array.from({length:Math.min(5,Math.floor(saldo/3000))}).map((_,i)=>(
-              <div key={`pass${i}`} style={{
-                position:"absolute",
-                left:`${20+i*15}%`,
-                top:40+Math.random()*80,
-                animation:`bird ${6+i}s linear infinite`,
-                animationDelay:`${i*2}s`
-              }}>
-                {/* Pássaro simplificado */}
-                <div style={{fontSize:20,transform:"scaleX(-1)"}}>🐦</div>
-              </div>
-            ))}
-
-            {/* Mensagem central quando saldo muito baixo */}
-            {saldo<100&&(
-              <div style={{
-                position:"absolute",
-                top:"50%",
-                left:"50%",
-                transform:"translate(-50%,-50%)",
-                textAlign:"center",
-                background:"rgba(255,255,255,.95)",
-                padding:"20px 30px",
-                borderRadius:16,
-                border:"2px solid var(--gn)",
-                boxShadow:"0 8px 24px rgba(0,0,0,.1)"
-              }}>
-                <div style={{fontSize:48,marginBottom:8}}>🌱</div>
-                <div style={{fontSize:16,fontWeight:700,color:"#2d5016",marginBottom:6}}>Plante sua primeira semente!</div>
-                <div style={{fontSize:12,color:"#666",lineHeight:1.5}}>
-                  Comece a economizar para ver seu jardim crescer.<br/>
-                  A cada R$ 200 economizados, uma nova flor aparece! 🌸
-                </div>
-              </div>
-            )}
-
-            {/* Animações CSS */}
-            <style>{`
-              @keyframes pulse {
-                0%, 100% { transform: scale(1); opacity: 1; }
-                50% { transform: scale(1.05); opacity: 0.9; }
-              }
-              @keyframes float {
-                0%, 100% { transform: translateY(0px); }
-                50% { transform: translateY(-15px); }
-              }
-              @keyframes sway {
-                0%, 100% { transform: rotate(-2deg); }
-                50% { transform: rotate(2deg); }
-              }
-              @keyframes butterfly {
-                0% { transform: translate(0, 0); }
-                25% { transform: translate(40px, -30px); }
-                50% { transform: translate(80px, 0px); }
-                75% { transform: translate(40px, 30px); }
-                100% { transform: translate(0, 0); }
-              }
-              @keyframes flutter {
-                0%, 100% { transform: scaleX(1); }
-                50% { transform: scaleX(0.8); }
-              }
-              @keyframes bird {
-                0% { transform: translateX(0) translateY(0); }
-                25% { transform: translateX(100px) translateY(-20px); }
-                50% { transform: translateX(200px) translateY(10px); }
-                75% { transform: translateX(300px) translateY(-15px); }
-                100% { transform: translateX(400px) translateY(0); opacity: 0; }
-              }
-            `}</style>
+      {/* JARDIM MÁGICO */}
+      <div style={{position:"relative",background:nivel.bg,borderRadius:20,minHeight:500,overflow:"hidden",border:`2px solid ${nivel.cor1}30`,boxShadow:"0 8px 32px rgba(0,0,0,.15)"}}>
+        
+        {/* Céu */}
+        <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(135,206,250,.3) 0%,transparent 50%)",pointerEvents:"none"}}/>
+        
+        {/* Sol mágico */}
+        <div style={{position:"absolute",top:30,right:40}}>
+          <div style={{width:70,height:70,background:"radial-gradient(circle,#FFD700,#FFA500)",borderRadius:"50%",boxShadow:"0 0 40px rgba(255,215,0,.6), 0 0 80px rgba(255,165,0,.3)",animation:"pulse 4s ease-in-out infinite"}}>
+            <div style={{position:"absolute",inset:-10,background:"radial-gradient(circle,rgba(255,215,0,.3),transparent 70%)",borderRadius:"50%",animation:"pulse 4s ease-in-out infinite reverse"}}/>
           </div>
+        </div>
 
-          {/* Informações do Jardim */}
-          <div className="card" style={{marginTop:16}}>
-            <div className="sec">📊 Estatísticas do Jardim</div>
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-              <div style={{background:"rgba(255,105,180,.08)",borderRadius:12,padding:12,border:"1px solid rgba(255,105,180,.2)"}}>
-                <div style={{fontSize:10,color:"var(--mt)",marginBottom:4}}>🌸 Flores</div>
-                <div style={{fontSize:20,fontWeight:700,color:"#FF69B4"}}>{Math.min(20,Math.floor(saldo/200)+1)}</div>
-                <div style={{fontSize:9,color:"var(--mt)",marginTop:2}}>+1 a cada R$ 200</div>
+        {/* Nuvens */}
+        {[1,2,3,4].map(i=>(
+          <div key={`nv${i}`} style={{position:"absolute",top:20+i*25,left:`${i*20}%`,display:"flex",gap:4,animation:`floatCloud ${5+i*1.5}s ease-in-out infinite`,animationDelay:`${i*0.8}s`,filter:"drop-shadow(0 2px 8px rgba(255,255,255,.4))"}}>
+            <div style={{width:60,height:24,background:"rgba(255,255,255,.75)",borderRadius:"50%"}}/>
+            <div style={{width:45,height:28,background:"rgba(255,255,255,.75)",borderRadius:"50%",marginTop:-4}}/>
+            <div style={{width:50,height:22,background:"rgba(255,255,255,.75)",borderRadius:"50%",marginTop:2}}/>
+          </div>
+        ))}
+
+        {/* Arco-íris */}
+        {arcoiris&&<div style={{position:"absolute",top:80,left:"20%",width:"60%",height:100,opacity:.6}}>
+          {["#FF0000","#FF7F00","#FFFF00","#00FF00","#0000FF","#4B0082","#9400D3"].map((c,i)=>(
+            <div key={c} style={{position:"absolute",width:"100%",height:15,background:`linear-gradient(90deg,transparent,${c}60,${c}80,${c}60,transparent)`,borderRadius:"50%",top:i*12,transform:`translateY(${i*2}px)`,animation:"rainbow 6s ease-in-out infinite",animationDelay:`${i*0.1}s`}}/>
+          ))}
+        </div>}
+
+        {/* Colinas */}
+        <div style={{position:"absolute",bottom:200,left:0,right:0,height:150}}>
+          <div style={{position:"absolute",bottom:0,left:"-10%",width:"50%",height:120,background:"rgba(76,175,80,.25)",borderRadius:"50%",filter:"blur(2px)"}}/>
+          <div style={{position:"absolute",bottom:0,right:"-10%",width:"60%",height:100,background:"rgba(139,195,74,.25)",borderRadius:"50%",filter:"blur(2px)"}}/>
+        </div>
+
+        {/* Cascata */}
+        {cascata&&<div style={{position:"absolute",top:150,right:50,width:40,height:200}}>
+          <div style={{position:"absolute",top:0,left:0,width:60,height:80,background:"linear-gradient(135deg,#607D8B,#78909C)",borderRadius:"20% 20% 40% 40%",boxShadow:"0 4px 8px rgba(0,0,0,.2)"}}/>
+          {Array.from({length:5}).map((_,i)=>(
+            <div key={i} style={{position:"absolute",top:80,left:15+i*8,width:6,height:120,background:"linear-gradient(180deg,rgba(100,181,246,.8),rgba(100,181,246,.4))",borderRadius:99,animation:`waterfall 1.5s linear infinite`,animationDelay:`${i*0.2}s`,filter:"blur(.5px)",boxShadow:"0 0 8px rgba(100,181,246,.6)"}}/>
+          ))}
+        </div>}
+
+        {/* Grama */}
+        <div style={{position:"absolute",bottom:0,left:0,right:0,height:"45%",background:"linear-gradient(180deg,rgba(76,175,80,.7),#4CAF50,#388E3C)",borderRadius:"0 0 18px 18px"}}>
+          {Array.from({length:60}).map((_,i)=>(
+            <div key={i} style={{position:"absolute",bottom:0,left:`${(i*2)%100}%`,width:2,height:15+Math.random()*20,background:`linear-gradient(180deg,transparent,#2E7D32)`,borderRadius:"50% 50% 0 0",transform:`rotate(${-10+Math.random()*20}deg)`,opacity:.4}}/>
+          ))}
+        </div>
+
+        {/* ÁRVORES */}
+        {Array.from({length:arvores}).map((_,i)=>{
+          const posX=10+(i*12)%75,size=0.8+Math.random()*0.4,hue=90+Math.random()*40
+          return(
+            <div key={`av${i}`} style={{position:"absolute",bottom:180+Math.random()*50,left:`${posX}%`,transform:`scale(${size})`,animation:`sway ${3+Math.random()*2}s ease-in-out infinite`,animationDelay:`${i*0.4}s`,filter:"drop-shadow(0 8px 12px rgba(0,0,0,.2))"}}>
+              <div style={{width:18,height:80,background:"linear-gradient(90deg,#5D4037,#6D4C41,#5D4037)",borderRadius:"6px 6px 2px 2px",margin:"0 auto",position:"relative"}}>
+                <div style={{position:"absolute",width:2,height:30,background:"rgba(0,0,0,.2)",left:4,top:10,borderRadius:99}}/>
+                <div style={{position:"absolute",width:2,height:25,background:"rgba(0,0,0,.2)",right:5,top:35,borderRadius:99}}/>
               </div>
-              <div style={{background:"rgba(186,85,211,.08)",borderRadius:12,padding:12,border:"1px solid rgba(186,85,211,.2)"}}>
-                <div style={{fontSize:10,color:"var(--mt)",marginBottom:4}}>🦋 Borboletas</div>
-                <div style={{fontSize:20,fontWeight:700,color:"#BA55D3"}}>{saldo>=1000?Math.min(8,Math.floor(saldo/1000)):0}</div>
-                <div style={{fontSize:9,color:"var(--mt)",marginTop:2}}>+1 a cada R$ 1.000</div>
+              <div style={{position:"relative",top:-40}}>
+                <div style={{width:90,height:70,background:`radial-gradient(circle,hsl(${hue},60%,45%),hsl(${hue},50%,35%))`,borderRadius:"50%",margin:"0 auto",boxShadow:`0 0 20px hsl(${hue},60%,45%)30,inset 0 -10px 20px rgba(0,0,0,.2)`,position:"relative"}}>
+                  {Array.from({length:8}).map((_,j)=>(
+                    <div key={j} style={{position:"absolute",width:20+Math.random()*15,height:20+Math.random()*15,background:`hsl(${hue+10},70%,${40+Math.random()*20}%)`,borderRadius:"50%",left:`${10+Math.random()*70}%`,top:`${Math.random()*70}%`,opacity:.7,boxShadow:"0 2px 4px rgba(0,0,0,.2)"}}/>
+                  ))}
+                </div>
+                <div style={{width:70,height:55,background:`radial-gradient(circle,hsl(${hue},65%,50%),hsl(${hue},55%,40%))`,borderRadius:"50%",margin:"-25px auto 0",position:"relative",boxShadow:`0 0 15px hsl(${hue},65%,50%)30`}}/>
+                <div style={{width:50,height:40,background:`radial-gradient(circle,hsl(${hue},70%,55%),hsl(${hue},60%,45%))`,borderRadius:"50%",margin:"-20px auto 0",boxShadow:`0 0 10px hsl(${hue},70%,55%)40,inset 0 -5px 10px rgba(0,0,0,.15)`}}/>
               </div>
-              <div style={{background:"rgba(100,149,237,.08)",borderRadius:12,padding:12,border:"1px solid rgba(100,149,237,.2)"}}>
-                <div style={{fontSize:10,color:"var(--mt)",marginBottom:4}}>🐦 Pássaros</div>
-                <div style={{fontSize:20,fontWeight:700,color:"#6495ED"}}>{saldo>=3000?Math.min(5,Math.floor(saldo/3000)):0}</div>
-                <div style={{fontSize:9,color:"var(--mt)",marginTop:2}}>+1 a cada R$ 3.000</div>
+              {Array.from({length:3}).map((_,k)=>(
+                <div key={k} style={{position:"absolute",width:4,height:4,background:`hsl(${hue+30},80%,70%)`,borderRadius:"50%",top:`${20+Math.random()*40}%`,left:`${-10+Math.random()*120}%`,animation:`floatSparkle ${2+Math.random()}s ease-in-out infinite`,animationDelay:`${k*0.6}s`,boxShadow:`0 0 6px hsl(${hue+30},80%,70%)`,filter:"blur(.5px)"}}/>
+              ))}
+            </div>
+          )
+        })}
+
+        {/* FLORES */}
+        {Array.from({length:flores}).map((_,i)=>{
+          const cores=[["#FF1493","#FF69B4","#FFB6C1"],["#9C27B0","#BA55D3","#DDA0DD"],["#FF6347","#FF7F50","#FFA07A"],["#4169E1","#6495ED","#87CEEB"],["#FFD700","#FFA500","#FFEB3B"]]
+          const paleta=cores[i%cores.length],left=8+((i*19)%(100-16)),bottom=70+Math.random()*140,size=0.7+Math.random()*0.5
+          return(
+            <div key={`fl${i}`} style={{position:"absolute",bottom,left:`${left}%`,transform:`scale(${size})`,animation:`sway ${2+Math.random()*1.5}s ease-in-out infinite`,animationDelay:`${i*0.2}s`,filter:"drop-shadow(0 4px 8px rgba(0,0,0,.15))"}}>
+              <div style={{width:4,height:55,background:"linear-gradient(90deg,#2E7D32,#43A047,#2E7D32)",margin:"0 auto",borderRadius:2,position:"relative"}}>
+                <div style={{position:"absolute",width:12,height:8,background:"#4CAF50",borderRadius:"0 50% 50% 0",left:-12,top:15,transform:"rotate(-20deg)"}}/>
+                <div style={{position:"absolute",width:12,height:8,background:"#4CAF50",borderRadius:"50% 0 0 50%",right:-12,top:25,transform:"rotate(20deg)"}}/>
               </div>
-              <div style={{background:"rgba(52,211,153,.08)",borderRadius:12,padding:12,border:"1px solid rgba(52,211,153,.2)"}}>
-                <div style={{fontSize:10,color:"var(--mt)",marginBottom:4}}>💰 Saldo Total</div>
-                <div style={{fontSize:20,fontWeight:700,color:"var(--gn)"}}>{fmt(Math.max(0,saldo))}</div>
-                <div style={{fontSize:9,color:"var(--mt)",marginTop:2}}>Continue economizando!</div>
+              <div style={{position:"relative",width:32,height:32,top:-18,left:"50%",transform:"translateX(-50%)"}}>
+                {[0,60,120,180,240,300].map(ang=>(
+                  <div key={ang} style={{position:"absolute",width:14,height:20,background:`linear-gradient(135deg,${paleta[0]},${paleta[1]})`,borderRadius:"50% 50% 50% 0",top:"50%",left:"50%",transform:`translate(-50%,-50%) rotate(${ang}deg) translateY(-10px)`,boxShadow:`0 0 8px ${paleta[0]}50,inset 0 -2px 4px rgba(0,0,0,.1)`,transformOrigin:"center bottom"}}/>
+                ))}
+                <div style={{position:"absolute",width:12,height:12,background:"radial-gradient(circle,#FFD700,#FFA500)",borderRadius:"50%",top:"50%",left:"50%",transform:"translate(-50%,-50%)",zIndex:2,boxShadow:"0 0 8px rgba(255,215,0,.6),inset 0 -2px 3px rgba(0,0,0,.2)"}}>
+                  {Array.from({length:6}).map((_,j)=>(
+                    <div key={j} style={{position:"absolute",width:2,height:2,background:"#FFF",borderRadius:"50%",top:`${2+Math.random()*8}px`,left:`${2+Math.random()*8}px`,opacity:.8}}/>
+                  ))}
+                </div>
+                <div style={{position:"absolute",width:40,height:40,background:`radial-gradient(circle,${paleta[2]}20,transparent 70%)`,borderRadius:"50%",top:"50%",left:"50%",transform:"translate(-50%,-50%)",animation:"pulse 3s ease-in-out infinite",pointerEvents:"none"}}/>
               </div>
             </div>
+          )
+        })}
+
+        {/* BORBOLETAS */}
+        {Array.from({length:borboletas}).map((_,i)=>{
+          const coresBorb=[{asa1:"linear-gradient(135deg,#FF1493,#FF69B4)",asa2:"linear-gradient(135deg,#FF69B4,#FFB6C1)"},{asa1:"linear-gradient(135deg,#9C27B0,#BA55D3)",asa2:"linear-gradient(135deg,#BA55D3,#DDA0DD)"},{asa1:"linear-gradient(135deg,#00CED1,#48D1CC)",asa2:"linear-gradient(135deg,#48D1CC,#7FFFD4)"},{asa1:"linear-gradient(135deg,#FFD700,#FFA500)",asa2:"linear-gradient(135deg,#FFA500,#FFB84D)"},{asa1:"linear-gradient(135deg,#4169E1,#6495ED)",asa2:"linear-gradient(135deg,#6495ED,#87CEEB)"}]
+          const cores=coresBorb[i%coresBorb.length],startX=Math.random()*70,startY=50+Math.random()*120,duration=10+Math.random()*8,size=0.8+Math.random()*0.4
+          return(
+            <div key={`bb${i}`} style={{position:"absolute",left:`${startX}%`,top:startY,transform:`scale(${size})`,animation:`butterfly ${duration}s ease-in-out infinite`,animationDelay:`${i*1.5}s`,filter:"drop-shadow(0 2px 6px rgba(0,0,0,.2))"}}>
+              <div style={{position:"relative",width:28,height:24,animation:"flutter .4s ease-in-out infinite"}}>
+                <div style={{position:"absolute",width:14,height:18,background:cores.asa1,borderRadius:"60% 40% 40% 60%",top:0,left:0,transformOrigin:"bottom right",boxShadow:"0 0 8px rgba(255,105,180,.5),inset 2px 2px 4px rgba(255,255,255,.3)"}}>
+                  <div style={{position:"absolute",width:4,height:4,background:"rgba(255,255,255,.6)",borderRadius:"50%",top:4,left:4}}/>
+                  <div style={{position:"absolute",width:3,height:3,background:"rgba(255,255,255,.5)",borderRadius:"50%",top:10,left:7}}/>
+                </div>
+                <div style={{position:"absolute",width:12,height:14,background:cores.asa2,borderRadius:"40% 60% 60% 40%",bottom:0,left:2,transformOrigin:"top right",boxShadow:"0 0 6px rgba(255,105,180,.4)"}}/>
+                <div style={{position:"absolute",width:14,height:18,background:cores.asa1,borderRadius:"40% 60% 60% 40%",top:0,right:0,transformOrigin:"bottom left",boxShadow:"0 0 8px rgba(255,105,180,.5),inset -2px 2px 4px rgba(255,255,255,.3)"}}>
+                  <div style={{position:"absolute",width:4,height:4,background:"rgba(255,255,255,.6)",borderRadius:"50%",top:4,right:4}}/>
+                  <div style={{position:"absolute",width:3,height:3,background:"rgba(255,255,255,.5)",borderRadius:"50%",top:10,right:7}}/>
+                </div>
+                <div style={{position:"absolute",width:12,height:14,background:cores.asa2,borderRadius:"60% 40% 40% 60%",bottom:0,right:2,transformOrigin:"top left",boxShadow:"0 0 6px rgba(255,105,180,.4)"}}/>
+                <div style={{position:"absolute",width:4,height:22,background:"linear-gradient(180deg,#2C3E50,#34495E)",left:"50%",top:"50%",transform:"translate(-50%,-50%)",borderRadius:99,zIndex:2,boxShadow:"0 2px 4px rgba(0,0,0,.3)"}}>
+                  <div style={{position:"absolute",width:1,height:6,background:"#2C3E50",top:-6,left:1,borderRadius:99,transform:"rotate(-30deg)"}}/>
+                  <div style={{position:"absolute",width:1,height:6,background:"#2C3E50",top:-6,right:1,borderRadius:99,transform:"rotate(30deg)"}}/>
+                </div>
+                <div style={{position:"absolute",width:50,height:50,background:"radial-gradient(circle,rgba(255,105,180,.2),transparent 60%)",top:"50%",left:"50%",transform:"translate(-50%,-50%)",borderRadius:"50%",animation:"pulse 2s ease-in-out infinite",pointerEvents:"none"}}/>
+              </div>
+            </div>
+          )
+        })}
+
+        {/* VAGALUMES */}
+        {Array.from({length:vagalumes}).map((_,i)=>{
+          const cores=["#FFEB3B","#FFF176","#FFD54F","#FFE082","#FFECB3"],cor=cores[i%cores.length]
+          return(
+            <div key={`vg${i}`} style={{position:"absolute",left:`${5+Math.random()*90}%`,top:`${40+Math.random()*200}px`,width:5,height:5,background:`radial-gradient(circle,${cor},transparent 70%)`,borderRadius:"50%",animation:`floatFirefly ${3+Math.random()*4}s ease-in-out infinite`,animationDelay:`${Math.random()*3}s`,boxShadow:`0 0 12px ${cor},0 0 20px ${cor}80`,filter:"blur(.5px)"}}>
+              <div style={{position:"absolute",width:3,height:3,background:"#FFF",borderRadius:"50%",top:"50%",left:"50%",transform:"translate(-50%,-50%)",animation:"twinkle 1.5s ease-in-out infinite",animationDelay:`${Math.random()}s`}}/>
+            </div>
+          )
+        })}
+
+        {/* Mensagem inicial */}
+        {saldoMes<=0&&<div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",textAlign:"center",background:"linear-gradient(135deg,rgba(255,255,255,.95),rgba(255,255,255,.85))",padding:"30px 40px",borderRadius:24,border:"3px solid rgba(167,139,250,.3)",boxShadow:"0 12px 40px rgba(0,0,0,.2),0 0 60px rgba(167,139,250,.2)",maxWidth:320}}>
+          <div style={{fontSize:56,marginBottom:12,animation:"bounce 2s ease-in-out infinite"}}>🌱</div>
+          <div style={{fontSize:18,fontWeight:700,color:"#2E7D32",marginBottom:10,letterSpacing:-.5}}>Plante sua primeira semente mágica</div>
+          <div style={{fontSize:13,color:"#666",lineHeight:1.6}}>Comece a economizar neste mês para ver seu jardim florescer!<br/><br/><span style={{fontSize:11,color:"#999"}}>💫 Cada R$ 80 faz uma flor nascer</span></div>
+        </div>}
+
+        {/* CSS Animations */}
+        <style>{`
+          @keyframes sparkle{0%,100%{opacity:0;transform:translateY(0) scale(0)}50%{opacity:1;transform:translateY(-20px) scale(1)}}
+          @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+          @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.08);opacity:.85}}
+          @keyframes floatCloud{0%,100%{transform:translateX(0) translateY(0)}50%{transform:translateX(30px) translateY(-10px)}}
+          @keyframes rainbow{0%,100%{opacity:.6;transform:translateY(0)}50%{opacity:.8;transform:translateY(-5px)}}
+          @keyframes waterfall{0%{transform:translateY(0);opacity:1}100%{transform:translateY(120px);opacity:0}}
+          @keyframes sway{0%,100%{transform:rotate(-3deg)}50%{transform:rotate(3deg)}}
+          @keyframes butterfly{0%,100%{transform:translate(0,0) rotate(0deg)}25%{transform:translate(60px,-40px) rotate(10deg)}50%{transform:translate(120px,-10px) rotate(-5deg)}75%{transform:translate(80px,30px) rotate(8deg)}}
+          @keyframes flutter{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.85)}}
+          @keyframes floatFirefly{0%,100%{transform:translate(0,0)}25%{transform:translate(-20px,-30px)}50%{transform:translate(15px,-15px)}75%{transform:translate(-10px,20px)}}
+          @keyframes twinkle{0%,100%{opacity:1;transform:translate(-50%,-50%) scale(1)}50%{opacity:.3;transform:translate(-50%,-50%) scale(.7)}}
+          @keyframes floatSparkle{0%,100%{transform:translateY(0);opacity:0}50%{transform:translateY(-15px);opacity:1}}
+          @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+        `}</style>
+      </div>
+
+      {/* Estatísticas */}
+      <div className="card" style={{marginTop:16}}>
+        <div className="sec">📊 Elementos do Jardim · {monthLabel(thisMonth)}</div>
+        <div style={{fontSize:10,color:"var(--mt)",marginBottom:12,lineHeight:1.5}}>Baseado no saldo deste mês: <strong style={{color:tm.saldo>=0?"var(--gn)":"var(--rd)"}}>{fmt(tm.saldo)}</strong></div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+          <div style={{background:"linear-gradient(135deg,rgba(255,105,180,.08),rgba(255,182,193,.05))",borderRadius:14,padding:14,border:"1.5px solid rgba(255,105,180,.2)"}}>
+            <div style={{fontSize:10,color:"var(--mt)",marginBottom:6}}>🌸 Flores Mágicas</div>
+            <div style={{fontSize:24,fontWeight:800,color:"#FF69B4",marginBottom:4}}>{flores}</div>
+            <div style={{fontSize:9,color:"var(--mt)"}}>+1 a cada R$ 80</div>
+            {flores<30&&<div style={{fontSize:9,color:"#FF1493",marginTop:4}}>Faltam {fmt(Math.max(0,((flores+1)*80)-saldoMes))}</div>}
           </div>
-
-        </>}
-
-    </>
-  )
-
-  return(
-    <>
-      <style>{CSS}</style>
-      {toast&&<div className="toast">{toast}</div>}
-      <div className={`app ${isMobile?"mobile":"desktop"}`}>
-        <div className="ga"/><div className="gb"/>
-
-        <header className="hdr">
-          <div>
-            <div className="logo">Aury Money</div>
-            <div className="logo-sub"><span className="sync"/>Lenin & Evelyn · {isMobile?"📱":"🖥️"}</div>
+          <div style={{background:"linear-gradient(135deg,rgba(186,85,211,.08),rgba(221,160,221,.05))",borderRadius:14,padding:14,border:"1.5px solid rgba(186,85,211,.2)"}}>
+            <div style={{fontSize:10,color:"var(--mt)",marginBottom:6}}>🦋 Borboletas</div>
+            <div style={{fontSize:24,fontWeight:800,color:"#BA55D3",marginBottom:4}}>{borboletas}</div>
+            <div style={{fontSize:9,color:"var(--mt)"}}>+1 a cada R$ 200</div>
+            {saldoMes<400&&<div style={{fontSize:9,color:"#9C27B0",marginTop:4}}>Desbloqueiam em R$ 400</div>}
           </div>
-          <div className="avs">
-            {!isMobile&&TABS.map(t=>(
-              <button key={t.id} onClick={()=>{setTab(t.id);if(t.id!=="adicionar")setEditId(null)}}
+          <div style={{background:"linear-gradient(135deg,rgba(76,175,80,.08),rgba(129,199,132,.05))",borderRadius:14,padding:14,border:"1.5px solid rgba(76,175,80,.2)"}}>
+            <div style={{fontSize:10,color:"var(--mt)",marginBottom:6}}>🌳 Árvores Sábias</div>
+            <div style={{fontSize:24,fontWeight:800,color:"#4CAF50",marginBottom:4}}>{arvores}</div>
+            <div style={{fontSize:9,color:"var(--mt)"}}>+1 a cada R$ 500</div>
+            {saldoMes<1000&&<div style={{fontSize:9,color:"#388E3C",marginTop:4}}>Desbloqueiam em R$ 1.000</div>}
+          </div>
+          <div style={{background:"linear-gradient(135deg,rgba(255,235,59,.08),rgba(255,241,118,.05))",borderRadius:14,padding:14,border:"1.5px solid rgba(255,235,59,.2)"}}>
+            <div style={{fontSize:10,color:"var(--mt)",marginBottom:6}}>✨ Vagalumes</div>
+            <div style={{fontSize:24,fontWeight:800,color:"#FFD54F",marginBottom:4}}>{vagalumes}</div>
+            <div style={{fontSize:9,color:"var(--mt)"}}>+1 a cada R$ 60</div>
+            {saldoMes<200&&<div style={{fontSize:9,color:"#F9A825",marginTop:4}}>Desbloqueiam em R$ 200</div>}
+          </div>
+        </div>
+        <div style={{marginTop:16,padding:12,background:"linear-gradient(135deg,rgba(167,139,250,.08),rgba(244,114,182,.05))",borderRadius:12,border:"1px solid rgba(167,139,250,.15)"}}>
+          <div style={{fontSize:11,fontWeight:600,color:"var(--pu)",marginBottom:6}}>🎯 Próximos Desbloqueios</div>
+          <div style={{fontSize:10,color:"var(--mt)",lineHeight:1.6}}>{cascata?"✅":"❌"} <strong>Cascata Mágica</strong> - R$ 3.000<br/>{arcoiris?"✅":"❌"} <strong>Arco-Íris Místico</strong> - R$ 4.500</div>
+        </div>
+      </div>
+    </>)
+  })()}
+</>}
                 style={{background:tab===t.id?"linear-gradient(135deg,rgba(167,139,250,.15),rgba(244,114,182,.08))":"none",border:`1px solid ${tab===t.id?"rgba(167,139,250,.3)":"rgba(255,255,255,.08)"}`,borderRadius:10,padding:"6px 14px",color:tab===t.id?"var(--pu)":"var(--mt)",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"'Outfit',sans-serif",transition:"all .2s",display:"flex",alignItems:"center",gap:6}}>
                 {t.ico} {t.lbl}
               </button>
