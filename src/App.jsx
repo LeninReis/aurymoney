@@ -417,17 +417,6 @@ export default function AuryMoney() {
   const showToast = m => { setToast(m); setTimeout(()=>setToast(""),2200) }
   const setF = (k,v) => setForm(f=>({...f,[k]:v}))
 
-  // ── Estados do Simulador Alquimista ──────────────────────────────────────────
-  const [simReceita, setSimReceita] = useState(0)
-  const [simDespesa, setSimDespesa] = useState(0)
-
-  // Inicializar simulador quando mudar de mês
-  useEffect(()=>{
-    const tm = getMonthData(thisMonth)
-    setSimReceita(tm.rec)
-    setSimDespesa(tm.exp)
-  },[thisMonth,records])
-
   // ── Core financials (casal conjunto) ────────────────────────────────────────
   const totalRec = useMemo(()=>records.filter(r=>r.type==="receita").reduce((a,b)=>a+Number(b.value||0),0),[records])
   const totalExp = useMemo(()=>records.filter(r=>r.type==="despesa").reduce((a,b)=>a+Number(b.value||0),0),[records])
@@ -467,6 +456,16 @@ export default function AuryMoney() {
   const tm         = getMonthData(thisMonth)
   const agData     = getMonthData(agMonth)
   const agSaldoAcumulado = getSaldoAcumuladoAte(agMonth) // Saldo acumulado até o mês da agenda
+  
+  // ── Estados do Simulador Alquimista ──────────────────────────────────────────
+  const [simReceita, setSimReceita] = useState(0)
+  const [simDespesa, setSimDespesa] = useState(0)
+
+  // Atualizar simulador quando tm mudar
+  useEffect(()=>{
+    setSimReceita(tm.rec || 0)
+    setSimDespesa(tm.exp || 0)
+  },[tm.rec, tm.exp])
 
   // Saldo faltante do mês atual (quanto precisa de renda extra pra fechar no zero)
   const faltando = tm.saldo < 0 ? Math.abs(tm.saldo) : 0
