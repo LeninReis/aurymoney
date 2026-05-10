@@ -417,6 +417,17 @@ export default function AuryMoney() {
   const showToast = m => { setToast(m); setTimeout(()=>setToast(""),2200) }
   const setF = (k,v) => setForm(f=>({...f,[k]:v}))
 
+  // ── Estados do Simulador Alquimista ──────────────────────────────────────────
+  const [simReceita, setSimReceita] = useState(0)
+  const [simDespesa, setSimDespesa] = useState(0)
+
+  // Inicializar simulador quando mudar de mês
+  useEffect(()=>{
+    const tm = getMonthData(thisMonth)
+    setSimReceita(tm.rec)
+    setSimDespesa(tm.exp)
+  },[thisMonth,records])
+
   // ── Core financials (casal conjunto) ────────────────────────────────────────
   const totalRec = useMemo(()=>records.filter(r=>r.type==="receita").reduce((a,b)=>a+Number(b.value||0),0),[records])
   const totalExp = useMemo(()=>records.filter(r=>r.type==="despesa").reduce((a,b)=>a+Number(b.value||0),0),[records])
@@ -1045,17 +1056,15 @@ export default function AuryMoney() {
           </div>
 
           {/* Caldeirão de Transmutação (Simulador Interativo) */}
-          {(()=>{
-            const [simReceita, setSimReceita] = useState(tm.rec)
-            const [simDespesa, setSimDespesa] = useState(tm.exp)
-            const simSaldo = simReceita - simDespesa
-            const economy = tm.saldo - simSaldo
+          <div className="card" style={{background:"linear-gradient(135deg,#16213e,#0f1419)",border:"1px solid rgba(255,152,0,.2)"}}>
+            <div className="sec">🔥 Caldeirão de Transmutação</div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,.6)",marginBottom:16}}>Simule cenários e descubra o potencial oculto</div>
             
-            return(
-              <div className="card" style={{background:"linear-gradient(135deg,#16213e,#0f1419)",border:"1px solid rgba(255,152,0,.2)"}}>
-                <div className="sec">🔥 Caldeirão de Transmutação</div>
-                <div style={{fontSize:11,color:"rgba(255,255,255,.6)",marginBottom:16}}>Simule cenários e descubra o potencial oculto</div>
-                
+            {(()=>{
+              const simSaldo = simReceita - simDespesa
+              const economy = tm.saldo - simSaldo
+              
+              return(<>
                 <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:16,marginBottom:20}}>
                   
                   <div>
@@ -1103,9 +1112,9 @@ export default function AuryMoney() {
                     </div>
                   )}
                 </div>
-              </div>
-            )
-          })()}
+              </>)
+            })()}
+          </div>
 
           {/* Cristal do Tempo (Histórico) */}
           <div className="card" style={{background:"linear-gradient(135deg,#1a1a2e,#16213e)",border:"1px solid rgba(139,195,74,.2)"}}>
@@ -1503,9 +1512,12 @@ export default function AuryMoney() {
 
         {/* ÁRVORES */}
         {Array.from({length:arvores}).map((_,i)=>{
-          const posX=10+(i*12)%75,size=0.8+Math.random()*0.4,hue=90+Math.random()*40
+          const posX=[15,30,50,70,85,20,40,60][i]||15+i*15
+          const size=0.9
+          const hue=95+i*5
+          
           return(
-            <div key={`av${i}`} style={{position:"absolute",bottom:180+Math.random()*50,left:`${posX}%`,transform:`scale(${size})`,animation:`sway ${3+Math.random()*2}s ease-in-out infinite`,animationDelay:`${i*0.4}s`,filter:"drop-shadow(0 8px 12px rgba(0,0,0,.2))"}}>
+            <div key={`av${i}`} style={{position:"absolute",bottom:220,left:`${posX}%`,transform:`scale(${size})`,animation:`sway ${3+Math.random()*2}s ease-in-out infinite`,animationDelay:`${i*0.4}s`,filter:"drop-shadow(0 8px 12px rgba(0,0,0,.2))"}}>
               <div style={{width:18,height:80,background:"linear-gradient(90deg,#5D4037,#6D4C41,#5D4037)",borderRadius:"6px 6px 2px 2px",margin:"0 auto",position:"relative"}}>
                 <div style={{position:"absolute",width:2,height:30,background:"rgba(0,0,0,.2)",left:4,top:10,borderRadius:99}}/>
                 <div style={{position:"absolute",width:2,height:25,background:"rgba(0,0,0,.2)",right:5,top:35,borderRadius:99}}/>
@@ -1529,7 +1541,13 @@ export default function AuryMoney() {
         {/* FLORES */}
         {Array.from({length:flores}).map((_,i)=>{
           const cores=[["#FF1493","#FF69B4","#FFB6C1"],["#9C27B0","#BA55D3","#DDA0DD"],["#FF6347","#FF7F50","#FFA07A"],["#4169E1","#6495ED","#87CEEB"],["#FFD700","#FFA500","#FFEB3B"]]
-          const paleta=cores[i%cores.length],left=8+((i*19)%(100-16)),bottom=70+Math.random()*140,size=0.7+Math.random()*0.5
+          const paleta=cores[i%cores.length]
+          const row=Math.floor(i/10)
+          const col=i%10
+          const left=10+(col*8)
+          const bottom=80+(row*60)
+          const size=0.7+Math.random()*0.3
+          
           return(
             <div key={`fl${i}`} style={{position:"absolute",bottom,left:`${left}%`,transform:`scale(${size})`,animation:`sway ${2+Math.random()*1.5}s ease-in-out infinite`,animationDelay:`${i*0.2}s`,filter:"drop-shadow(0 4px 8px rgba(0,0,0,.15))"}}>
               <div style={{width:4,height:55,background:"linear-gradient(90deg,#2E7D32,#43A047,#2E7D32)",margin:"0 auto",borderRadius:2,position:"relative"}}>
