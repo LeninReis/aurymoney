@@ -624,6 +624,7 @@ export default function AuryMoney() {
 
   const TABS=[
     {id:"dashboard",lbl:"Início",ico:"⬡"},
+    {id:"alquimia", lbl:"Alquimia",ico:"🔮"},
     {id:"agenda",   lbl:"Agenda", ico:"📅"},
     {id:"registros",lbl:"Registros",ico:"☰"},
     {id:"adicionar",lbl:editId?"Editar":"Novo",ico:"+"},
@@ -822,6 +823,348 @@ export default function AuryMoney() {
         </>)}
 
         {/* ── AGENDA ── */}
+        {/* ── DASHBOARD ALQUIMISTA ── */}
+        {tab==="alquimia"&&<>
+          <div style={{marginBottom:16}}>
+            <div className="pt">🔮 Laboratório do Alquimista</div>
+            <div style={{fontSize:11,color:"var(--mt)",lineHeight:1.6}}>
+              Transforme suas finanças em ouro através da alquimia estratégica ⚗️✨
+            </div>
+          </div>
+
+          {/* Nível do Alquimista */}
+          {(()=>{
+            const niveis = [
+              {min:0,max:500,nome:"Aprendiz",rank:"🎓",cor:"#9E9E9E",desc:"Aprendendo os fundamentos"},
+              {min:500,max:1500,nome:"Iniciado",rank:"⭐",cor:"#8BC34A",desc:"Dominando o básico"},
+              {min:1500,max:3000,nome:"Praticante",rank:"✨",cor:"#03A9F4",desc:"Habilidades em evolução"},
+              {min:3000,max:5000,nome:"Mestre",rank:"🔮",cor:"#9C27B0",desc:"Conhecimento profundo"},
+              {min:5000,max:8000,nome:"Arquimago",rank:"🌟",cor:"#FF9800",desc:"Poder extraordinário"},
+              {min:8000,max:999999,nome:"Grão-Mestre",rank:"👑",cor:"#FFD700",desc:"Sabedoria infinita"}
+            ]
+            
+            const saldoMes = Math.max(0, tm.saldo)
+            const nivel = niveis.find(n=>saldoMes>=n.min&&saldoMes<n.max)||niveis[niveis.length-1]
+            const nIdx = niveis.indexOf(nivel)
+            const prog = nivel.max===999999?100:Math.min(100,((saldoMes-nivel.min)/(nivel.max-nivel.min))*100)
+            const prox = nIdx<niveis.length-1?niveis[nIdx+1]:null
+            
+            return(
+              <div style={{background:"linear-gradient(135deg,#1a0033,#2d1b4e)",border:"2px solid rgba(156,39,176,.3)",borderRadius:20,padding:24,marginBottom:16,position:"relative",overflow:"hidden"}}>
+                {/* Partículas mágicas */}
+                <div style={{position:"absolute",inset:0,opacity:.15}}>
+                  {Array.from({length:20}).map((_,i)=>(
+                    <div key={i} style={{position:"absolute",width:2+Math.random()*4,height:2+Math.random()*4,background:nivel.cor,borderRadius:"50%",left:`${Math.random()*100}%`,top:`${Math.random()*100}%`,animation:`sparkle ${2+Math.random()*3}s ease-in-out infinite`,animationDelay:`${Math.random()*2}s`,boxShadow:`0 0 10px ${nivel.cor}`}}/>
+                  ))}
+                </div>
+                
+                <div style={{position:"relative",zIndex:1}}>
+                  <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
+                    <div style={{fontSize:48,filter:"drop-shadow(0 4px 12px rgba(156,39,176,.6))"}}>🧙‍♂️</div>
+                    <div style={{flex:1}}>
+                      <div style={{fontSize:12,color:"rgba(255,255,255,.6)",marginBottom:4}}>SEU POSTO</div>
+                      <div style={{fontSize:28,fontWeight:800,color:nivel.cor,textShadow:`0 0 20px ${nivel.cor}`,marginBottom:4}}>{nivel.rank} {nivel.nome}</div>
+                      <div style={{fontSize:13,color:"rgba(255,255,255,.7)"}}>{nivel.desc}</div>
+                    </div>
+                  </div>
+                  
+                  <div style={{marginBottom:8,display:"flex",justifyContent:"space-between"}}>
+                    <span style={{fontSize:11,color:"rgba(255,255,255,.7)"}}>{prox?`Próximo posto: ${prox.nome}`:"✨ Grau Máximo Alcançado!"}</span>
+                    <span style={{fontSize:12,fontWeight:700,color:nivel.cor}}>{Math.round(prog)}%</span>
+                  </div>
+                  
+                  <div style={{background:"rgba(0,0,0,.4)",borderRadius:99,height:12,overflow:"hidden",border:"1px solid rgba(156,39,176,.3)"}}>
+                    <div style={{background:`linear-gradient(90deg,${nivel.cor},${nivel.cor}dd)`,height:"100%",width:`${prog}%`,borderRadius:99,transition:"width 1s ease",boxShadow:`0 0 20px ${nivel.cor}`,position:"relative"}}>
+                      <div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent)",animation:"shimmer 2s infinite"}}/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          })()}
+
+          {/* Poções Mágicas (Análises Rápidas) */}
+          <div className="card" style={{background:"linear-gradient(135deg,#1a1a2e,#16213e)",border:"1px solid rgba(3,169,244,.2)",marginBottom:16}}>
+            <div className="sec">⚗️ Poções da Sabedoria</div>
+            <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:12}}>
+              
+              {/* Poção da Disciplina */}
+              <div style={{background:"linear-gradient(135deg,rgba(76,175,80,.12),rgba(76,175,80,.05))",border:"1.5px solid rgba(76,175,80,.3)",borderRadius:16,padding:16,position:"relative",overflow:"hidden"}}>
+                <div style={{position:"absolute",top:-20,right:-20,width:80,height:80,background:"radial-gradient(circle,rgba(76,175,80,.2),transparent)",borderRadius:"50%"}}/>
+                <div style={{position:"relative",zIndex:1}}>
+                  <div style={{fontSize:32,marginBottom:8,filter:"drop-shadow(0 2px 8px rgba(76,175,80,.6))"}}>🧪</div>
+                  <div style={{fontSize:14,fontWeight:700,color:"#4CAF50",marginBottom:4}}>Poção da Disciplina</div>
+                  <div style={{fontSize:12,color:"rgba(255,255,255,.7)",marginBottom:12}}>Taxa de comprometimento da renda</div>
+                  {(()=>{
+                    const taxa = tm.rec>0?(tm.exp/tm.rec)*100:0
+                    const nivel = taxa<50?"Excelente":taxa<70?"Bom":taxa<85?"Atenção":"Crítico"
+                    const cor = taxa<50?"#4CAF50":taxa<70?"#8BC34A":taxa<85?"#FF9800":"#F44336"
+                    return(<>
+                      <div style={{fontSize:24,fontWeight:800,color:cor,marginBottom:8}}>{taxa.toFixed(1)}%</div>
+                      <div style={{fontSize:11,color:"rgba(255,255,255,.6)"}}>Status: <strong style={{color:cor}}>{nivel}</strong></div>
+                      <div style={{marginTop:12,background:"rgba(0,0,0,.3)",borderRadius:99,height:6}}>
+                        <div style={{background:`linear-gradient(90deg,${cor},${cor}dd)`,width:`${Math.min(100,taxa)}%`,height:"100%",borderRadius:99,boxShadow:`0 0 8px ${cor}`}}/>
+                      </div>
+                    </>)
+                  })()}
+                </div>
+              </div>
+
+              {/* Poção da Prosperidade */}
+              <div style={{background:"linear-gradient(135deg,rgba(255,193,7,.12),rgba(255,193,7,.05))",border:"1.5px solid rgba(255,193,7,.3)",borderRadius:16,padding:16,position:"relative",overflow:"hidden"}}>
+                <div style={{position:"absolute",top:-20,right:-20,width:80,height:80,background:"radial-gradient(circle,rgba(255,193,7,.2),transparent)",borderRadius:"50%"}}/>
+                <div style={{position:"relative",zIndex:1}}>
+                  <div style={{fontSize:32,marginBottom:8,filter:"drop-shadow(0 2px 8px rgba(255,193,7,.6))"}}>⚱️</div>
+                  <div style={{fontSize:14,fontWeight:700,color:"#FFC107",marginBottom:4}}>Poção da Prosperidade</div>
+                  <div style={{fontSize:12,color:"rgba(255,255,255,.7)",marginBottom:12}}>Velocidade de acumulação mensal</div>
+                  {(()=>{
+                    const velocidade = tm.saldo
+                    const diasRestantes = new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate() - new Date().getDate()
+                    const projecaoMes = velocidade + ((velocidade/new Date().getDate())*diasRestantes)
+                    const cor = projecaoMes>0?"#4CAF50":"#F44336"
+                    return(<>
+                      <div style={{fontSize:24,fontWeight:800,color:cor,marginBottom:8}}>{fmt(velocidade)}</div>
+                      <div style={{fontSize:11,color:"rgba(255,255,255,.6)"}}>Projeção fim do mês: <strong style={{color:cor}}>{fmt(Math.max(0,projecaoMes))}</strong></div>
+                      <div style={{fontSize:10,color:"rgba(255,255,255,.5)",marginTop:6}}>Faltam {diasRestantes} dias</div>
+                    </>)
+                  })()}
+                </div>
+              </div>
+
+              {/* Poção do Equilíbrio */}
+              <div style={{background:"linear-gradient(135deg,rgba(156,39,176,.12),rgba(156,39,176,.05))",border:"1.5px solid rgba(156,39,176,.3)",borderRadius:16,padding:16,position:"relative",overflow:"hidden"}}>
+                <div style={{position:"absolute",top:-20,right:-20,width:80,height:80,background:"radial-gradient(circle,rgba(156,39,176,.2),transparent)",borderRadius:"50%"}}/>
+                <div style={{position:"relative",zIndex:1}}>
+                  <div style={{fontSize:32,marginBottom:8,filter:"drop-shadow(0 2px 8px rgba(156,39,176,.6))"}}>🍷</div>
+                  <div style={{fontSize:14,fontWeight:700,color:"#9C27B0",marginBottom:4}}>Poção do Equilíbrio</div>
+                  <div style={{fontSize:12,color:"rgba(255,255,255,.7)",marginBottom:12}}>Distribuição de gastos por categoria</div>
+                  {(()=>{
+                    const gastosPorCat = {}
+                    records.filter(r=>r.date?.startsWith(thisMonth)&&r.type==="despesa").forEach(r=>{
+                      gastosPorCat[r.category] = (gastosPorCat[r.category]||0) + Number(r.value||0)
+                    })
+                    const topCat = Object.entries(gastosPorCat).sort((a,b)=>b[1]-a[1])[0]
+                    const catLabel = topCat?CAT_MAP[topCat[0]]?.label||topCat[0]:"Nenhuma"
+                    const catValue = topCat?topCat[1]:0
+                    const pct = tm.exp>0?(catValue/tm.exp)*100:0
+                    return(<>
+                      <div style={{fontSize:13,color:"rgba(255,255,255,.8)",marginBottom:8}}>Maior gasto: <strong style={{color:"#9C27B0"}}>{catLabel}</strong></div>
+                      <div style={{fontSize:20,fontWeight:800,color:"#9C27B0",marginBottom:8}}>{fmt(catValue)}</div>
+                      <div style={{fontSize:11,color:"rgba(255,255,255,.6)"}}>{pct.toFixed(1)}% dos gastos totais</div>
+                    </>)
+                  })()}
+                </div>
+              </div>
+
+              {/* Poção da Visão */}
+              <div style={{background:"linear-gradient(135deg,rgba(3,169,244,.12),rgba(3,169,244,.05))",border:"1.5px solid rgba(3,169,244,.3)",borderRadius:16,padding:16,position:"relative",overflow:"hidden"}}>
+                <div style={{position:"absolute",top:-20,right:-20,width:80,height:80,background:"radial-gradient(circle,rgba(3,169,244,.2),transparent)",borderRadius:"50%"}}/>
+                <div style={{position:"relative",zIndex:1}}>
+                  <div style={{fontSize:32,marginBottom:8,filter:"drop-shadow(0 2px 8px rgba(3,169,244,.6))"}}>🔮</div>
+                  <div style={{fontSize:14,fontWeight:700,color:"#03A9F4",marginBottom:4}}>Poção da Visão</div>
+                  <div style={{fontSize:12,color:"rgba(255,255,255,.7)",marginBottom:12}}>Tendência dos últimos 3 meses</div>
+                  {(()=>{
+                    const ultimos3 = [addMonths(thisMonth,-2),addMonths(thisMonth,-1),thisMonth].map(m=>getMonthData(m).saldo)
+                    const tendencia = ultimos3[2]-ultimos3[0]
+                    const cor = tendencia>0?"#4CAF50":tendencia<0?"#F44336":"#FF9800"
+                    const emoji = tendencia>0?"📈":tendencia<0?"📉":"📊"
+                    return(<>
+                      <div style={{fontSize:32,marginBottom:8}}>{emoji}</div>
+                      <div style={{fontSize:20,fontWeight:800,color:cor,marginBottom:8}}>{tendencia>0?"+":""}{fmt(tendencia)}</div>
+                      <div style={{fontSize:11,color:"rgba(255,255,255,.6)"}}>
+                        {tendencia>0?"Melhorando!":tendencia<0?"Precisa atenção":"Estável"}
+                      </div>
+                    </>)
+                  })()}
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          {/* Grimório de Conquistas */}
+          <div className="card" style={{background:"linear-gradient(135deg,#2d1b4e,#1a0033)",border:"1px solid rgba(255,215,0,.2)",marginBottom:16}}>
+            <div className="sec">📖 Grimório de Conquistas</div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,.6)",marginBottom:16}}>Desbloqueie medalhas através das suas conquistas financeiras</div>
+            
+            <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)",gap:12}}>
+              
+              {/* Primeira Economia */}
+              {(()=>{
+                const conquistada = tm.saldo > 0
+                return(
+                  <div style={{background:conquistada?"linear-gradient(135deg,rgba(76,175,80,.15),rgba(76,175,80,.05))":"rgba(255,255,255,.03)",border:`1.5px solid ${conquistada?"rgba(76,175,80,.4)":"rgba(255,255,255,.1)"}`,borderRadius:14,padding:14,textAlign:"center",position:"relative",overflow:"hidden"}}>
+                    {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(76,175,80,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
+                    <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(76,175,80,.6))":"grayscale(1) opacity(.3)"}}>🌱</div>
+                    <div style={{fontSize:11,fontWeight:700,color:conquistada?"#4CAF50":"rgba(255,255,255,.4)",marginBottom:4}}>Primeira Semente</div>
+                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>Economize neste mês</div>
+                  </div>
+                )
+              })()}
+
+              {/* Disciplina Férrea */}
+              {(()=>{
+                const conquistada = tm.rec>0&&(tm.exp/tm.rec)<0.7
+                return(
+                  <div style={{background:conquistada?"linear-gradient(135deg,rgba(3,169,244,.15),rgba(3,169,244,.05))":"rgba(255,255,255,.03)",border:`1.5px solid ${conquistada?"rgba(3,169,244,.4)":"rgba(255,255,255,.1)"}`,borderRadius:14,padding:14,textAlign:"center",position:"relative"}}>
+                    {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(3,169,244,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
+                    <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(3,169,244,.6))":"grayscale(1) opacity(.3)"}}>🛡️</div>
+                    <div style={{fontSize:11,fontWeight:700,color:conquistada?"#03A9F4":"rgba(255,255,255,.4)",marginBottom:4}}>Disciplina Férrea</div>
+                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>Gastos &lt; 70% renda</div>
+                  </div>
+                )
+              })()}
+
+              {/* Acumulador */}
+              {(()=>{
+                const conquistada = tm.saldo >= 1000
+                return(
+                  <div style={{background:conquistada?"linear-gradient(135deg,rgba(156,39,176,.15),rgba(156,39,176,.05))":"rgba(255,255,255,.03)",border:`1.5px solid ${conquistada?"rgba(156,39,176,.4)":"rgba(255,255,255,.1)"}`,borderRadius:14,padding:14,textAlign:"center",position:"relative"}}>
+                    {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(156,39,176,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
+                    <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(156,39,176,.6))":"grayscale(1) opacity(.3)"}}>💎</div>
+                    <div style={{fontSize:11,fontWeight:700,color:conquistada?"#9C27B0":"rgba(255,255,255,.4)",marginBottom:4}}>Acumulador</div>
+                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>R$ 1.000 no mês</div>
+                  </div>
+                )
+              })()}
+
+              {/* Mestre das Finanças */}
+              {(()=>{
+                const conquistada = tm.saldo >= 3000
+                return(
+                  <div style={{background:conquistada?"linear-gradient(135deg,rgba(255,193,7,.15),rgba(255,193,7,.05))":"rgba(255,255,255,.03)",border:`1.5px solid ${conquistada?"rgba(255,193,7,.4)":"rgba(255,255,255,.1)"}`,borderRadius:14,padding:14,textAlign:"center",position:"relative"}}>
+                    {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(255,193,7,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
+                    <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(255,193,7,.6))":"grayscale(1) opacity(.3)"}}>👑</div>
+                    <div style={{fontSize:11,fontWeight:700,color:conquistada?"#FFC107":"rgba(255,255,255,.4)",marginBottom:4}}>Mestre Alquimista</div>
+                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>R$ 3.000 no mês</div>
+                  </div>
+                )
+              })()}
+
+            </div>
+          </div>
+
+          {/* Caldeirão de Transmutação (Simulador Interativo) */}
+          {(()=>{
+            const [simReceita, setSimReceita] = useState(tm.rec)
+            const [simDespesa, setSimDespesa] = useState(tm.exp)
+            const simSaldo = simReceita - simDespesa
+            const economy = tm.saldo - simSaldo
+            
+            return(
+              <div className="card" style={{background:"linear-gradient(135deg,#16213e,#0f1419)",border:"1px solid rgba(255,152,0,.2)"}}>
+                <div className="sec">🔥 Caldeirão de Transmutação</div>
+                <div style={{fontSize:11,color:"rgba(255,255,255,.6)",marginBottom:16}}>Simule cenários e descubra o potencial oculto</div>
+                
+                <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:16,marginBottom:20}}>
+                  
+                  <div>
+                    <label style={{fontSize:11,color:"rgba(255,255,255,.7)",marginBottom:8,display:"block"}}>💰 Receitas Mensais</label>
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max={tm.rec*2}
+                      step="100"
+                      value={simReceita}
+                      onChange={e=>setSimReceita(Number(e.target.value))}
+                      style={{width:"100%",marginBottom:8}}
+                    />
+                    <div style={{fontSize:16,fontWeight:700,color:"#4CAF50"}}>{fmt(simReceita)}</div>
+                  </div>
+                  
+                  <div>
+                    <label style={{fontSize:11,color:"rgba(255,255,255,.7)",marginBottom:8,display:"block"}}>💸 Despesas Mensais</label>
+                    <input 
+                      type="range" 
+                      min="0" 
+                      max={tm.exp*1.5}
+                      step="100"
+                      value={simDespesa}
+                      onChange={e=>setSimDespesa(Number(e.target.value))}
+                      style={{width:"100%",marginBottom:8}}
+                    />
+                    <div style={{fontSize:16,fontWeight:700,color:"#F44336"}}>{fmt(simDespesa)}</div>
+                  </div>
+                  
+                </div>
+                
+                <div style={{background:"linear-gradient(135deg,rgba(255,152,0,.15),rgba(255,152,0,.05))",border:"1.5px solid rgba(255,152,0,.3)",borderRadius:16,padding:20,textAlign:"center"}}>
+                  <div style={{fontSize:48,marginBottom:12,filter:"drop-shadow(0 4px 12px rgba(255,152,0,.6))"}}>⚗️</div>
+                  <div style={{fontSize:13,color:"rgba(255,255,255,.7)",marginBottom:8}}>Resultado da Transmutação</div>
+                  <div style={{fontSize:32,fontWeight:800,color:simSaldo>=0?"#4CAF50":"#F44336",marginBottom:16}}>{fmt(simSaldo)}</div>
+                  
+                  {economy !== 0 && (
+                    <div style={{fontSize:12,color:"rgba(255,255,255,.8)",padding:"12px 16px",background:"rgba(0,0,0,.3)",borderRadius:12,border:"1px solid rgba(255,152,0,.2)"}}>
+                      {economy > 0 ? (
+                        <>🎯 Você precisa <strong style={{color:"#4CAF50"}}>economizar {fmt(Math.abs(economy))}</strong> para alcançar este cenário!</>
+                      ) : (
+                        <>✨ Você teria <strong style={{color:"#FF9800"}}>gastado {fmt(Math.abs(economy))} a mais</strong> neste cenário</>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
+          })()}
+
+          {/* Cristal do Tempo (Histórico) */}
+          <div className="card" style={{background:"linear-gradient(135deg,#1a1a2e,#16213e)",border:"1px solid rgba(139,195,74,.2)"}}>
+            <div className="sec">🔮 Cristal do Tempo</div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,.6)",marginBottom:16}}>Evolução dos últimos 6 meses</div>
+            
+            {(()=>{
+              const ultimos6 = Array.from({length:6},(_,i)=>addMonths(thisMonth,-5+i)).map(m=>{
+                const data = getMonthData(m)
+                return {mes:monthShort(m),rec:data.rec,exp:data.exp,saldo:data.saldo}
+              })
+              const maxVal = Math.max(...ultimos6.map(m=>Math.max(m.rec,m.exp)),1)
+              
+              return(
+                <div>
+                  <div style={{display:"flex",gap:8,alignItems:"flex-end",height:140,marginBottom:12}}>
+                    {ultimos6.map((m,i)=>(
+                      <div key={i} style={{flex:1,display:"flex",flexDirection:"column",gap:4,alignItems:"center",justifyContent:"flex-end"}}>
+                        <div style={{width:"100%",background:"rgba(76,175,80,.8)",height:`${(m.rec/maxVal)*120}px`,borderRadius:"4px 4px 0 0",minHeight:m.rec>0?4:0,transition:"height .5s ease",position:"relative"}}>
+                          <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(255,255,255,.2),transparent)",borderRadius:"4px 4px 0 0"}}/>
+                        </div>
+                        <div style={{width:"100%",background:"rgba(244,67,54,.8)",height:`${(m.exp/maxVal)*120}px`,borderRadius:"4px 4px 0 0",minHeight:m.exp>0?4:0,transition:"height .5s ease",position:"relative"}}>
+                          <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(255,255,255,.2),transparent)",borderRadius:"4px 4px 0 0"}}/>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div style={{display:"flex",gap:8}}>
+                    {ultimos6.map((m,i)=>(
+                      <div key={i} style={{flex:1,textAlign:"center"}}>
+                        <div style={{fontSize:9,color:"rgba(255,255,255,.5)",marginBottom:4}}>{m.mes}</div>
+                        <div style={{fontSize:10,fontWeight:700,color:m.saldo>=0?"#4CAF50":"#F44336"}}>{m.saldo>=0?"+":""}{fmt(m.saldo).replace("R$\u00a0","").replace("R$ ","").substring(0,6)}</div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div style={{display:"flex",gap:16,justifyContent:"center",marginTop:16,paddingTop:16,borderTop:"1px solid rgba(255,255,255,.1)"}}>
+                    <div style={{display:"flex",alignItems:"center",gap:6}}>
+                      <div style={{width:12,height:12,background:"#4CAF50",borderRadius:3}}/>
+                      <span style={{fontSize:10,color:"rgba(255,255,255,.7)"}}>Receitas</span>
+                    </div>
+                    <div style={{display:"flex",alignItems:"center",gap:6}}>
+                      <div style={{width:12,height:12,background:"#F44336",borderRadius:3}}/>
+                      <span style={{fontSize:10,color:"rgba(255,255,255,.7)"}}>Despesas</span>
+                    </div>
+                  </div>
+                </div>
+              )
+            })()}
+          </div>
+
+          <style>{`
+            @keyframes sparkle{0%,100%{opacity:0;transform:translateY(0) scale(0)}50%{opacity:1;transform:translateY(-20px) scale(1)}}
+            @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+            @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.7}}
+          `}</style>
+
+        </>}
         {tab==="agenda"&&<>
           <div className="pt">Agenda Financeira</div>
 
