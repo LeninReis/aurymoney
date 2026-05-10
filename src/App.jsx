@@ -685,7 +685,7 @@ export default function AuryMoney() {
                 <div style={{fontSize:9,color:"var(--mt)",marginBottom:3}}>💰 Saldo Acumulado</div>
                 <div style={{fontSize:15,fontWeight:700,color:agSaldoAcumulado>=0?"var(--gn)":"var(--rd)"}}>{fmt(agSaldoAcumulado)}</div>
               </div>
-              <div style={{background:totalRec>0&&(totalExp/totalRec)<0.7?"rgba(52,211,153,.06)":totalRec>0&&(totalExp/totalRec)<0.85?"rgba(251,191,36,.06)":"rgba(248,113,113,.06)",border:,borderRadius:12,padding:"11px 12px"}}>
+              <div style={{background:totalRec>0&&(totalExp/totalRec)<0.7?"rgba(52,211,153,.06)":totalRec>0&&(totalExp/totalRec)<0.85?"rgba(251,191,36,.06)":"rgba(248,113,113,.06)",border:`1px solid ${totalRec>0&&(totalExp/totalRec)<0.7?"rgba(52,211,153,.15)":totalRec>0&&(totalExp/totalRec)<0.85?"rgba(251,191,36,.15)":"rgba(248,113,113,.15)"}`,borderRadius:12,padding:"11px 12px"}}>
                 <div style={{fontSize:9,color:"var(--mt)",marginBottom:3}}>% Gasto / Receita</div>
                 <div style={{fontSize:15,fontWeight:700,color:totalRec>0&&(totalExp/totalRec)<0.7?"var(--gn)":totalRec>0&&(totalExp/totalRec)<0.85?"var(--yw)":"var(--rd)"}}>{totalRec>0?Math.round((totalExp/totalRec)*100):0}%</div>
               </div>
@@ -1265,7 +1265,7 @@ export default function AuryMoney() {
             })()}
           </div>
 
-          </>
+          </>}
 
           <style>{`
             @keyframes sparkle{0%,100%{opacity:0;transform:translateY(0) scale(0)}50%{opacity:1;transform:translateY(-20px) scale(1)}}
