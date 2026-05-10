@@ -638,7 +638,7 @@ export default function AuryMoney() {
     {id:"agenda",   lbl:"Agenda", ico:"📅"},
     {id:"registros",lbl:"Registros",ico:"☰"},
     {id:"adicionar",lbl:editId?"Editar":"Novo",ico:"+"},
-    {id:"jardim",   lbl:"Jardim",ico:"🌸"},
+    {id:"jardim",   lbl:"Criaturas",ico:"✨"},
   ]
 
   // ── Content JSX ────────────────────────────────────────────────────────────
@@ -1581,61 +1581,56 @@ export default function AuryMoney() {
         </>}
 
 {tab==="jardim"&&<>
-  <div style={{marginBottom:16}}>
-    <div className="pt">✨ Centro de Criaturas Místicas</div>
-    <div style={{fontSize:11,color:"var(--mt)",lineHeight:1.6}}>
-      Suas criaturas evoluem conforme seu saldo do mês cresce! 🐉🦉🐱
+  <div style={{marginBottom:20}}>
+    <div className="pt" style={{background:"linear-gradient(135deg,#A78BFA,#F472B6,#FBBF24)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",fontSize:24}}>✨ Centro de Criaturas Místicas ✨</div>
+    <div style={{fontSize:12,color:"var(--mt)",lineHeight:1.8,maxWidth:600}}>
+      Suas criaturas mágicas ganham vida e evoluem conforme sua prosperidade cresce 🌟
     </div>
   </div>
 
   {(()=>{
     const saldoMes = Math.max(0, tm.saldo)
     
-    // Sistema de criaturas com evolução baseada no saldo
+    // Sistema de criaturas com evolução
     const criaturas = [
       {
         nome: "Dragão",
-        emoji: "🐉",
         estagios: [
-          {min:0,    max:500,  nome:"Ovo de Dragão",    emoji:"🥚", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Aguardando calor..."},
-          {min:500,  max:1500, nome:"Filhote de Dragão",emoji:"🦎", poder:15,  cor:"#F59E0B", cor2:"#D97706", desc:"Começando a soltar faíscas"},
-          {min:1500, max:3500, nome:"Dragão Juvenil",   emoji:"🐲", poder:45,  cor:"#EF4444", cor2:"#DC2626", desc:"Voando pelas montanhas"},
-          {min:3500, max:999999,nome:"Dragão Ancião",   emoji:"🐉", poder:100, cor:"#7C3AED", cor2:"#6D28D9", desc:"Guardião do tesouro dourado"}
+          {min:0,    max:500,  nome:"Ovo de Dragão",    emoji:"🥚", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Aguardando o calor da prosperidade..."},
+          {min:500,  max:1500, nome:"Filhote de Dragão",emoji:"🦎", poder:15,  cor:"#F59E0B", cor2:"#D97706", desc:"Começando a soltar faíscas douradas"},
+          {min:1500, max:3500, nome:"Dragão Juvenil",   emoji:"🐲", poder:45,  cor:"#EF4444", cor2:"#DC2626", desc:"Voando pelas montanhas encantadas"},
+          {min:3500, max:999999,nome:"Dragão Ancião",   emoji:"🐉", poder:100, cor:"#7C3AED", cor2:"#6D28D9", desc:"Guardião supremo do tesouro eterno"}
         ]
       },
       {
         nome: "Coruja",
-        emoji: "🦉",
         estagios: [
-          {min:0,    max:400,  nome:"Ovo de Coruja",     emoji:"🥚", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Em seu ninho quente"},
-          {min:400,  max:1200, nome:"Corujinha",         emoji:"🐣", poder:12,  cor:"#A78BFA", cor2:"#8B5CF6", desc:"Aprendendo a voar"},
-          {min:1200, max:2800, nome:"Coruja Sábia",      emoji:"🦉", poder:40,  cor:"#6366F1", cor2:"#4F46E5", desc:"Vê no escuro"},
-          {min:2800, max:999999,nome:"Coruja Mística",   emoji:"🔮", poder:85,  cor:"#14B8A6", cor2:"#0D9488", desc:"Porta da sabedoria ancestral"}
+          {min:0,    max:400,  nome:"Ovo de Coruja",     emoji:"🥚", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Descansando em seu ninho macio"},
+          {min:400,  max:1200, nome:"Corujinha Bebê",    emoji:"🐣", poder:12,  cor:"#A78BFA", cor2:"#8B5CF6", desc:"Dando seus primeiros voos noturnos"},
+          {min:1200, max:2800, nome:"Coruja Sábia",      emoji:"🦉", poder:40,  cor:"#6366F1", cor2:"#4F46E5", desc:"Enxerga através da escuridão"},
+          {min:2800, max:999999,nome:"Coruja Mística",   emoji:"🔮", poder:85,  cor:"#14B8A6", cor2:"#0D9488", desc:"Porta dos mistérios ancestrais"}
         ]
       },
       {
         nome: "Gato",
-        emoji: "🐱",
         estagios: [
-          {min:0,    max:300,  nome:"Ovo Felino",        emoji:"🥚", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Ronronando baixinho"},
-          {min:300,  max:1000, nome:"Gatinho",           emoji:"🐱", poder:10,  cor:"#F472B6", cor2:"#EC4899", desc:"Brincando com novelos"},
-          {min:1000, max:2500, nome:"Gato Mágico",       emoji:"😺", poder:35,  cor:"#8B5CF6", cor2:"#7C3AED", desc:"Traz boa sorte"},
-          {min:2500, max:999999,nome:"Gato Cósmico",     emoji:"🌟", poder:75,  cor:"#F59E0B", cor2:"#D97706", desc:"Viaja entre dimensões"}
+          {min:0,    max:300,  nome:"Ovo Felino",        emoji:"🥚", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Ronronando baixinho no silêncio"},
+          {min:300,  max:1000, nome:"Gatinho Fofinho",   emoji:"🐱", poder:10,  cor:"#F472B6", cor2:"#EC4899", desc:"Brincando com novelos de estrelas"},
+          {min:1000, max:2500, nome:"Gato Mágico",       emoji:"😺", poder:35,  cor:"#8B5CF6", cor2:"#7C3AED", desc:"Traz sorte e prosperidade"},
+          {min:2500, max:999999,nome:"Gato Cósmico",     emoji:"🌟", poder:75,  cor:"#F59E0B", cor2:"#D97706", desc:"Caminha entre as dimensões"}
         ]
       },
       {
         nome: "Fênix",
-        emoji: "🔥",
         estagios: [
-          {min:0,    max:800,  nome:"Cinzas Místicas",   emoji:"🌫️", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Aguardando renascimento"},
-          {min:800,  max:2000, nome:"Chama Nascente",    emoji:"🕯️", poder:20,  cor:"#FBBF24", cor2:"#F59E0B", desc:"A chama começa a brilhar"},
-          {min:2000, max:4000, nome:"Fênix em Chamas",   emoji:"🔥", poder:60,  cor:"#EF4444", cor2:"#DC2626", desc:"Ilumina o céu noturno"},
-          {min:4000, max:999999,nome:"Fênix Imortal",    emoji:"✨", poder:120, cor:"#F97316", cor2:"#EA580C", desc:"Renasce eternamente"}
+          {min:0,    max:800,  nome:"Cinzas Místicas",   emoji:"🌫️", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Aguardando o renascimento glorioso"},
+          {min:800,  max:2000, nome:"Chama Nascente",    emoji:"🕯️", poder:20,  cor:"#FBBF24", cor2:"#F59E0B", desc:"A primeira chama da eternidade"},
+          {min:2000, max:4000, nome:"Fênix Flamejante",  emoji:"🔥", poder:60,  cor:"#EF4444", cor2:"#DC2626", desc:"Iluminando os céus com fogo sagrado"},
+          {min:4000, max:999999,nome:"Fênix Imortal",    emoji:"✨", poder:120, cor:"#F97316", cor2:"#EA580C", desc:"Renascendo eternamente das cinzas"}
         ]
       }
     ]
 
-    // Calcular evolução de cada criatura
     const criaturasEvoluidas = criaturas.map(criatura => {
       const estagio = criatura.estagios.find(e => saldoMes >= e.min && saldoMes < e.max) || criatura.estagios[criatura.estagios.length - 1]
       const estagioIdx = criatura.estagios.indexOf(estagio)
@@ -1645,12 +1640,12 @@ export default function AuryMoney() {
       return { ...criatura, estagio, estagioIdx, progresso, proximoEstagio }
     })
 
-    // Cenário que evolui com o saldo
+    // Cenários evoluindo
     const cenarios = [
-      {min:0,    max:1000, nome:"Caverna Sombria",    emoji:"🕳️", bg:"linear-gradient(135deg,#1F2937,#111827)", desc:"Um lugar úmido e escuro"},
-      {min:1000, max:2500, nome:"Floresta Encantada", emoji:"🌲", bg:"linear-gradient(135deg,#065F46,#047857)", desc:"Árvores antigas sussurram"},
-      {min:2500, max:4500, nome:"Montanha Celeste",   emoji:"⛰️",  bg:"linear-gradient(135deg,#1E40AF,#3B82F6)", desc:"Onde o céu toca a terra"},
-      {min:4500, max:999999,nome:"Castelo de Cristal",emoji:"🏰", bg:"linear-gradient(135deg,#7C3AED,#A78BFA)", desc:"Reino da prosperidade eterna"}
+      {min:0,    max:1000, nome:"Caverna dos Sonhos",    emoji:"🕳️", bg:"linear-gradient(135deg,#1e1b4b,#0f172a)", particulas:"#60A5FA", desc:"Um refúgio tranquilo onde tudo começa"},
+      {min:1000, max:2500, nome:"Floresta Encantada",    emoji:"🌲", bg:"linear-gradient(135deg,#064e3b,#022c22)", particulas:"#34D399", desc:"Árvores antigas sussurram segredos"},
+      {min:2500, max:4500, nome:"Vale das Estrelas",     emoji:"⭐", bg:"linear-gradient(135deg,#1e3a8a,#1e40af)", particulas:"#FCD34D", desc:"Onde o céu toca a terra gentilmente"},
+      {min:4500, max:999999,nome:"Palácio de Cristal",   emoji:"🏰", bg:"linear-gradient(135deg,#581c87,#6b21a8)", particulas:"#E9D5FF", desc:"Reino eterno da prosperidade infinita"}
     ]
     
     const cenario = cenarios.find(c => saldoMes >= c.min && saldoMes < c.max) || cenarios[cenarios.length - 1]
@@ -1660,151 +1655,315 @@ export default function AuryMoney() {
 
     return(
       <>
-        {/* Card do Cenário Atual */}
+        {/* Cenário Mágico Principal */}
         <div style={{
           background:cenario.bg,
-          border:"1px solid rgba(255,255,255,.15)",
-          borderRadius:16,
-          padding:24,
-          marginBottom:20,
+          border:"1px solid rgba(255,255,255,.2)",
+          borderRadius:20,
+          padding:isMobile?20:32,
+          marginBottom:24,
           position:"relative",
-          overflow:"hidden"
+          overflow:"hidden",
+          boxShadow:"0 10px 40px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.1)"
         }}>
-          {/* Textura mágica animada */}
+          {/* Partículas flutuantes mágicas */}
+          <div style={{position:"absolute",inset:0,overflow:"hidden",opacity:0.4}}>
+            {Array.from({length:30}).map((_,i)=>(
+              <div key={i} style={{
+                position:"absolute",
+                width:Math.random()*4+2,
+                height:Math.random()*4+2,
+                background:cenario.particulas,
+                borderRadius:"50%",
+                left:`${Math.random()*100}%`,
+                top:`${Math.random()*100}%`,
+                animation:`float-particle ${3+Math.random()*4}s ease-in-out infinite`,
+                animationDelay:`${Math.random()*3}s`,
+                filter:"blur(1px)",
+                boxShadow:`0 0 ${Math.random()*10+5}px ${cenario.particulas}`
+              }}/>
+            ))}
+          </div>
+          
+          {/* Brilho ambiente */}
           <div style={{
             position:"absolute",
-            top:0,left:0,right:0,bottom:0,
-            background:"radial-gradient(circle at 20% 50%, rgba(255,255,255,.05) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(255,255,255,.03) 0%, transparent 50%)",
-            animation:"pulse 4s ease-in-out infinite",
-            pointerEvents:"none"
+            inset:0,
+            background:"radial-gradient(circle at 30% 40%, rgba(255,255,255,.08) 0%, transparent 60%), radial-gradient(circle at 70% 70%, rgba(255,255,255,.05) 0%, transparent 50%)",
+            animation:"pulse-glow 6s ease-in-out infinite"
           }}/>
           
           <div style={{position:"relative",zIndex:1}}>
-            <div style={{fontSize:48,textAlign:"center",marginBottom:12,filter:"drop-shadow(0 0 20px rgba(255,255,255,.3))"}}>{cenario.emoji}</div>
-            <div style={{fontSize:20,fontWeight:800,textAlign:"center",color:"#FFF",marginBottom:6,textShadow:"0 2px 10px rgba(0,0,0,.5)"}}>{cenario.nome}</div>
-            <div style={{fontSize:11,textAlign:"center",color:"rgba(255,255,255,.8)",marginBottom:16}}>{cenario.desc}</div>
+            <div style={{
+              fontSize:72,
+              textAlign:"center",
+              marginBottom:16,
+              filter:"drop-shadow(0 0 30px rgba(255,255,255,.4))",
+              animation:"float-slow 4s ease-in-out infinite"
+            }}>{cenario.emoji}</div>
+            
+            <div style={{
+              fontSize:24,
+              fontWeight:800,
+              textAlign:"center",
+              color:"#FFF",
+              marginBottom:8,
+              textShadow:"0 2px 20px rgba(0,0,0,.8), 0 0 40px rgba(255,255,255,.3)",
+              letterSpacing:1
+            }}>{cenario.nome}</div>
+            
+            <div style={{
+              fontSize:12,
+              textAlign:"center",
+              color:"rgba(255,255,255,.85)",
+              marginBottom:20,
+              fontStyle:"italic",
+              textShadow:"0 1px 3px rgba(0,0,0,.5)"
+            }}>{cenario.desc}</div>
             
             {proxCenario && (
-              <>
-                <div style={{background:"rgba(0,0,0,.3)",borderRadius:99,height:8,overflow:"hidden",marginBottom:6}}>
+              <div style={{maxWidth:400,margin:"0 auto"}}>
+                <div style={{
+                  background:"rgba(0,0,0,.4)",
+                  borderRadius:99,
+                  height:10,
+                  overflow:"hidden",
+                  marginBottom:8,
+                  border:"1px solid rgba(255,255,255,.1)",
+                  boxShadow:"inset 0 2px 4px rgba(0,0,0,.3)"
+                }}>
                   <div style={{
-                    background:"linear-gradient(90deg,#FCD34D,#F59E0B,#FCD34D)",
+                    background:"linear-gradient(90deg,#FCD34D,#F59E0B,#FBBF24,#FCD34D)",
+                    backgroundSize:"200% 100%",
                     width:`${progCenario}%`,
                     height:"100%",
                     borderRadius:99,
-                    boxShadow:"0 0 12px #F59E0B",
-                    transition:"width 1s ease"
+                    boxShadow:"0 0 20px #F59E0B, 0 0 40px #FCD34D",
+                    transition:"width 1s ease",
+                    animation:"shimmer-gold 3s linear infinite"
                   }}/>
                 </div>
-                <div style={{fontSize:10,textAlign:"center",color:"rgba(255,255,255,.6)"}}>
-                  Faltam {fmt(proxCenario.min - saldoMes)} para {proxCenario.emoji} {proxCenario.nome}
+                <div style={{
+                  fontSize:11,
+                  textAlign:"center",
+                  color:"rgba(255,255,255,.7)",
+                  fontWeight:600
+                }}>
+                  Faltam {fmt(proxCenario.min - saldoMes)} para desbloquear {proxCenario.emoji} {proxCenario.nome}
                 </div>
-              </>
+              </div>
             )}
             {!proxCenario && (
-              <div style={{fontSize:12,textAlign:"center",color:"#FCD34D",fontWeight:700}}>✨ Cenário Máximo Alcançado! ✨</div>
+              <div style={{
+                fontSize:14,
+                textAlign:"center",
+                color:"#FCD34D",
+                fontWeight:800,
+                textShadow:"0 0 20px #F59E0B",
+                animation:"glow-pulse 2s ease-in-out infinite"
+              }}>✨ Reino Máximo Conquistado! ✨</div>
             )}
           </div>
         </div>
 
-        {/* Grid de Criaturas */}
+        {/* Grid de Criaturas - Design Ultra Cozy */}
         <div style={{
           display:"grid",
           gridTemplateColumns:isMobile?"1fr":"repeat(2,1fr)",
-          gap:12,
-          marginBottom:16
+          gap:16,
+          marginBottom:20
         }}>
-          {criaturasEvoluidas.map(criatura => (
+          {criaturasEvoluidas.map((criatura,idx) => (
             <div key={criatura.nome} style={{
-              background:"linear-gradient(135deg,rgba(0,0,0,.4),rgba(0,0,0,.2))",
+              background:"linear-gradient(135deg,rgba(17,24,39,.95),rgba(31,41,55,.9))",
               border:`2px solid ${criatura.estagio.cor}`,
-              borderRadius:16,
-              padding:16,
+              borderRadius:20,
+              padding:20,
               position:"relative",
               overflow:"hidden",
-              boxShadow:`0 4px 20px ${criatura.estagio.cor}40`
-            }}>
-              {/* Brilho mágico de fundo */}
+              boxShadow:`0 8px 32px ${criatura.estagio.cor}60, inset 0 1px 0 rgba(255,255,255,.1)`,
+              transition:"transform 0.3s ease, box-shadow 0.3s ease",
+              cursor:"pointer"
+            }}
+            onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-4px)";e.currentTarget.style.boxShadow=`0 12px 48px ${criatura.estagio.cor}80, inset 0 1px 0 rgba(255,255,255,.15)`}}
+            onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow=`0 8px 32px ${criatura.estagio.cor}60, inset 0 1px 0 rgba(255,255,255,.1)`}}
+            >
+              {/* Aura mágica rotativa */}
               <div style={{
                 position:"absolute",
-                top:"-50%",right:"-50%",
-                width:"200%",height:"200%",
-                background:`radial-gradient(circle, ${criatura.estagio.cor}15 0%, transparent 70%)`,
-                animation:"rotate 8s linear infinite",
-                pointerEvents:"none"
+                inset:-20,
+                background:`conic-gradient(from 0deg, transparent 0%, ${criatura.estagio.cor}30 25%, transparent 50%, ${criatura.estagio.cor}30 75%, transparent 100%)`,
+                animation:"rotate-aura 8s linear infinite",
+                filter:"blur(20px)",
+                opacity:0.6
               }}/>
               
+              {/* Partículas específicas da criatura */}
+              <div style={{position:"absolute",inset:0,overflow:"hidden"}}>
+                {Array.from({length:8}).map((_,i)=>(
+                  <div key={i} style={{
+                    position:"absolute",
+                    width:3,
+                    height:3,
+                    background:criatura.estagio.cor,
+                    borderRadius:"50%",
+                    left:`${20+Math.random()*60}%`,
+                    top:`${20+Math.random()*60}%`,
+                    animation:`sparkle-creature ${2+Math.random()*2}s ease-in-out infinite`,
+                    animationDelay:`${i*0.3}s`,
+                    boxShadow:`0 0 10px ${criatura.estagio.cor}`
+                  }}/>
+                ))}
+              </div>
+              
               <div style={{position:"relative",zIndex:1}}>
-                {/* Emoji da criatura */}
+                {/* Criatura em movimento */}
                 <div style={{
-                  fontSize:64,
+                  fontSize:80,
                   textAlign:"center",
-                  marginBottom:12,
-                  filter:`drop-shadow(0 0 15px ${criatura.estagio.cor})`,
-                  animation:"float 3s ease-in-out infinite"
+                  marginBottom:16,
+                  filter:`drop-shadow(0 0 20px ${criatura.estagio.cor}) drop-shadow(0 0 40px ${criatura.estagio.cor}80)`,
+                  animation:`float-creature-${idx % 3} 3s ease-in-out infinite`,
+                  transform:"scale(1)",
+                  transition:"transform 0.3s ease"
                 }}>
                   {criatura.estagio.emoji}
                 </div>
                 
-                {/* Nome e estágio */}
-                <div style={{textAlign:"center",marginBottom:8}}>
-                  <div style={{fontSize:14,fontWeight:800,color:criatura.estagio.cor,marginBottom:2}}>
+                {/* Nome com efeito de brilho */}
+                <div style={{
+                  textAlign:"center",
+                  marginBottom:12,
+                  padding:"8px 12px",
+                  background:`linear-gradient(135deg,${criatura.estagio.cor}20,${criatura.estagio.cor2}10)`,
+                  borderRadius:12,
+                  border:`1px solid ${criatura.estagio.cor}40`
+                }}>
+                  <div style={{
+                    fontSize:16,
+                    fontWeight:800,
+                    background:`linear-gradient(135deg,${criatura.estagio.cor},${criatura.estagio.cor2},#FFF)`,
+                    WebkitBackgroundClip:"text",
+                    WebkitTextFillColor:"transparent",
+                    marginBottom:4,
+                    letterSpacing:0.5
+                  }}>
                     {criatura.estagio.nome}
                   </div>
-                  <div style={{fontSize:10,color:"var(--mt)"}}>
+                  <div style={{
+                    fontSize:10,
+                    color:"rgba(255,255,255,.7)",
+                    fontStyle:"italic"
+                  }}>
                     {criatura.estagio.desc}
                   </div>
                 </div>
 
-                {/* Barra de poder */}
-                <div style={{marginBottom:10}}>
-                  <div style={{fontSize:9,color:"var(--mt)",marginBottom:4,display:"flex",justifyContent:"space-between"}}>
-                    <span>⚡ Nível de Poder</span>
-                    <span style={{fontWeight:700,color:criatura.estagio.cor}}>{criatura.estagio.poder}</span>
+                {/* Barra de Poder Animada */}
+                <div style={{marginBottom:12}}>
+                  <div style={{
+                    fontSize:10,
+                    color:"var(--mt)",
+                    marginBottom:6,
+                    display:"flex",
+                    justifyContent:"space-between",
+                    alignItems:"center"
+                  }}>
+                    <span style={{display:"flex",alignItems:"center",gap:4}}>
+                      ⚡ <span style={{fontWeight:600}}>Poder Místico</span>
+                    </span>
+                    <span style={{
+                      fontWeight:800,
+                      fontSize:14,
+                      color:criatura.estagio.cor,
+                      textShadow:`0 0 10px ${criatura.estagio.cor}`
+                    }}>{criatura.estagio.poder}</span>
                   </div>
-                  <div style={{background:"rgba(0,0,0,.5)",borderRadius:99,height:6,overflow:"hidden"}}>
+                  <div style={{
+                    background:"rgba(0,0,0,.6)",
+                    borderRadius:99,
+                    height:8,
+                    overflow:"hidden",
+                    border:"1px solid rgba(255,255,255,.1)",
+                    boxShadow:"inset 0 2px 4px rgba(0,0,0,.3)"
+                  }}>
                     <div style={{
-                      background:`linear-gradient(90deg,${criatura.estagio.cor},${criatura.estagio.cor2})`,
+                      background:`linear-gradient(90deg,${criatura.estagio.cor},${criatura.estagio.cor2},${criatura.estagio.cor})`,
+                      backgroundSize:"200% 100%",
                       width:`${criatura.estagio.poder}%`,
                       height:"100%",
                       borderRadius:99,
-                      boxShadow:`0 0 10px ${criatura.estagio.cor}`
+                      boxShadow:`0 0 15px ${criatura.estagio.cor}, 0 0 30px ${criatura.estagio.cor}80`,
+                      animation:"shimmer-power 2s linear infinite",
+                      transition:"width 1s ease"
                     }}/>
                   </div>
                 </div>
 
-                {/* Progresso para próxima evolução */}
+                {/* Progresso de Evolução */}
                 {criatura.proximoEstagio ? (
-                  <>
-                    <div style={{background:"rgba(255,255,255,.05)",borderRadius:10,padding:"8px 10px",border:"1px solid rgba(255,255,255,.1)"}}>
-                      <div style={{fontSize:9,color:"var(--mt)",marginBottom:4}}>
-                        Próxima evolução: {criatura.proximoEstagio.nome}
-                      </div>
-                      <div style={{background:"rgba(0,0,0,.3)",borderRadius:99,height:6,overflow:"hidden",marginBottom:4}}>
-                        <div style={{
-                          background:`linear-gradient(90deg,#34D399,#10B981)`,
-                          width:`${criatura.progresso}%`,
-                          height:"100%",
-                          borderRadius:99,
-                          boxShadow:"0 0 8px #10B981",
-                          transition:"width 1s ease"
-                        }}/>
-                      </div>
-                      <div style={{fontSize:9,color:"#34D399",fontWeight:600}}>
-                        {criatura.progresso.toFixed(0)}% · Faltam {fmt(criatura.proximoEstagio.min - saldoMes)}
-                      </div>
+                  <div style={{
+                    background:"rgba(16,185,129,.1)",
+                    borderRadius:12,
+                    padding:"10px 12px",
+                    border:"1px solid rgba(16,185,129,.3)",
+                    boxShadow:"0 4px 12px rgba(16,185,129,.2)"
+                  }}>
+                    <div style={{
+                      fontSize:10,
+                      color:"#6EE7B7",
+                      marginBottom:6,
+                      fontWeight:600
+                    }}>
+                      🌟 Próxima Evolução: {criatura.proximoEstagio.nome}
                     </div>
-                  </>
+                    <div style={{
+                      background:"rgba(0,0,0,.4)",
+                      borderRadius:99,
+                      height:6,
+                      overflow:"hidden",
+                      marginBottom:6,
+                      border:"1px solid rgba(255,255,255,.1)"
+                    }}>
+                      <div style={{
+                        background:"linear-gradient(90deg,#10B981,#34D399,#6EE7B7)",
+                        backgroundSize:"200% 100%",
+                        width:`${criatura.progresso}%`,
+                        height:"100%",
+                        borderRadius:99,
+                        boxShadow:"0 0 10px #10B981",
+                        transition:"width 1s ease",
+                        animation:"shimmer-progress 3s linear infinite"
+                      }}/>
+                    </div>
+                    <div style={{
+                      fontSize:10,
+                      color:"#6EE7B7",
+                      fontWeight:700,
+                      display:"flex",
+                      justifyContent:"space-between"
+                    }}>
+                      <span>{criatura.progresso.toFixed(0)}% completo</span>
+                      <span>Faltam {fmt(criatura.proximoEstagio.min - saldoMes)}</span>
+                    </div>
+                  </div>
                 ) : (
                   <div style={{
-                    background:"linear-gradient(135deg,rgba(251,191,36,.2),rgba(245,158,11,.1))",
-                    border:"1px solid rgba(251,191,36,.3)",
-                    borderRadius:10,
-                    padding:"8px 10px",
-                    textAlign:"center"
+                    background:"linear-gradient(135deg,rgba(251,191,36,.25),rgba(245,158,11,.15))",
+                    border:"1px solid rgba(251,191,36,.4)",
+                    borderRadius:12,
+                    padding:"12px",
+                    textAlign:"center",
+                    boxShadow:"0 4px 12px rgba(251,191,36,.3), inset 0 1px 0 rgba(255,255,255,.1)"
                   }}>
-                    <div style={{fontSize:11,fontWeight:700,color:"#FBBF24"}}>
-                      👑 EVOLUÇÃO MÁXIMA!
+                    <div style={{
+                      fontSize:13,
+                      fontWeight:800,
+                      color:"#FCD34D",
+                      textShadow:"0 0 10px #F59E0B",
+                      letterSpacing:1
+                    }}>
+                      👑 FORMA SUPREMA! 👑
                     </div>
                   </div>
                 )}
@@ -1813,55 +1972,140 @@ export default function AuryMoney() {
           ))}
         </div>
 
-        {/* Estatísticas gerais */}
+        {/* Dashboard Místico de Estatísticas */}
         <div style={{
-          background:"linear-gradient(135deg,rgba(167,139,250,.1),rgba(139,92,246,.05))",
+          background:"linear-gradient(135deg,rgba(139,92,246,.15),rgba(167,139,250,.1))",
           border:"1px solid rgba(167,139,250,.3)",
-          borderRadius:12,
-          padding:16
+          borderRadius:20,
+          padding:20,
+          position:"relative",
+          overflow:"hidden",
+          boxShadow:"0 8px 24px rgba(139,92,246,.2), inset 0 1px 0 rgba(255,255,255,.1)"
         }}>
-          <div style={{fontSize:12,fontWeight:700,color:"var(--pu)",marginBottom:10}}>📊 Status Geral do Centro</div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(2,1fr)",gap:8}}>
-            <div style={{background:"rgba(0,0,0,.2)",borderRadius:8,padding:"8px 10px"}}>
-              <div style={{fontSize:9,color:"var(--mt)",marginBottom:2}}>Poder Total</div>
-              <div style={{fontSize:18,fontWeight:800,color:"#FCD34D"}}>
-                {criaturasEvoluidas.reduce((sum,c)=>sum+c.estagio.poder,0)}
-              </div>
+          <div style={{
+            position:"absolute",
+            inset:0,
+            background:"radial-gradient(circle at 80% 20%, rgba(167,139,250,.1) 0%, transparent 50%)",
+            animation:"pulse-stats 4s ease-in-out infinite"
+          }}/>
+          
+          <div style={{position:"relative",zIndex:1}}>
+            <div style={{
+              fontSize:14,
+              fontWeight:800,
+              background:"linear-gradient(135deg,#A78BFA,#C4B5FD,#FFF)",
+              WebkitBackgroundClip:"text",
+              WebkitTextFillColor:"transparent",
+              marginBottom:16,
+              display:"flex",
+              alignItems:"center",
+              gap:8
+            }}>
+              <span>📊</span> Livro de Registros Místicos
             </div>
-            <div style={{background:"rgba(0,0,0,.2)",borderRadius:8,padding:"8px 10px"}}>
-              <div style={{fontSize:9,color:"var(--mt)",marginBottom:2}}>Criaturas</div>
-              <div style={{fontSize:18,fontWeight:800,color:"#A78BFA"}}>
-                {criaturas.length}
-              </div>
-            </div>
-            <div style={{background:"rgba(0,0,0,.2)",borderRadius:8,padding:"8px 10px"}}>
-              <div style={{fontSize:9,color:"var(--mt)",marginBottom:2}}>Evoluções Máx.</div>
-              <div style={{fontSize:18,fontWeight:800,color:"#34D399"}}>
-                {criaturasEvoluidas.filter(c=>!c.proximoEstagio).length}/{criaturas.length}
-              </div>
-            </div>
-            <div style={{background:"rgba(0,0,0,.2)",borderRadius:8,padding:"8px 10px"}}>
-              <div style={{fontSize:9,color:"var(--mt)",marginBottom:2}}>Saldo do Mês</div>
-              <div style={{fontSize:18,fontWeight:800,color:saldoMes>=0?"#10B981":"#EF4444"}}>
-                {fmt(saldoMes)}
-              </div>
+            
+            <div style={{
+              display:"grid",
+              gridTemplateColumns:isMobile?"repeat(2,1fr)":"repeat(4,1fr)",
+              gap:12
+            }}>
+              {[
+                {label:"Poder Total",value:criaturasEvoluidas.reduce((sum,c)=>sum+c.estagio.poder,0),cor:"#FCD34D",icon:"⚡"},
+                {label:"Criaturas",value:criaturas.length,cor:"#A78BFA",icon:"✨"},
+                {label:"Supremas",value:`${criaturasEvoluidas.filter(c=>!c.proximoEstagio).length}/${criaturas.length}`,cor:"#34D399",icon:"👑"},
+                {label:"Saldo Mês",value:fmt(saldoMes),cor:saldoMes>=0?"#10B981":"#EF4444",icon:"💰"}
+              ].map(stat=>(
+                <div key={stat.label} style={{
+                  background:"rgba(0,0,0,.3)",
+                  borderRadius:12,
+                  padding:"12px",
+                  border:"1px solid rgba(255,255,255,.1)",
+                  boxShadow:"inset 0 2px 4px rgba(0,0,0,.2)",
+                  transition:"transform 0.2s ease",
+                  cursor:"pointer"
+                }}
+                onMouseEnter={e=>e.currentTarget.style.transform="scale(1.05)"}
+                onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}
+                >
+                  <div style={{
+                    fontSize:10,
+                    color:"rgba(255,255,255,.6)",
+                    marginBottom:6,
+                    display:"flex",
+                    alignItems:"center",
+                    gap:4
+                  }}>
+                    <span>{stat.icon}</span>
+                    <span>{stat.label}</span>
+                  </div>
+                  <div style={{
+                    fontSize:20,
+                    fontWeight:800,
+                    color:stat.cor,
+                    textShadow:`0 0 15px ${stat.cor}`,
+                    fontFamily:"'Outfit',sans-serif"
+                  }}>
+                    {stat.value}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
-        {/* Animações CSS */}
+        {/* CSS para Animações Mágicas */}
         <style>{`
-          @keyframes float {
+          @keyframes float-slow {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-15px); }
           }
-          @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+          @keyframes float-creature-0 {
+            0%, 100% { transform: translateY(0px) rotate(-2deg); }
+            50% { transform: translateY(-12px) rotate(2deg); }
           }
-          @keyframes rotate {
+          @keyframes float-creature-1 {
+            0%, 100% { transform: translateY(0px) rotate(2deg); }
+            50% { transform: translateY(-15px) rotate(-2deg); }
+          }
+          @keyframes float-creature-2 {
+            0%, 100% { transform: translateY(0px) rotate(-1deg); }
+            50% { transform: translateY(-10px) rotate(1deg); }
+          }
+          @keyframes float-particle {
+            0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.4; }
+            50% { transform: translateY(-30px) translateX(10px); opacity: 1; }
+          }
+          @keyframes sparkle-creature {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+          }
+          @keyframes rotate-aura {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
+          }
+          @keyframes shimmer-gold {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+          }
+          @keyframes shimmer-power {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+          }
+          @keyframes shimmer-progress {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+          }
+          @keyframes pulse-glow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+          }
+          @keyframes glow-pulse {
+            0%, 100% { opacity: 1; text-shadow: 0 0 20px #F59E0B; }
+            50% { opacity: 0.8; text-shadow: 0 0 40px #F59E0B, 0 0 60px #FCD34D; }
+          }
+          @keyframes pulse-stats {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
           }
         `}</style>
       </>
