@@ -394,15 +394,7 @@ export default function AuryMoney() {
   const [fCard, setFCard] = useState("todos")
   const [fCat,  setFCat]  = useState("todos")
   const [toast, setToast] = useState("")
-  const [chat, setChat]   = useState([{
-    role:"assistant",
-    text:"Oi! Sou o Aury 💜 Estou aqui pra ajudar vocês a quitar tudo e começar a construir patrimônio. Posso analisar suas finanças, registrar lançamentos e traçar estratégias. Por onde começamos?",
-  }])
-  const [chatIn, setChatIn]     = useState("")
-  const [chatLoad, setChatLoad] = useState(false)
-  const chatEnd = useRef(null)
 
-  useEffect(() => { chatEnd.current?.scrollIntoView({ behavior:"smooth" }) }, [chat])
   useEffect(() => {
     const q = query(collection(db,"records"), orderBy("createdAt","desc"))
     return onSnapshot(q, snap => { setRecs(snap.docs.map(d=>({id:d.id,...d.data()}))); setLoad(false) })
@@ -439,9 +431,31 @@ export default function AuryMoney() {
     return { rec, exp, saldo:rec-exp, count:rs.length }
   }
 
+  // Calcula saldo acumulado até um determinado mês
+  const getSaldoAcumuladoAte = (targetMonth) => {
+    if(records.length === 0) return 0
+    
+    // Pega todos os meses com registros até o mês alvo, em ordem
+    const allDates = records.map(r => r.date?.slice(0,7)).filter(Boolean).sort()
+    const firstMonth = allDates[0]
+    
+    let saldoAcumulado = 0
+    let ym = firstMonth
+    
+    // Acumula saldo de todos os meses até o targetMonth (inclusive)
+    while(ym <= targetMonth) {
+      const monthData = getMonthData(ym)
+      saldoAcumulado += monthData.saldo
+      ym = addMonths(ym, 1)
+    }
+    
+    return saldoAcumulado
+  }
+
   const thisMonth  = curMonth()
   const tm         = getMonthData(thisMonth)
   const agData     = getMonthData(agMonth)
+  const agSaldoAcumulado = getSaldoAcumuladoAte(agMonth) // Saldo acumulado até o mês da agenda
 
   // Saldo faltante do mês atual (quanto precisa de renda extra pra fechar no zero)
   const faltando = tm.saldo < 0 ? Math.abs(tm.saldo) : 0
@@ -581,40 +595,6 @@ export default function AuryMoney() {
   }
   async function handleDel(id){ await deleteDoc(doc(db,"records",id)); showToast("✓ Removido") }
 
-  // ── Chat ───────────────────────────────────────────────────────────────────
-  async function sendChat(){
-    const msg=chatIn.trim(); if(!msg||chatLoad) return
-    setChatIn("")
-    const h=[...chat,{role:"user",text:msg}]; setChat(h); setChatLoad(true)
-    const cardSum = Object.entries(CARDS).map(([k,c])=>`${c.name}(${c.owner}) vence dia ${c.venc}, fatura mês=${fmt(cardFaturaMonth(k,thisMonth))}`).join(" | ")
-    const projSum = projection.map(p=>`${p.label}: exp ${fmt(p.projExp)}, rec ${fmt(p.projRec)}, saldo ${fmt(p.saldo)}`).join(" | ")
-    const system = `Você é o Aury, assistente financeiro estratégico do casal Lenin e Evelyn. Meta principal: quitar todas as dívidas, depois poupar e investir.
-Situação financeira conjunta: receitas totais ${fmt(totalRec)}, despesas totais ${fmt(totalExp)}, saldo ${fmt(saldo)}, poupança ${savePct}%.
-Mês atual: receitas ${fmt(tm.rec)}, despesas ${fmt(tm.exp)}, saldo ${fmt(tm.saldo)}${faltando>0?`, FALTAM ${fmt(faltando)} para fechar no zero`:""}.
-Cartões: ${cardSum}.
-Projeção: ${projSum}.
-Alertas: ${alerts.map(a=>a.title).join("; ")||"nenhum"}.
-Seja direto, estratégico e empático. Dê conselhos reais e acionáveis focados em solvência.
-Para REGISTRAR responda SOMENTE com JSON:
-{"action":"add","type":"receita|despesa","desc":"...","value":0,"category":"cartao|pix|mensalidade|emprestimo|salario|freelance|investimento|outro","card":"nubank_l|inter_l|nubank_e|mercadopago_e|picpay_e","shared":false,"recorrente":false}`
-
-    const messages=h.slice(-8).map(m=>({role:m.role==="assistant"?"assistant":"user",content:m.text}))
-    try {
-      const res=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({system,messages})})
-      const data=await res.json()
-      const text=data.text||"Não entendi 😅"
-      const match=text.match(/\{[\s\S]*"action"\s*:\s*"add"[\s\S]*\}/)
-      if(match){
-        try{
-          const p=JSON.parse(match[0])
-          await addDoc(collection(db,"records"),{type:p.type,desc:p.desc,value:p.value,category:p.category,date:todayStr(),card:p.card||"nubank_l",shared:!!p.shared,recorrente:!!p.recorrente,createdAt:serverTimestamp()})
-          setChat([...h,{role:"assistant",text:`✅ **${p.desc}** — ${fmt(p.value)} registrado${p.recorrente?" 🔄":""}`}])
-        } catch { setChat([...h,{role:"assistant",text}]) }
-      } else { setChat([...h,{role:"assistant",text}]) }
-    } catch { setChat([...h,{role:"assistant",text:"Problema de conexão 😅"}]) }
-    setChatLoad(false)
-  }
-
   // ── RecItem ────────────────────────────────────────────────────────────────
   function RecItem({r}){
     const cardKey = r.card || r.bank
@@ -647,7 +627,7 @@ Para REGISTRAR responda SOMENTE com JSON:
     {id:"agenda",   lbl:"Agenda", ico:"📅"},
     {id:"registros",lbl:"Registros",ico:"☰"},
     {id:"adicionar",lbl:editId?"Editar":"Novo",ico:"+"},
-    {id:"chat",     lbl:"Aury IA",ico:"✦"},
+    {id:"jardim",   lbl:"Jardim",ico:"🌸"},
   ]
 
   // ── Content JSX ────────────────────────────────────────────────────────────
@@ -856,8 +836,22 @@ Para REGISTRAR responda SOMENTE com JSON:
             <div className="mc"><div className="ml">Receitas</div><div className="mv" style={{color:"var(--gn)"}}>{fmt(agData.rec)}</div></div>
             <div className="mc"><div className="ml">Despesas</div><div className="mv" style={{color:"var(--rd)"}}>{fmt(agData.exp)}</div></div>
             <div className="mc">
-              <div className="ml">Saldo</div>
+              <div className="ml">Saldo do Mês</div>
               <div className="mv" style={{color:agData.saldo>=0?"var(--gn)":"var(--rd)"}}>{fmt(agData.saldo)}</div>
+            </div>
+          </div>
+
+          {/* Card de Saldo Acumulado */}
+          <div className="hero" style={{marginTop:12}}>
+            <div style={{position:"relative",zIndex:1}}>
+              <div className="h-lbl">💰 Saldo Acumulado até {monthLabel(agMonth)}</div>
+              <div className={`h-val ${agSaldoAcumulado>=0?"pos":"neg"}`}>{fmt(agSaldoAcumulado)}</div>
+              <div style={{fontSize:11,color:"var(--mt)",marginTop:6,lineHeight:1.5}}>
+                {agSaldoAcumulado >= 0 
+                  ? "Dinheiro que você terá disponível neste mês considerando todos os meses anteriores 🎉"
+                  : "Déficit acumulado até este mês — precisa de renda extra para zerar 🚨"
+                }
+              </div>
             </div>
           </div>
 
@@ -1046,35 +1040,341 @@ Para REGISTRAR responda SOMENTE com JSON:
           {editId&&<button className="cbtn" onClick={()=>{setEditId(null);setForm({type:"despesa",desc:"",value:"",category:"cartao",date:todayStr(),card:"nubank_l",shared:false,recorrente:false})}}>Cancelar</button>}
         </>}
 
-        {/* ── CHAT ── */}
-        {tab==="chat"&&<>
-          <div style={{marginBottom:12}}>
-            <div className="pt">Aury IA</div>
-            <div style={{fontSize:10,color:"var(--mt)"}}>Estratégia financeira · Powered by Claude</div>
-          </div>
-          <div style={{background:"linear-gradient(135deg,#16103a,#1a1240)",border:"1px solid rgba(167,139,250,.1)",borderRadius:12,padding:"10px 12px",marginBottom:11}}>
+        {/* ── JARDIM DA PROSPERIDADE ── */}
+        {tab==="jardim"&&<>
+          <div style={{marginBottom:16}}>
+            <div className="pt">🌸 Jardim da Prosperidade</div>
             <div style={{fontSize:11,color:"var(--mt)",lineHeight:1.6}}>
-              💬 <span style={{color:"var(--pu)"}}>"paguei fatura Nubank Lenin de 450"</span> · <span style={{color:"var(--pk)"}}>"quanto falta pra fechar o mês?"</span> · <span style={{color:"var(--pu)"}}>"qual estratégia pra quitar tudo?"</span>
+              Seu jardim cresce conforme seu saldo aumenta! Quanto mais você economiza, mais flores, borboletas e pássaros aparecem 🦋
             </div>
           </div>
-          <div className="chat-w">
-            <div className="msgs">
-              {chat.map((m,i)=>(
-                <div key={i} className={`msg ${m.role==="user"?"u":"a"}`}>
-                  {m.role==="assistant"&&<div className="avy">A</div>}
-                  <div className="bubble">{m.text}</div>
+
+          {/* Barra de Progresso de Nível */}
+          {(()=>{
+            const niveis = [
+              {min:0,max:500,nome:"Semente 🌱",desc:"Começando a plantar"},
+              {min:500,max:1500,nome:"Broto 🌿",desc:"Primeiros sinais de vida"},
+              {min:1500,max:3000,nome:"Jardim Jovem 🌻",desc:"Crescendo firme"},
+              {min:3000,max:5000,nome:"Jardim Florido 🌺",desc:"Beleza em expansão"},
+              {min:5000,max:8000,nome:"Paraíso Verde 🌳",desc:"Prosperidade abundante"},
+              {min:8000,max:15000,nome:"Oásis Mágico ✨",desc:"Riqueza florescendo"},
+              {min:15000,max:999999999,nome:"Éden Dourado 👑",desc:"Fartura máxima alcançada!"}
+            ]
+            
+            const saldoTotal = Math.max(0, saldo)
+            const nivelAtual = niveis.find(n=>saldoTotal>=n.min&&saldoTotal<n.max)||niveis[niveis.length-1]
+            const nivelIndex = niveis.indexOf(nivelAtual)
+            const progresso = nivelAtual.max===999999999 ? 100 : Math.min(100,((saldoTotal-nivelAtual.min)/(nivelAtual.max-nivelAtual.min))*100)
+            const proximo = nivelIndex<niveis.length-1?niveis[nivelIndex+1]:null
+            
+            return(<>
+              <div className="hero" style={{background:"linear-gradient(135deg,#0d3b2e,#1a5f4a)",border:"1px solid rgba(52,211,153,.2)"}}>
+                <div style={{position:"relative",zIndex:1}}>
+                  <div style={{fontSize:11,color:"rgba(255,255,255,.6)",marginBottom:4}}>NÍVEL ATUAL</div>
+                  <div style={{fontSize:22,fontWeight:800,marginBottom:2}}>{nivelAtual.nome}</div>
+                  <div style={{fontSize:11,color:"rgba(255,255,255,.7)",marginBottom:12}}>{nivelAtual.desc}</div>
+                  
+                  <div style={{marginBottom:6,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <span style={{fontSize:10,color:"rgba(255,255,255,.6)"}}>
+                      {proximo?`Próximo: ${proximo.nome}`:"Nível Máximo Alcançado! 🎉"}
+                    </span>
+                    <span style={{fontSize:11,fontWeight:700,color:"var(--gn)"}}>{Math.round(progresso)}%</span>
+                  </div>
+                  
+                  <div style={{background:"rgba(0,0,0,.3)",borderRadius:99,height:12,overflow:"hidden",position:"relative"}}>
+                    <div style={{
+                      background:"linear-gradient(90deg,var(--gn),#10b981,#6ee7b7)",
+                      height:"100%",
+                      width:`${progresso}%`,
+                      borderRadius:99,
+                      transition:"width 1s ease",
+                      boxShadow:"0 0 12px rgba(52,211,153,.5)"
+                    }}/>
+                  </div>
+                  
+                  {proximo&&<div style={{fontSize:10,color:"rgba(255,255,255,.5)",marginTop:6}}>
+                    Faltam {fmt(Math.max(0,proximo.min-saldoTotal))} para o próximo nível
+                  </div>}
                 </div>
-              ))}
-              {chatLoad&&<div className="msg a"><div className="avy">A</div><div className="bubble" style={{color:"var(--mt)"}}>Pensando…</div></div>}
-              <div ref={chatEnd}/>
-            </div>
-            <div className="cin-row">
-              <textarea className="cin" rows={1} placeholder="Mensagem…" value={chatIn}
-                onChange={e=>setChatIn(e.target.value)}
-                onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendChat()}}}/>
-              <button className="send" onClick={sendChat} disabled={chatLoad||!chatIn.trim()}>➤</button>
+              </div>
+            </>)
+          })()}
+
+          {/* Jardim Animado */}
+          <div style={{
+            position:"relative",
+            background:"linear-gradient(180deg,#87CEEB 0%,#E0F6FF 40%,#90EE90 100%)",
+            borderRadius:18,
+            padding:20,
+            minHeight:400,
+            overflow:"hidden",
+            marginTop:16,
+            border:"2px solid rgba(52,211,153,.3)"
+          }}>
+            
+            {/* Sol */}
+            <div style={{
+              position:"absolute",
+              top:20,
+              right:30,
+              width:60,
+              height:60,
+              background:"radial-gradient(circle,#FFD700,#FFA500)",
+              borderRadius:"50%",
+              boxShadow:"0 0 30px rgba(255,215,0,.6)",
+              animation:"pulse 3s ease-in-out infinite"
+            }}/>
+
+            {/* Nuvens */}
+            {[1,2,3].map(i=>(
+              <div key={`nuvem${i}`} style={{
+                position:"absolute",
+                top:30+i*20,
+                left:`${i*30}%`,
+                width:80,
+                height:30,
+                background:"rgba(255,255,255,.7)",
+                borderRadius:"50%",
+                animation:`float ${4+i}s ease-in-out infinite`,
+                animationDelay:`${i*0.5}s`
+              }}>
+                <div style={{position:"absolute",width:50,height:30,background:"rgba(255,255,255,.7)",borderRadius:"50%",left:20,top:5}}/>
+                <div style={{position:"absolute",width:40,height:25,background:"rgba(255,255,255,.7)",borderRadius:"50%",left:45,top:8}}/>
+              </div>
+            ))}
+
+            {/* Grama no fundo */}
+            <div style={{
+              position:"absolute",
+              bottom:0,
+              left:0,
+              right:0,
+              height:"30%",
+              background:"linear-gradient(180deg,rgba(34,139,34,.6),#228B22)",
+              borderRadius:"0 0 18px 18px"
+            }}/>
+
+            {/* Flores - quantidade baseada no saldo */}
+            {Array.from({length:Math.min(20,Math.floor(saldo/200)+1)}).map((_,i)=>{
+              const cores=["#FF69B4","#FF1493","#FFB6C1","#FF69B4","#FFC0CB","#DA70D6","#BA55D3"]
+              const cor=cores[i%cores.length]
+              const left=15+((i*37)%(100-20))
+              const size=20+Math.random()*15
+              const delay=i*0.3
+              
+              return(
+                <div key={`flor${i}`} style={{
+                  position:"absolute",
+                  bottom:80+Math.random()*100,
+                  left:`${left}%`,
+                  animation:`sway ${2+Math.random()}s ease-in-out infinite`,
+                  animationDelay:`${delay}s`
+                }}>
+                  {/* Caule */}
+                  <div style={{width:3,height:40,background:"#2d5016",margin:"0 auto",borderRadius:2}}/>
+                  {/* Flor */}
+                  <div style={{
+                    width:size,
+                    height:size,
+                    background:cor,
+                    borderRadius:"50%",
+                    position:"relative",
+                    top:-20,
+                    left:"50%",
+                    transform:"translateX(-50%)",
+                    boxShadow:`0 0 10px ${cor}`,
+                  }}>
+                    <div style={{position:"absolute",width:"100%",height:"100%",top:0,left:0}}>
+                      {[0,72,144,216,288].map(ang=>(
+                        <div key={ang} style={{
+                          position:"absolute",
+                          width:"60%",
+                          height:"60%",
+                          background:cor,
+                          borderRadius:"50%",
+                          top:"50%",
+                          left:"50%",
+                          transform:`translate(-50%,-50%) rotate(${ang}deg) translateY(-40%)`
+                        }}/>
+                      ))}
+                    </div>
+                    {/* Centro amarelo */}
+                    <div style={{
+                      position:"absolute",
+                      width:"40%",
+                      height:"40%",
+                      background:"#FFD700",
+                      borderRadius:"50%",
+                      top:"50%",
+                      left:"50%",
+                      transform:"translate(-50%,-50%)",
+                      zIndex:2
+                    }}/>
+                  </div>
+                </div>
+              )
+            })}
+
+            {/* Borboletas - aparecem a partir de R$ 1000 */}
+            {saldo>=1000&&Array.from({length:Math.min(8,Math.floor(saldo/1000))}).map((_,i)=>{
+              const cores=[
+                ["#FF1493","#FF69B4"],
+                ["#9370DB","#BA55D3"],
+                ["#FF6347","#FF7F50"],
+                ["#00CED1","#48D1CC"],
+                ["#FFD700","#FFA500"]
+              ]
+              const [cor1,cor2]=cores[i%cores.length]
+              const startX=Math.random()*80
+              const startY=20+Math.random()*150
+              const duration=8+Math.random()*4
+              
+              return(
+                <div key={`borb${i}`} style={{
+                  position:"absolute",
+                  left:`${startX}%`,
+                  top:startY,
+                  animation:`butterfly ${duration}s linear infinite`,
+                  animationDelay:`${i*1.2}s`
+                }}>
+                  <div style={{position:"relative",width:20,height:20,animation:"flutter .3s ease-in-out infinite"}}>
+                    {/* Asa esquerda */}
+                    <div style={{
+                      position:"absolute",
+                      width:10,
+                      height:15,
+                      background:`linear-gradient(135deg,${cor1},${cor2})`,
+                      borderRadius:"50% 0 50% 0",
+                      left:0,
+                      transformOrigin:"right center",
+                      boxShadow:`0 0 8px ${cor1}`
+                    }}/>
+                    {/* Asa direita */}
+                    <div style={{
+                      position:"absolute",
+                      width:10,
+                      height:15,
+                      background:`linear-gradient(135deg,${cor1},${cor2})`,
+                      borderRadius:"0 50% 0 50%",
+                      right:0,
+                      transformOrigin:"left center",
+                      boxShadow:`0 0 8px ${cor2}`
+                    }}/>
+                    {/* Corpo */}
+                    <div style={{
+                      position:"absolute",
+                      width:3,
+                      height:18,
+                      background:"#1a1a1a",
+                      left:"50%",
+                      top:"50%",
+                      transform:"translate(-50%,-50%)",
+                      borderRadius:99
+                    }}/>
+                  </div>
+                </div>
+              )
+            })}
+
+            {/* Pássaros - aparecem a partir de R$ 3000 */}
+            {saldo>=3000&&Array.from({length:Math.min(5,Math.floor(saldo/3000))}).map((_,i)=>(
+              <div key={`pass${i}`} style={{
+                position:"absolute",
+                left:`${20+i*15}%`,
+                top:40+Math.random()*80,
+                animation:`bird ${6+i}s linear infinite`,
+                animationDelay:`${i*2}s`
+              }}>
+                {/* Pássaro simplificado */}
+                <div style={{fontSize:20,transform:"scaleX(-1)"}}>🐦</div>
+              </div>
+            ))}
+
+            {/* Mensagem central quando saldo muito baixo */}
+            {saldo<100&&(
+              <div style={{
+                position:"absolute",
+                top:"50%",
+                left:"50%",
+                transform:"translate(-50%,-50%)",
+                textAlign:"center",
+                background:"rgba(255,255,255,.95)",
+                padding:"20px 30px",
+                borderRadius:16,
+                border:"2px solid var(--gn)",
+                boxShadow:"0 8px 24px rgba(0,0,0,.1)"
+              }}>
+                <div style={{fontSize:48,marginBottom:8}}>🌱</div>
+                <div style={{fontSize:16,fontWeight:700,color:"#2d5016",marginBottom:6}}>Plante sua primeira semente!</div>
+                <div style={{fontSize:12,color:"#666",lineHeight:1.5}}>
+                  Comece a economizar para ver seu jardim crescer.<br/>
+                  A cada R$ 200 economizados, uma nova flor aparece! 🌸
+                </div>
+              </div>
+            )}
+
+            {/* Animações CSS */}
+            <style>{`
+              @keyframes pulse {
+                0%, 100% { transform: scale(1); opacity: 1; }
+                50% { transform: scale(1.05); opacity: 0.9; }
+              }
+              @keyframes float {
+                0%, 100% { transform: translateY(0px); }
+                50% { transform: translateY(-15px); }
+              }
+              @keyframes sway {
+                0%, 100% { transform: rotate(-2deg); }
+                50% { transform: rotate(2deg); }
+              }
+              @keyframes butterfly {
+                0% { transform: translate(0, 0); }
+                25% { transform: translate(40px, -30px); }
+                50% { transform: translate(80px, 0px); }
+                75% { transform: translate(40px, 30px); }
+                100% { transform: translate(0, 0); }
+              }
+              @keyframes flutter {
+                0%, 100% { transform: scaleX(1); }
+                50% { transform: scaleX(0.8); }
+              }
+              @keyframes bird {
+                0% { transform: translateX(0) translateY(0); }
+                25% { transform: translateX(100px) translateY(-20px); }
+                50% { transform: translateX(200px) translateY(10px); }
+                75% { transform: translateX(300px) translateY(-15px); }
+                100% { transform: translateX(400px) translateY(0); opacity: 0; }
+              }
+            `}</style>
+          </div>
+
+          {/* Informações do Jardim */}
+          <div className="card" style={{marginTop:16}}>
+            <div className="sec">📊 Estatísticas do Jardim</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
+              <div style={{background:"rgba(255,105,180,.08)",borderRadius:12,padding:12,border:"1px solid rgba(255,105,180,.2)"}}>
+                <div style={{fontSize:10,color:"var(--mt)",marginBottom:4}}>🌸 Flores</div>
+                <div style={{fontSize:20,fontWeight:700,color:"#FF69B4"}}>{Math.min(20,Math.floor(saldo/200)+1)}</div>
+                <div style={{fontSize:9,color:"var(--mt)",marginTop:2}}>+1 a cada R$ 200</div>
+              </div>
+              <div style={{background:"rgba(186,85,211,.08)",borderRadius:12,padding:12,border:"1px solid rgba(186,85,211,.2)"}}>
+                <div style={{fontSize:10,color:"var(--mt)",marginBottom:4}}>🦋 Borboletas</div>
+                <div style={{fontSize:20,fontWeight:700,color:"#BA55D3"}}>{saldo>=1000?Math.min(8,Math.floor(saldo/1000)):0}</div>
+                <div style={{fontSize:9,color:"var(--mt)",marginTop:2}}>+1 a cada R$ 1.000</div>
+              </div>
+              <div style={{background:"rgba(100,149,237,.08)",borderRadius:12,padding:12,border:"1px solid rgba(100,149,237,.2)"}}>
+                <div style={{fontSize:10,color:"var(--mt)",marginBottom:4}}>🐦 Pássaros</div>
+                <div style={{fontSize:20,fontWeight:700,color:"#6495ED"}}>{saldo>=3000?Math.min(5,Math.floor(saldo/3000)):0}</div>
+                <div style={{fontSize:9,color:"var(--mt)",marginTop:2}}>+1 a cada R$ 3.000</div>
+              </div>
+              <div style={{background:"rgba(52,211,153,.08)",borderRadius:12,padding:12,border:"1px solid rgba(52,211,153,.2)"}}>
+                <div style={{fontSize:10,color:"var(--mt)",marginBottom:4}}>💰 Saldo Total</div>
+                <div style={{fontSize:20,fontWeight:700,color:"var(--gn)"}}>{fmt(Math.max(0,saldo))}</div>
+                <div style={{fontSize:9,color:"var(--mt)",marginTop:2}}>Continue economizando!</div>
+              </div>
             </div>
           </div>
+
         </>}
 
     </>
