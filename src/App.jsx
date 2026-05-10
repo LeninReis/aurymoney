@@ -648,13 +648,26 @@ export default function AuryMoney() {
         {/* ── DASHBOARD ── */}
         {tab==="dashboard"&&(loading?<div className="ld"><div className="sp"/>Carregando...</div>:<>
 
-          {/* Hero saldo acumulado — principal */}
-          <div className="hero">
-            <div className="h-lbl">💰 Saldo Acumulado · {monthLabel(thisMonth)}</div>
-            <div className={`h-val ${agSaldoAcumulado>0?"pos":agSaldoAcumulado<0?"neg":"warn"}`}>{fmt(agSaldoAcumulado)}</div>
-            <div style={{fontSize:10,color:"var(--mt)",marginTop:4,marginBottom:10}}>Soma de todos os meses até hoje</div>
-            <div className="pbar">
-              <div className="pfill" style={{width:`${Math.min(100,Math.abs(agSaldoAcumulado/50))}%`,background:agSaldoAcumulado>=0?"linear-gradient(90deg,var(--gn),#059669)":"linear-gradient(90deg,var(--rd),#dc2626)"}}/>
+          {/* Cards principais: Total Receitas e Total Despesas */}
+          <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:12,marginBottom:16}}>
+            {/* Total Geral de Receitas */}
+            <div style={{background:"linear-gradient(135deg,rgba(52,211,153,.1),rgba(16,185,129,.05))",border:"1px solid rgba(52,211,153,.25)",borderRadius:16,padding:20}}>
+              <div style={{fontSize:11,color:"rgba(52,211,153,.8)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:8,fontWeight:600}}>💰 Saldo Acumulado</div>
+              <div style={{fontSize:36,fontWeight:800,color:agSaldoAcumulado>=0?"var(--gn)":"var(--rd)",lineHeight:1,marginBottom:8}}>{fmt(agSaldoAcumulado)}</div>
+              <div style={{fontSize:10,color:"var(--mt)",marginBottom:12}}>todos os meses</div>
+              <div className="pbar">
+                <div className="pfill" style={{width:`${Math.min(100,Math.abs(agSaldoAcumulado/50))}%`,background:agSaldoAcumulado>=0?"linear-gradient(90deg,var(--gn),#059669)":"linear-gradient(90deg,var(--rd),#dc2626)"}}/>
+              </div>
+            </div>
+
+            {/* Total Geral de Despesas */}
+            <div style={{background:"linear-gradient(135deg,rgba(248,113,113,.1),rgba(239,68,68,.05))",border:"1px solid rgba(248,113,113,.25)",borderRadius:16,padding:20}}>
+              <div style={{fontSize:11,color:"rgba(248,113,113,.8)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:8,fontWeight:600}}>📊 % Gasto Acumulado</div>
+              <div style={{fontSize:36,fontWeight:800,color:totalRec>0&&(totalExp/totalRec)<0.7?"var(--gn)":totalRec>0&&(totalExp/totalRec)<0.85?"var(--yw)":"var(--rd)",lineHeight:1,marginBottom:8}}>{totalRec>0?Math.round((totalExp/totalRec)*100):0}%</div>
+              <div style={{fontSize:10,color:"var(--mt)",marginBottom:12}}>histórico total</div>
+              <div className="pbar">
+                <div className="pfill" style={{width:`${totalRec>0?Math.min(100,(totalExp/totalRec)*100):0}%`,background:totalRec>0&&(totalExp/totalRec)<0.7?"linear-gradient(90deg,var(--gn),#059669)":totalRec>0&&(totalExp/totalRec)<0.85?"linear-gradient(90deg,var(--yw),#f59e0b)":"linear-gradient(90deg,var(--rd),#dc2626)"}}/>
+              </div>
             </div>
           </div>
 
@@ -701,17 +714,17 @@ export default function AuryMoney() {
               )
             })()}
 
-            {/* Linha 3: Acumulado + % acumulado — menor, secundário */}
+            {/* Linha 3: Total Receitas e Total Despesas */}
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-              <div style={{background:"rgba(167,139,250,.06)",border:"1px solid rgba(167,139,250,.12)",borderRadius:12,padding:"10px 12px"}}>
-                <div style={{fontSize:9,color:"var(--mt)",marginBottom:3}}>💎 Saldo Acumulado</div>
-                <div style={{fontSize:15,fontWeight:700,color:agSaldoAcumulado>=0?"var(--gn)":"var(--rd)"}}>{fmt(agSaldoAcumulado)}</div>
-                <div style={{fontSize:8,color:"var(--mt)",marginTop:2}}>todos os meses</div>
+              <div style={{background:"rgba(52,211,153,.08)",border:"1px solid rgba(52,211,153,.2)",borderRadius:12,padding:"12px 14px"}}>
+                <div style={{fontSize:9,color:"rgba(52,211,153,.9)",marginBottom:4,fontWeight:600,letterSpacing:0.5}}>↑ TOTAL RECEITAS</div>
+                <div style={{fontSize:18,fontWeight:800,color:"var(--gn)",marginBottom:2}}>{fmt(totalRec)}</div>
+                <div style={{fontSize:8,color:"var(--mt)",marginTop:2}}>todos os registros</div>
               </div>
-              <div style={{background:totalRec>0&&(totalExp/totalRec)<0.7?"rgba(52,211,153,.06)":totalRec>0&&(totalExp/totalRec)<0.85?"rgba(251,191,36,.06)":"rgba(248,113,113,.06)",border:`1px solid ${totalRec>0&&(totalExp/totalRec)<0.7?"rgba(52,211,153,.15)":totalRec>0&&(totalExp/totalRec)<0.85?"rgba(251,191,36,.15)":"rgba(248,113,113,.15)"}`,borderRadius:12,padding:"10px 12px"}}>
-                <div style={{fontSize:9,color:"var(--mt)",marginBottom:3}}>📊 % Gasto Acumulado</div>
-                <div style={{fontSize:15,fontWeight:700,color:totalRec>0&&(totalExp/totalRec)<0.7?"var(--gn)":totalRec>0&&(totalExp/totalRec)<0.85?"var(--yw)":"var(--rd)"}}>{totalRec>0?Math.round((totalExp/totalRec)*100):0}%</div>
-                <div style={{fontSize:8,color:"var(--mt)",marginTop:2}}>histórico total</div>
+              <div style={{background:"rgba(248,113,113,.08)",border:"1px solid rgba(248,113,113,.2)",borderRadius:12,padding:"12px 14px"}}>
+                <div style={{fontSize:9,color:"rgba(248,113,113,.9)",marginBottom:4,fontWeight:600,letterSpacing:0.5}}>↓ TOTAL DESPESAS</div>
+                <div style={{fontSize:18,fontWeight:800,color:"var(--rd)",marginBottom:2}}>{fmt(totalExp)}</div>
+                <div style={{fontSize:8,color:"var(--mt)",marginTop:2}}>todos os registros</div>
               </div>
             </div>
 
