@@ -638,7 +638,7 @@ export default function AuryMoney() {
     {id:"agenda",   lbl:"Agenda", ico:"📅"},
     {id:"registros",lbl:"Registros",ico:"☰"},
     {id:"adicionar",lbl:editId?"Editar":"Novo",ico:"+"},
-    {id:"jardim",   lbl:"Criaturas",ico:"✨"},
+    {id:"jardim",   lbl:"Jardim",ico:"🌸"},
   ]
 
   // ── Content JSX ────────────────────────────────────────────────────────────
@@ -650,23 +650,23 @@ export default function AuryMoney() {
 
           {/* Cards principais: Total Receitas e Total Despesas */}
           <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:12,marginBottom:16}}>
-            {/* Saldo do Mês Atual */}
+            {/* Total Geral de Receitas */}
             <div style={{background:"linear-gradient(135deg,rgba(52,211,153,.1),rgba(16,185,129,.05))",border:"1px solid rgba(52,211,153,.25)",borderRadius:16,padding:20}}>
-              <div style={{fontSize:11,color:"rgba(52,211,153,.8)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:8,fontWeight:600}}>💰 Saldo Acumulado · {monthLabel(thisMonth)}</div>
-              <div style={{fontSize:36,fontWeight:800,color:tm.saldo>=0?"var(--gn)":"var(--rd)",lineHeight:1,marginBottom:8}}>{fmt(tm.saldo)}</div>
-              <div style={{fontSize:10,color:"var(--mt)",marginBottom:12}}>mês atual</div>
+              <div style={{fontSize:11,color:"rgba(52,211,153,.8)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:8,fontWeight:600}}>💰 Saldo Acumulado</div>
+              <div style={{fontSize:36,fontWeight:800,color:agSaldoAcumulado>=0?"var(--gn)":"var(--rd)",lineHeight:1,marginBottom:8}}>{fmt(agSaldoAcumulado)}</div>
+              <div style={{fontSize:10,color:"var(--mt)",marginBottom:12}}>todos os meses</div>
               <div className="pbar">
-                <div className="pfill" style={{width:`${Math.min(100,Math.abs(tm.saldo/50))}%`,background:tm.saldo>=0?"linear-gradient(90deg,var(--gn),#059669)":"linear-gradient(90deg,var(--rd),#dc2626)"}}/>
+                <div className="pfill" style={{width:`${Math.min(100,Math.abs(agSaldoAcumulado/50))}%`,background:agSaldoAcumulado>=0?"linear-gradient(90deg,var(--gn),#059669)":"linear-gradient(90deg,var(--rd),#dc2626)"}}/>
               </div>
             </div>
 
-            {/* % Gasto do Mês Atual */}
+            {/* Total Geral de Despesas */}
             <div style={{background:"linear-gradient(135deg,rgba(248,113,113,.1),rgba(239,68,68,.05))",border:"1px solid rgba(248,113,113,.25)",borderRadius:16,padding:20}}>
-              <div style={{fontSize:11,color:"rgba(248,113,113,.8)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:8,fontWeight:600}}>📊 % Gasto · {monthLabel(thisMonth)}</div>
-              <div style={{fontSize:36,fontWeight:800,color:tm.rec>0&&(tm.exp/tm.rec)<0.7?"var(--gn)":tm.rec>0&&(tm.exp/tm.rec)<0.85?"var(--yw)":"var(--rd)",lineHeight:1,marginBottom:8}}>{tm.rec>0?Math.round((tm.exp/tm.rec)*100):0}%</div>
-              <div style={{fontSize:10,color:"var(--mt)",marginBottom:12}}>mês atual</div>
+              <div style={{fontSize:11,color:"rgba(248,113,113,.8)",letterSpacing:1.5,textTransform:"uppercase",marginBottom:8,fontWeight:600}}>📊 % Gasto Acumulado</div>
+              <div style={{fontSize:36,fontWeight:800,color:totalRec>0&&(totalExp/totalRec)<0.7?"var(--gn)":totalRec>0&&(totalExp/totalRec)<0.85?"var(--yw)":"var(--rd)",lineHeight:1,marginBottom:8}}>{totalRec>0?Math.round((totalExp/totalRec)*100):0}%</div>
+              <div style={{fontSize:10,color:"var(--mt)",marginBottom:12}}>histórico total</div>
               <div className="pbar">
-                <div className="pfill" style={{width:`${tm.rec>0?Math.min(100,(tm.exp/tm.rec)*100):0}%`,background:tm.rec>0&&(tm.exp/tm.rec)<0.7?"linear-gradient(90deg,var(--gn),#059669)":tm.rec>0&&(tm.exp/tm.rec)<0.85?"linear-gradient(90deg,var(--yw),#f59e0b)":"linear-gradient(90deg,var(--rd),#dc2626)"}}/>
+                <div className="pfill" style={{width:`${totalRec>0?Math.min(100,(totalExp/totalRec)*100):0}%`,background:totalRec>0&&(totalExp/totalRec)<0.7?"linear-gradient(90deg,var(--gn),#059669)":totalRec>0&&(totalExp/totalRec)<0.85?"linear-gradient(90deg,var(--yw),#f59e0b)":"linear-gradient(90deg,var(--rd),#dc2626)"}}/>
               </div>
             </div>
           </div>
@@ -714,21 +714,17 @@ export default function AuryMoney() {
               )
             })()}
 
-            {/* Linha 3: Total Receitas e Total Despesas com % */}
+            {/* Linha 3: Total Receitas e Total Despesas */}
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
               <div style={{background:"rgba(52,211,153,.08)",border:"1px solid rgba(52,211,153,.2)",borderRadius:12,padding:"12px 14px"}}>
                 <div style={{fontSize:9,color:"rgba(52,211,153,.9)",marginBottom:4,fontWeight:600,letterSpacing:0.5}}>↑ TOTAL RECEITAS</div>
                 <div style={{fontSize:18,fontWeight:800,color:"var(--gn)",marginBottom:2}}>{fmt(totalRec)}</div>
-                <div style={{fontSize:11,fontWeight:700,color:"rgba(52,211,153,.7)",marginTop:2}}>
-                  {totalRec>0?Math.round((totalRec/(totalRec+totalExp))*100):0}% do total
-                </div>
+                <div style={{fontSize:8,color:"var(--mt)",marginTop:2}}>todos os registros</div>
               </div>
               <div style={{background:"rgba(248,113,113,.08)",border:"1px solid rgba(248,113,113,.2)",borderRadius:12,padding:"12px 14px"}}>
                 <div style={{fontSize:9,color:"rgba(248,113,113,.9)",marginBottom:4,fontWeight:600,letterSpacing:0.5}}>↓ TOTAL DESPESAS</div>
                 <div style={{fontSize:18,fontWeight:800,color:"var(--rd)",marginBottom:2}}>{fmt(totalExp)}</div>
-                <div style={{fontSize:11,fontWeight:700,color:"rgba(248,113,113,.7)",marginTop:2}}>
-                  {totalExp>0?Math.round((totalExp/(totalRec+totalExp))*100):0}% do total
-                </div>
+                <div style={{fontSize:8,color:"var(--mt)",marginTop:2}}>todos os registros</div>
               </div>
             </div>
 
@@ -1581,537 +1577,332 @@ export default function AuryMoney() {
         </>}
 
 {tab==="jardim"&&<>
-  <div style={{marginBottom:20}}>
-    <div className="pt" style={{background:"linear-gradient(135deg,#A78BFA,#F472B6,#FBBF24)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",fontSize:24}}>✨ Centro de Criaturas Místicas ✨</div>
-    <div style={{fontSize:12,color:"var(--mt)",lineHeight:1.8,maxWidth:600}}>
-      Suas criaturas mágicas ganham vida e evoluem conforme sua prosperidade cresce 🌟
+  <div style={{marginBottom:16}}>
+    <div className="pt">🌾 Jardim da Prosperidade</div>
+    <div style={{fontSize:11,color:"var(--mt)",lineHeight:1.6}}>
+      Seu jardim cresce com as economias do mês — estilo Stardew Valley! 🌱
     </div>
   </div>
 
   {(()=>{
+    const niveis = [
+      {min:-999999,max:0,   nome:"Terra Árida",     emoji:"🏜️", cor:"#8B6914",cor2:"#C9A23A"},
+      {min:0,      max:400, nome:"Canteiro Inicial", emoji:"🌱", cor:"#5C8A2E",cor2:"#8BC34A"},
+      {min:400,    max:1000,nome:"Horta Florescente",emoji:"🌿", cor:"#2E7D32",cor2:"#66BB6A"},
+      {min:1000,   max:2000,nome:"Pomar Encantado",  emoji:"🌺", cor:"#AD1457",cor2:"#F06292"},
+      {min:2000,   max:3500,nome:"Bosque Místico",   emoji:"🌳", cor:"#4527A0",cor2:"#9575CD"},
+      {min:3500,   max:5500,nome:"Santuário Etéreo", emoji:"✨", cor:"#1565C0",cor2:"#42A5F5"},
+      {min:5500,   max:999999,nome:"Éden Dourado",   emoji:"👑", cor:"#B8860B",cor2:"#FFD700"},
+    ]
     const saldoMes = Math.max(0, tm.saldo)
-    
-    // Sistema de criaturas com evolução
-    const criaturas = [
-      {
-        nome: "Dragão",
-        estagios: [
-          {min:0,    max:500,  nome:"Ovo de Dragão",    emoji:"🥚", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Aguardando o calor da prosperidade..."},
-          {min:500,  max:1500, nome:"Filhote de Dragão",emoji:"🦎", poder:15,  cor:"#F59E0B", cor2:"#D97706", desc:"Começando a soltar faíscas douradas"},
-          {min:1500, max:3500, nome:"Dragão Juvenil",   emoji:"🐲", poder:45,  cor:"#EF4444", cor2:"#DC2626", desc:"Voando pelas montanhas encantadas"},
-          {min:3500, max:999999,nome:"Dragão Ancião",   emoji:"🐉", poder:100, cor:"#7C3AED", cor2:"#6D28D9", desc:"Guardião supremo do tesouro eterno"}
-        ]
-      },
-      {
-        nome: "Coruja",
-        estagios: [
-          {min:0,    max:400,  nome:"Ovo de Coruja",     emoji:"🥚", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Descansando em seu ninho macio"},
-          {min:400,  max:1200, nome:"Corujinha Bebê",    emoji:"🐣", poder:12,  cor:"#A78BFA", cor2:"#8B5CF6", desc:"Dando seus primeiros voos noturnos"},
-          {min:1200, max:2800, nome:"Coruja Sábia",      emoji:"🦉", poder:40,  cor:"#6366F1", cor2:"#4F46E5", desc:"Enxerga através da escuridão"},
-          {min:2800, max:999999,nome:"Coruja Mística",   emoji:"🔮", poder:85,  cor:"#14B8A6", cor2:"#0D9488", desc:"Porta dos mistérios ancestrais"}
-        ]
-      },
-      {
-        nome: "Gato",
-        estagios: [
-          {min:0,    max:300,  nome:"Ovo Felino",        emoji:"🥚", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Ronronando baixinho no silêncio"},
-          {min:300,  max:1000, nome:"Gatinho Fofinho",   emoji:"🐱", poder:10,  cor:"#F472B6", cor2:"#EC4899", desc:"Brincando com novelos de estrelas"},
-          {min:1000, max:2500, nome:"Gato Mágico",       emoji:"😺", poder:35,  cor:"#8B5CF6", cor2:"#7C3AED", desc:"Traz sorte e prosperidade"},
-          {min:2500, max:999999,nome:"Gato Cósmico",     emoji:"🌟", poder:75,  cor:"#F59E0B", cor2:"#D97706", desc:"Caminha entre as dimensões"}
-        ]
-      },
-      {
-        nome: "Fênix",
-        estagios: [
-          {min:0,    max:800,  nome:"Cinzas Místicas",   emoji:"🌫️", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Aguardando o renascimento glorioso"},
-          {min:800,  max:2000, nome:"Chama Nascente",    emoji:"🕯️", poder:20,  cor:"#FBBF24", cor2:"#F59E0B", desc:"A primeira chama da eternidade"},
-          {min:2000, max:4000, nome:"Fênix Flamejante",  emoji:"🔥", poder:60,  cor:"#EF4444", cor2:"#DC2626", desc:"Iluminando os céus com fogo sagrado"},
-          {min:4000, max:999999,nome:"Fênix Imortal",    emoji:"✨", poder:120, cor:"#F97316", cor2:"#EA580C", desc:"Renascendo eternamente das cinzas"}
-        ]
-      }
+    const nivel = niveis.find(n=>saldoMes>=n.min&&saldoMes<n.max)||niveis[niveis.length-1]
+    const nIdx = niveis.indexOf(nivel)
+    const prog = nivel.max===999999?100:Math.min(100,((saldoMes-nivel.min)/(nivel.max-nivel.min))*100)
+    const prox = nIdx<niveis.length-1?niveis[nIdx+1]:null
+
+    const flores    = Math.min(24, Math.max(0,Math.floor(saldoMes/80)))
+    const arvores   = Math.min(6,  Math.max(0,Math.floor((saldoMes-800)/500)))
+    const borboletas= Math.min(10, Math.max(0,Math.floor((saldoMes-400)/250)))
+    const passaros  = Math.min(5,  Math.max(0,Math.floor((saldoMes-1500)/600)))
+    const rio       = saldoMes>=2500
+    const arcoiris  = saldoMes>=4000
+    const fonteMagica = saldoMes>=3000
+
+    // Paleta stardew: céu azul pastoral, grama verde viva
+    const skyColor = saldoMes<=0?"linear-gradient(180deg,#D4C5A9,#C9B88A)":
+                     saldoMes<1000?"linear-gradient(180deg,#87CEEB 0%,#B0E2FF 50%,#C8E6C9 100%)":
+                     saldoMes<3000?"linear-gradient(180deg,#64B5F6 0%,#90CAF9 40%,#A5D6A7 100%)":
+                     "linear-gradient(180deg,#42A5F5 0%,#81D4FA 40%,#AED581 100%)"
+
+    // Cores de flores por índice
+    const floresCores = [
+      {petala:"#FF4081",centro:"#FFC107"},
+      {petala:"#7C4DFF",centro:"#FFEB3B"},
+      {petala:"#FF6D00",centro:"#FFEE58"},
+      {petala:"#00BFA5",centro:"#FFCA28"},
+      {petala:"#2979FF",centro:"#FFD740"},
+      {petala:"#F50057",centro:"#FFF176"},
+      {petala:"#AA00FF",centro:"#FFD740"},
+      {petala:"#FFAB00",centro:"#E8F5E9"},
     ]
 
-    const criaturasEvoluidas = criaturas.map(criatura => {
-      const estagio = criatura.estagios.find(e => saldoMes >= e.min && saldoMes < e.max) || criatura.estagios[criatura.estagios.length - 1]
-      const estagioIdx = criatura.estagios.indexOf(estagio)
-      const progresso = estagio.max === 999999 ? 100 : Math.min(100, ((saldoMes - estagio.min) / (estagio.max - estagio.min)) * 100)
-      const proximoEstagio = estagioIdx < criatura.estagios.length - 1 ? criatura.estagios[estagioIdx + 1] : null
-      
-      return { ...criatura, estagio, estagioIdx, progresso, proximoEstagio }
-    })
-
-    // Cenários evoluindo
-    const cenarios = [
-      {min:0,    max:1000, nome:"Caverna dos Sonhos",    emoji:"🕳️", bg:"linear-gradient(135deg,#1e1b4b,#0f172a)", particulas:"#60A5FA", desc:"Um refúgio tranquilo onde tudo começa"},
-      {min:1000, max:2500, nome:"Floresta Encantada",    emoji:"🌲", bg:"linear-gradient(135deg,#064e3b,#022c22)", particulas:"#34D399", desc:"Árvores antigas sussurram segredos"},
-      {min:2500, max:4500, nome:"Vale das Estrelas",     emoji:"⭐", bg:"linear-gradient(135deg,#1e3a8a,#1e40af)", particulas:"#FCD34D", desc:"Onde o céu toca a terra gentilmente"},
-      {min:4500, max:999999,nome:"Palácio de Cristal",   emoji:"🏰", bg:"linear-gradient(135deg,#581c87,#6b21a8)", particulas:"#E9D5FF", desc:"Reino eterno da prosperidade infinita"}
-    ]
-    
-    const cenario = cenarios.find(c => saldoMes >= c.min && saldoMes < c.max) || cenarios[cenarios.length - 1]
-    const cenarioIdx = cenarios.indexOf(cenario)
-    const progCenario = cenario.max === 999999 ? 100 : Math.min(100, ((saldoMes - cenario.min) / (cenario.max - cenario.min)) * 100)
-    const proxCenario = cenarioIdx < cenarios.length - 1 ? cenarios[cenarioIdx + 1] : null
-
-    return(
-      <>
-        {/* Cenário Mágico Principal */}
-        <div style={{
-          background:cenario.bg,
-          border:"1px solid rgba(255,255,255,.2)",
-          borderRadius:20,
-          padding:isMobile?20:32,
-          marginBottom:24,
-          position:"relative",
-          overflow:"hidden",
-          boxShadow:"0 10px 40px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.1)"
-        }}>
-          {/* Partículas flutuantes mágicas */}
-          <div style={{position:"absolute",inset:0,overflow:"hidden",opacity:0.4}}>
-            {Array.from({length:30}).map((_,i)=>(
-              <div key={i} style={{
-                position:"absolute",
-                width:Math.random()*4+2,
-                height:Math.random()*4+2,
-                background:cenario.particulas,
-                borderRadius:"50%",
-                left:`${Math.random()*100}%`,
-                top:`${Math.random()*100}%`,
-                animation:`float-particle ${3+Math.random()*4}s ease-in-out infinite`,
-                animationDelay:`${Math.random()*3}s`,
-                filter:"blur(1px)",
-                boxShadow:`0 0 ${Math.random()*10+5}px ${cenario.particulas}`
-              }}/>
-            ))}
+    return(<>
+      {/* Painel de Nível */}
+      <div style={{background:`linear-gradient(135deg,${nivel.cor}25,${nivel.cor2}15)`,border:`2px solid ${nivel.cor}60`,borderRadius:20,padding:18,marginBottom:16,position:"relative",overflow:"hidden"}}>
+        <div style={{position:"absolute",inset:0,opacity:.08}}>
+          {Array.from({length:10}).map((_,i)=>(
+            <div key={i} style={{position:"absolute",width:3+Math.random()*4,height:3+Math.random()*4,background:nivel.cor2,borderRadius:"50%",left:`${Math.random()*100}%`,top:`${Math.random()*100}%`,animation:`sparkle ${2+Math.random()*3}s ease-in-out infinite`,animationDelay:`${Math.random()*2}s`}}/>
+          ))}
+        </div>
+        <div style={{position:"relative",zIndex:1}}>
+          <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:12}}>
+            <div style={{fontSize:36}}>{nivel.emoji}</div>
+            <div>
+              <div style={{fontSize:9,color:"rgba(255,255,255,.6)",letterSpacing:1.5}}>NÍVEL DO JARDIM · {(() => { const [y,m] = thisMonth.split("-").map(Number); return ["Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"][m-1]+" "+y })()}</div>
+              <div style={{fontSize:22,fontWeight:800,background:`linear-gradient(135deg,${nivel.cor},${nivel.cor2})`,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent"}}>{nivel.nome}</div>
+            </div>
           </div>
-          
-          {/* Brilho ambiente */}
-          <div style={{
-            position:"absolute",
-            inset:0,
-            background:"radial-gradient(circle at 30% 40%, rgba(255,255,255,.08) 0%, transparent 60%), radial-gradient(circle at 70% 70%, rgba(255,255,255,.05) 0%, transparent 50%)",
-            animation:"pulse-glow 6s ease-in-out infinite"
-          }}/>
-          
-          <div style={{position:"relative",zIndex:1}}>
-            <div style={{
-              fontSize:72,
-              textAlign:"center",
-              marginBottom:16,
-              filter:"drop-shadow(0 0 30px rgba(255,255,255,.4))",
-              animation:"float-slow 4s ease-in-out infinite"
-            }}>{cenario.emoji}</div>
-            
-            <div style={{
-              fontSize:24,
-              fontWeight:800,
-              textAlign:"center",
-              color:"#FFF",
-              marginBottom:8,
-              textShadow:"0 2px 20px rgba(0,0,0,.8), 0 0 40px rgba(255,255,255,.3)",
-              letterSpacing:1
-            }}>{cenario.nome}</div>
-            
-            <div style={{
-              fontSize:12,
-              textAlign:"center",
-              color:"rgba(255,255,255,.85)",
-              marginBottom:20,
-              fontStyle:"italic",
-              textShadow:"0 1px 3px rgba(0,0,0,.5)"
-            }}>{cenario.desc}</div>
-            
-            {proxCenario && (
-              <div style={{maxWidth:400,margin:"0 auto"}}>
-                <div style={{
-                  background:"rgba(0,0,0,.4)",
-                  borderRadius:99,
-                  height:10,
-                  overflow:"hidden",
-                  marginBottom:8,
-                  border:"1px solid rgba(255,255,255,.1)",
-                  boxShadow:"inset 0 2px 4px rgba(0,0,0,.3)"
-                }}>
-                  <div style={{
-                    background:"linear-gradient(90deg,#FCD34D,#F59E0B,#FBBF24,#FCD34D)",
-                    backgroundSize:"200% 100%",
-                    width:`${progCenario}%`,
-                    height:"100%",
-                    borderRadius:99,
-                    boxShadow:"0 0 20px #F59E0B, 0 0 40px #FCD34D",
-                    transition:"width 1s ease",
-                    animation:"shimmer-gold 3s linear infinite"
-                  }}/>
-                </div>
-                <div style={{
-                  fontSize:11,
-                  textAlign:"center",
-                  color:"rgba(255,255,255,.7)",
-                  fontWeight:600
-                }}>
-                  Faltam {fmt(proxCenario.min - saldoMes)} para desbloquear {proxCenario.emoji} {proxCenario.nome}
-                </div>
-              </div>
-            )}
-            {!proxCenario && (
-              <div style={{
-                fontSize:14,
-                textAlign:"center",
-                color:"#FCD34D",
-                fontWeight:800,
-                textShadow:"0 0 20px #F59E0B",
-                animation:"glow-pulse 2s ease-in-out infinite"
-              }}>✨ Reino Máximo Conquistado! ✨</div>
-            )}
+          <div style={{background:"rgba(0,0,0,.25)",borderRadius:99,height:14,overflow:"hidden",position:"relative",marginBottom:6}}>
+            <div style={{background:`linear-gradient(90deg,${nivel.cor},${nivel.cor2})`,height:"100%",width:`${prog}%`,borderRadius:99,transition:"width 1.2s cubic-bezier(.34,1.56,.64,1)",boxShadow:`0 0 16px ${nivel.cor2}80`,position:"relative",overflow:"hidden"}}>
+              <div style={{position:"absolute",inset:0,background:"linear-gradient(90deg,transparent,rgba(255,255,255,.25),transparent)",animation:"shimmer 2s infinite"}}/>
+            </div>
+          </div>
+          <div style={{display:"flex",justifyContent:"space-between",fontSize:10}}>
+            <span style={{color:"rgba(255,255,255,.6)"}}>{prox?`Próximo: ${prox.nome}`:"✨ Nível Máximo!"}</span>
+            <span style={{fontWeight:700,color:nivel.cor2}}>{Math.round(prog)}%{prox&&` · faltam ${(() => { const v = Math.max(0, prox.min - saldoMes); return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}) })()}`}</span>
           </div>
         </div>
+      </div>
 
-        {/* Grid de Criaturas - Design Ultra Cozy */}
-        <div style={{
-          display:"grid",
-          gridTemplateColumns:isMobile?"1fr":"repeat(2,1fr)",
-          gap:16,
-          marginBottom:20
-        }}>
-          {criaturasEvoluidas.map((criatura,idx) => (
-            <div key={criatura.nome} style={{
-              background:"linear-gradient(135deg,rgba(17,24,39,.95),rgba(31,41,55,.9))",
-              border:`2px solid ${criatura.estagio.cor}`,
-              borderRadius:20,
-              padding:20,
-              position:"relative",
-              overflow:"hidden",
-              boxShadow:`0 8px 32px ${criatura.estagio.cor}60, inset 0 1px 0 rgba(255,255,255,.1)`,
-              transition:"transform 0.3s ease, box-shadow 0.3s ease",
-              cursor:"pointer"
-            }}
-            onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-4px)";e.currentTarget.style.boxShadow=`0 12px 48px ${criatura.estagio.cor}80, inset 0 1px 0 rgba(255,255,255,.15)`}}
-            onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)";e.currentTarget.style.boxShadow=`0 8px 32px ${criatura.estagio.cor}60, inset 0 1px 0 rgba(255,255,255,.1)`}}
-            >
-              {/* Aura mágica rotativa */}
-              <div style={{
-                position:"absolute",
-                inset:-20,
-                background:`conic-gradient(from 0deg, transparent 0%, ${criatura.estagio.cor}30 25%, transparent 50%, ${criatura.estagio.cor}30 75%, transparent 100%)`,
-                animation:"rotate-aura 8s linear infinite",
-                filter:"blur(20px)",
-                opacity:0.6
-              }}/>
-              
-              {/* Partículas específicas da criatura */}
-              <div style={{position:"absolute",inset:0,overflow:"hidden"}}>
-                {Array.from({length:8}).map((_,i)=>(
-                  <div key={i} style={{
-                    position:"absolute",
-                    width:3,
-                    height:3,
-                    background:criatura.estagio.cor,
-                    borderRadius:"50%",
-                    left:`${20+Math.random()*60}%`,
-                    top:`${20+Math.random()*60}%`,
-                    animation:`sparkle-creature ${2+Math.random()*2}s ease-in-out infinite`,
-                    animationDelay:`${i*0.3}s`,
-                    boxShadow:`0 0 10px ${criatura.estagio.cor}`
-                  }}/>
-                ))}
+      {/* CANVAS STARDEW VALLEY */}
+      <div style={{position:"relative",background:skyColor,borderRadius:20,minHeight:440,overflow:"hidden",border:"3px solid rgba(101,67,33,.4)",boxShadow:"0 8px 32px rgba(0,0,0,.3),inset 0 0 0 1px rgba(255,255,255,.1)"}}>
+
+        {/* === CÉU === */}
+
+        {/* Sol */}
+        {saldoMes>0&&<div style={{position:"absolute",top:24,right:50,zIndex:5}}>
+          <div style={{width:56,height:56,background:"radial-gradient(circle,#FFF176,#FFD600)",borderRadius:"50%",boxShadow:"0 0 30px rgba(255,214,0,.7),0 0 60px rgba(255,214,0,.3)"}}>
+            {[0,45,90,135,180,225,270,315].map(ang=>(
+              <div key={ang} style={{position:"absolute",width:4,height:14,background:"#FFD600",borderRadius:99,top:"50%",left:"50%",transform:`translate(-50%,-50%) rotate(${ang}deg) translateY(-34px)`,opacity:.8}}/>
+            ))}
+          </div>
+        </div>}
+
+        {/* Lua (se no vermelho) */}
+        {saldoMes<=0&&<div style={{position:"absolute",top:20,right:50,zIndex:5}}>
+          <div style={{width:48,height:48,background:"radial-gradient(circle at 40% 40%,#ECEFF1,#B0BEC5)",borderRadius:"50%",boxShadow:"0 0 20px rgba(176,190,197,.5)"}}>
+            <div style={{position:"absolute",width:38,height:38,background:"#8B7355",borderRadius:"50%",top:4,right:-8,opacity:.95}}/>
+          </div>
+        </div>}
+
+        {/* Nuvens fofinhas estilo stardew */}
+        {saldoMes>0&&[
+          {top:18,left:"8%",w:80,delay:0},
+          {top:28,left:"35%",w:60,delay:1.5},
+          {top:15,left:"60%",w:90,delay:0.8},
+          {top:32,left:"82%",w:50,delay:2.2},
+        ].map((c,i)=>(
+          <div key={`nv${i}`} style={{position:"absolute",top:c.top,left:c.left,zIndex:4,animation:`floatCloud ${6+i}s ease-in-out infinite`,animationDelay:`${c.delay}s`}}>
+            <div style={{width:c.w,height:28,background:"rgba(255,255,255,.85)",borderRadius:99,boxShadow:"0 4px 12px rgba(0,0,0,.1)",position:"relative"}}>
+              <div style={{position:"absolute",width:c.w*.6,height:22,background:"rgba(255,255,255,.85)",borderRadius:99,top:-10,left:c.w*.15}}/>
+              <div style={{position:"absolute",width:c.w*.4,height:18,background:"rgba(255,255,255,.85)",borderRadius:99,top:-6,left:c.w*.45}}/>
+            </div>
+          </div>
+        ))}
+
+        {/* Arco-íris */}
+        {arcoiris&&<div style={{position:"absolute",top:50,left:"5%",width:"55%",height:120,zIndex:3,opacity:.55,pointerEvents:"none"}}>
+          {["#FF0000","#FF7F00","#FFFF00","#00C853","#1565C0","#6A1B9A"].map((c,i)=>(
+            <div key={c} style={{position:"absolute",width:"100%",height:18,borderTop:`4px solid ${c}`,borderRadius:"50% 50% 0 0",top:i*13,opacity:.8}}/>
+          ))}
+        </div>}
+
+        {/* Pássaros voando */}
+        {Array.from({length:passaros}).map((_,i)=>(
+          <div key={`pa${i}`} style={{position:"absolute",top:50+i*25,left:`${5+i*15}%`,zIndex:6,animation:`birdFly ${8+i*2}s linear infinite`,animationDelay:`${i*2}s`}}>
+            <svg width="22" height="12" viewBox="0 0 22 12">
+              <path d="M1 6 Q5 0 11 6 Q17 0 21 6" stroke="#5D4037" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+            </svg>
+          </div>
+        ))}
+
+        {/* === TERRENO / GRAMA === */}
+
+        {/* Colinas ao fundo — zIndex baixo, atrás de tudo */}
+        <div style={{position:"absolute",bottom:195,left:"-5%",width:"40%",height:80,background:"rgba(56,142,60,.35)",borderRadius:"50%",filter:"blur(3px)",zIndex:1}}/>
+        <div style={{position:"absolute",bottom:190,right:"-5%",width:"50%",height:70,background:"rgba(46,125,50,.3)",borderRadius:"50%",filter:"blur(3px)",zIndex:1}}/>
+
+        {/* Chão arado / terra — renderizado ANTES das plantas, serve como base */}
+        <div style={{position:"absolute",bottom:0,left:0,right:0,height:200,background:"linear-gradient(180deg,#5C8A2E 0%,#4CAF50 8%,#388E3C 18%,#8B6914 30%,#795548 55%,#6D4C41 100%)",zIndex:3}}>
+          {Array.from({length:8}).map((_,i)=>(
+            <div key={`s${i}`} style={{position:"absolute",bottom:10+i*18,left:0,right:0,height:3,background:"rgba(0,0,0,.12)",borderRadius:99}}/>
+          ))}
+          <div style={{position:"absolute",top:0,left:0,right:0,height:28,background:"linear-gradient(180deg,rgba(56,142,60,.9),transparent)",borderRadius:"4px 4px 0 0"}}/>
+          {Array.from({length:40}).map((_,i)=>(
+            <div key={`gr${i}`} style={{position:"absolute",bottom:160+[4,8,2,6,3,7,1,5][i%8],left:`${i*2.5}%`,width:3,height:10+[3,6,2,8,4,7,1,5][i%8],background:`hsl(${110+i%4*8},60%,${30+i%3*8}%)`,borderRadius:"50% 50% 0 0",transform:`rotate(${[-15,-8,5,12,-3,8,-12,3][i%8]}deg)`,opacity:.7}}/>
+          ))}
+        </div>
+
+        {/* Rio — ancorado no chão */}
+        {rio&&<div style={{position:"absolute",bottom:150,right:30,width:50,height:180,zIndex:4}}>
+          <div style={{position:"absolute",top:0,width:50,height:60,background:"linear-gradient(135deg,#78909C,#90A4AE)",borderRadius:"12px 12px 4px 4px",boxShadow:"0 4px 8px rgba(0,0,0,.3)"}}>
+            <div style={{position:"absolute",bottom:-2,left:0,right:0,height:10,background:"rgba(100,181,246,.6)",borderRadius:99}}/>
+          </div>
+          {Array.from({length:4}).map((_,i)=>(
+            <div key={i} style={{position:"absolute",top:55+i*15,left:"50%",width:12,height:14,marginLeft:-6,background:"linear-gradient(180deg,rgba(100,181,246,.9),rgba(100,181,246,.3))",borderRadius:"0 0 50% 50%",animation:"waterfall 1.2s linear infinite",animationDelay:`${i*.3}s`}}/>
+          ))}
+          <div style={{position:"absolute",top:115,left:-20,width:90,height:50,background:"linear-gradient(180deg,rgba(100,181,246,.5),rgba(79,195,247,.3))",borderRadius:"50%",animation:"ripple 3s ease-in-out infinite"}}/>
+        </div>}
+
+        {/* Fonte mágica — pés no chão (bottom=200 = topo da terra) */}
+        {fonteMagica&&<div style={{position:"absolute",bottom:200,left:30,zIndex:6}}>
+          <div style={{width:50,height:30,background:"linear-gradient(135deg,#78909C,#607D8B)",borderRadius:"50% 50% 30% 30%",boxShadow:"0 4px 12px rgba(0,0,0,.4)",border:"2px solid rgba(255,255,255,.2)"}}>
+            <div style={{position:"absolute",top:-8,left:"50%",transform:"translateX(-50%)",width:10,height:20,background:"linear-gradient(90deg,#546E7A,#78909C)",borderRadius:"50% 50% 0 0"}}/>
+          </div>
+          {Array.from({length:5}).map((_,i)=>(
+            <div key={i} style={{position:"absolute",bottom:28,left:10+i*8,width:4,height:20+Math.sin(i)*8,background:"linear-gradient(180deg,rgba(100,181,246,.9),rgba(100,181,246,.2))",borderRadius:99,animation:`fountain ${1+i*.2}s ease-in-out infinite`,animationDelay:`${i*.15}s`}}/>
+          ))}
+        </div>}
+
+        {/* Cerca de madeira — estacas com pé em bottom=200 */}
+        {saldoMes>200&&<>
+          {Array.from({length:12}).map((_,i)=>(
+            <div key={`f${i}`} style={{position:"absolute",bottom:200,left:`${3+i*8.2}%`,zIndex:5}}>
+              <div style={{width:10,height:30,background:"linear-gradient(90deg,#8D6E63,#A1887F,#8D6E63)",borderRadius:"4px 4px 2px 2px",boxShadow:"2px 2px 4px rgba(0,0,0,.3)",position:"relative"}}>
+                <div style={{position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:0,height:0,borderLeft:"5px solid transparent",borderRight:"5px solid transparent",borderBottom:"8px solid #795548"}}/>
               </div>
-              
-              <div style={{position:"relative",zIndex:1}}>
-                {/* Criatura em movimento */}
-                <div style={{
-                  fontSize:80,
-                  textAlign:"center",
-                  marginBottom:16,
-                  filter:`drop-shadow(0 0 20px ${criatura.estagio.cor}) drop-shadow(0 0 40px ${criatura.estagio.cor}80)`,
-                  animation:`float-creature-${idx % 3} 3s ease-in-out infinite`,
-                  transform:"scale(1)",
-                  transition:"transform 0.3s ease"
-                }}>
-                  {criatura.estagio.emoji}
-                </div>
-                
-                {/* Nome com efeito de brilho */}
-                <div style={{
-                  textAlign:"center",
-                  marginBottom:12,
-                  padding:"8px 12px",
-                  background:`linear-gradient(135deg,${criatura.estagio.cor}20,${criatura.estagio.cor2}10)`,
-                  borderRadius:12,
-                  border:`1px solid ${criatura.estagio.cor}40`
-                }}>
-                  <div style={{
-                    fontSize:16,
-                    fontWeight:800,
-                    background:`linear-gradient(135deg,${criatura.estagio.cor},${criatura.estagio.cor2},#FFF)`,
-                    WebkitBackgroundClip:"text",
-                    WebkitTextFillColor:"transparent",
-                    marginBottom:4,
-                    letterSpacing:0.5
-                  }}>
-                    {criatura.estagio.nome}
-                  </div>
-                  <div style={{
-                    fontSize:10,
-                    color:"rgba(255,255,255,.7)",
-                    fontStyle:"italic"
-                  }}>
-                    {criatura.estagio.desc}
-                  </div>
-                </div>
+            </div>
+          ))}
+          <div style={{position:"absolute",bottom:226,left:"3%",right:"3%",height:5,background:"linear-gradient(90deg,#8D6E63,#A1887F,#8D6E63)",borderRadius:99,zIndex:4,boxShadow:"0 2px 4px rgba(0,0,0,.2)"}}/>
+          <div style={{position:"absolute",bottom:212,left:"3%",right:"3%",height:4,background:"linear-gradient(90deg,#795548,#8D6E63,#795548)",borderRadius:99,zIndex:4}}/>
+        </>}
 
-                {/* Barra de Poder Animada */}
-                <div style={{marginBottom:12}}>
-                  <div style={{
-                    fontSize:10,
-                    color:"var(--mt)",
-                    marginBottom:6,
-                    display:"flex",
-                    justifyContent:"space-between",
-                    alignItems:"center"
-                  }}>
-                    <span style={{display:"flex",alignItems:"center",gap:4}}>
-                      ⚡ <span style={{fontWeight:600}}>Poder Místico</span>
-                    </span>
-                    <span style={{
-                      fontWeight:800,
-                      fontSize:14,
-                      color:criatura.estagio.cor,
-                      textShadow:`0 0 10px ${criatura.estagio.cor}`
-                    }}>{criatura.estagio.poder}</span>
-                  </div>
-                  <div style={{
-                    background:"rgba(0,0,0,.6)",
-                    borderRadius:99,
-                    height:8,
-                    overflow:"hidden",
-                    border:"1px solid rgba(255,255,255,.1)",
-                    boxShadow:"inset 0 2px 4px rgba(0,0,0,.3)"
-                  }}>
-                    <div style={{
-                      background:`linear-gradient(90deg,${criatura.estagio.cor},${criatura.estagio.cor2},${criatura.estagio.cor})`,
-                      backgroundSize:"200% 100%",
-                      width:`${criatura.estagio.poder}%`,
-                      height:"100%",
-                      borderRadius:99,
-                      boxShadow:`0 0 15px ${criatura.estagio.cor}, 0 0 30px ${criatura.estagio.cor}80`,
-                      animation:"shimmer-power 2s linear infinite",
-                      transition:"width 1s ease"
-                    }}/>
-                  </div>
-                </div>
+        {/* === PLANTAS — todas com transformOrigin bottom, plantadas no solo === */}
 
-                {/* Progresso de Evolução */}
-                {criatura.proximoEstagio ? (
-                  <div style={{
-                    background:"rgba(16,185,129,.1)",
-                    borderRadius:12,
-                    padding:"10px 12px",
-                    border:"1px solid rgba(16,185,129,.3)",
-                    boxShadow:"0 4px 12px rgba(16,185,129,.2)"
-                  }}>
-                    <div style={{
-                      fontSize:10,
-                      color:"#6EE7B7",
-                      marginBottom:6,
-                      fontWeight:600
-                    }}>
-                      🌟 Próxima Evolução: {criatura.proximoEstagio.nome}
-                    </div>
-                    <div style={{
-                      background:"rgba(0,0,0,.4)",
-                      borderRadius:99,
-                      height:6,
-                      overflow:"hidden",
-                      marginBottom:6,
-                      border:"1px solid rgba(255,255,255,.1)"
-                    }}>
-                      <div style={{
-                        background:"linear-gradient(90deg,#10B981,#34D399,#6EE7B7)",
-                        backgroundSize:"200% 100%",
-                        width:`${criatura.progresso}%`,
-                        height:"100%",
-                        borderRadius:99,
-                        boxShadow:"0 0 10px #10B981",
-                        transition:"width 1s ease",
-                        animation:"shimmer-progress 3s linear infinite"
-                      }}/>
-                    </div>
-                    <div style={{
-                      fontSize:10,
-                      color:"#6EE7B7",
-                      fontWeight:700,
-                      display:"flex",
-                      justifyContent:"space-between"
-                    }}>
-                      <span>{criatura.progresso.toFixed(0)}% completo</span>
-                      <span>Faltam {fmt(criatura.proximoEstagio.min - saldoMes)}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div style={{
-                    background:"linear-gradient(135deg,rgba(251,191,36,.25),rgba(245,158,11,.15))",
-                    border:"1px solid rgba(251,191,36,.4)",
-                    borderRadius:12,
-                    padding:"12px",
-                    textAlign:"center",
-                    boxShadow:"0 4px 12px rgba(251,191,36,.3), inset 0 1px 0 rgba(255,255,255,.1)"
-                  }}>
-                    <div style={{
-                      fontSize:13,
-                      fontWeight:800,
-                      color:"#FCD34D",
-                      textShadow:"0 0 10px #F59E0B",
-                      letterSpacing:1
-                    }}>
-                      👑 FORMA SUPREMA! 👑
-                    </div>
-                  </div>
-                )}
+        {/* ÁRVORES — tronco nasce do chão (bottom=200) */}
+        {Array.from({length:arvores}).map((_,i)=>{
+          const posX=[8,22,38,55,68,82][i]
+          const hue=100+i*8
+          const treeH=90+i*10
+          return(
+            <div key={`av${i}`} style={{position:"absolute",bottom:200,left:`${posX}%`,zIndex:5,transformOrigin:"bottom center",animation:`treeSway ${4+i*.5}s ease-in-out infinite`,animationDelay:`${i*.3}s`}}>
+              <div style={{width:16,height:treeH*.4,background:"linear-gradient(90deg,#5D4037,#8D6E63,#5D4037)",margin:"0 auto",borderRadius:"4px 4px 2px 2px",position:"relative",boxShadow:"inset -3px 0 6px rgba(0,0,0,.3)"}}>
+                <div style={{position:"absolute",width:3,height:treeH*.2,background:"rgba(0,0,0,.15)",left:4,top:"20%",borderRadius:99}}/>
+              </div>
+              <div style={{position:"relative",top:-20}}>
+                <div style={{width:70,height:55,background:`radial-gradient(circle at 40% 35%,hsl(${hue},55%,50%),hsl(${hue},50%,35%))`,borderRadius:"50% 50% 45% 45%",margin:"0 auto",boxShadow:`0 4px 12px rgba(0,0,0,.25),inset -8px -8px 16px rgba(0,0,0,.2)`,position:"relative"}}>
+                  <div style={{position:"absolute",top:8,left:12,width:20,height:14,background:"rgba(255,255,255,.15)",borderRadius:"50%",transform:"rotate(-20deg)"}}/>
+                  {i%2===0&&[0,1,2,3].map(j=>(
+                    <div key={j} style={{position:"absolute",width:8,height:8,background:"#FF5722",borderRadius:"50%",top:`${15+j*18}%`,left:`${12+j*18}%`,boxShadow:"0 2px 4px rgba(0,0,0,.3)"}}/>
+                  ))}
+                </div>
+                <div style={{width:55,height:42,background:`radial-gradient(circle at 40% 35%,hsl(${hue},60%,55%),hsl(${hue},55%,40%))`,borderRadius:"50%",margin:"-18px auto 0",boxShadow:`0 4px 8px rgba(0,0,0,.2),inset -6px -6px 12px rgba(0,0,0,.15)`}}/>
+                <div style={{width:38,height:30,background:`radial-gradient(circle at 40% 35%,hsl(${hue},65%,60%),hsl(${hue},60%,45%))`,borderRadius:"50%",margin:"-14px auto 0",boxShadow:`0 2px 6px rgba(0,0,0,.15)`}}/>
+              </div>
+            </div>
+          )
+        })}
+
+        {/* FLORES — caule nasce do solo (bottom=200), transformOrigin bottom */}
+        {Array.from({length:flores}).map((_,i)=>{
+          const col = i % 8
+          const row = Math.floor(i / 8)
+          const paleta = floresCores[col % floresCores.length]
+          const leftPct = 4 + col * 11.5
+          // Todas as flores têm raiz no nível da grama — bottom=200
+          const stemH = 36 + [0,8,4,12,2,10,6,14][col] // caules de alturas variadas mas raiz fixa
+          const sz = [0.85,0.95,0.8,1,0.9,0.88,0.92,0.85][col]
+
+          return(
+            <div key={`fl${i}`} style={{position:"absolute",bottom:200,left:`${leftPct}%`,zIndex:7+row,transformOrigin:"bottom center",transform:`scale(${sz})`,animation:`plantSway ${2.5+col*0.2}s ease-in-out infinite`,animationDelay:`${i*0.15}s`}}>
+              {/* Caule enraizado no solo */}
+              <div style={{width:5,height:stemH,background:"linear-gradient(90deg,#2E7D32,#43A047,#2E7D32)",margin:"0 auto",borderRadius:"2px 2px 0 0",position:"relative"}}>
+                <div style={{position:"absolute",width:13,height:7,background:"#4CAF50",borderRadius:"0 50% 50% 0",left:-13,top:stemH*.35,transform:"rotate(-20deg)"}}/>
+                <div style={{position:"absolute",width:13,height:7,background:"#388E3C",borderRadius:"50% 0 0 50%",right:-13,top:stemH*.55,transform:"rotate(20deg)"}}/>
+              </div>
+              {/* Flor */}
+              <div style={{position:"relative",width:34,height:34,top:-10,left:"50%",transform:"translateX(-50%)"}}>
+                {[0,51,102,153,204,255,306].map(ang=>(
+                  <div key={ang} style={{position:"absolute",width:12,height:18,background:`linear-gradient(135deg,${paleta.petala},${paleta.petala}BB)`,borderRadius:"50% 50% 40% 40%",top:"50%",left:"50%",transform:`translate(-50%,-50%) rotate(${ang}deg) translateY(-10px)`,boxShadow:`0 0 6px ${paleta.petala}40`,transformOrigin:"center bottom"}}/>
+                ))}
+                <div style={{position:"absolute",width:13,height:13,background:`radial-gradient(circle,${paleta.centro},${paleta.centro}CC)`,borderRadius:"50%",top:"50%",left:"50%",transform:"translate(-50%,-50%)",zIndex:2,boxShadow:`0 0 8px ${paleta.centro}80`,border:"1px solid rgba(255,255,255,.3)"}}/>
+              </div>
+            </div>
+          )
+        })}
+
+        {/* BORBOLETAS */}
+        {Array.from({length:borboletas}).map((_,i)=>{
+          const cbs=[
+            {g:"linear-gradient(135deg,#FF4081,#FF80AB)"},
+            {g:"linear-gradient(135deg,#7C4DFF,#B388FF)"},
+            {g:"linear-gradient(135deg,#00BFA5,#64FFDA)"},
+            {g:"linear-gradient(135deg,#FFD740,#FFAB40)"},
+            {g:"linear-gradient(135deg,#40C4FF,#80D8FF)"},
+          ]
+          const cb=cbs[i%cbs.length]
+          return(
+            <div key={`bb${i}`} style={{position:"absolute",top:80+Math.sin(i)*40,left:`${10+i*8}%`,zIndex:8,animation:`butterflyFly ${9+i*1.5}s ease-in-out infinite`,animationDelay:`${i*1.2}s`}}>
+              <div style={{animation:"flutter .5s ease-in-out infinite",position:"relative",width:28,height:22}}>
+                <div style={{position:"absolute",width:14,height:18,background:cb.g,borderRadius:"55% 45% 35% 65%",top:0,left:0,boxShadow:"0 2px 8px rgba(0,0,0,.2)",opacity:.9}}/>
+                <div style={{position:"absolute",width:14,height:18,background:cb.g,borderRadius:"45% 55% 65% 35%",top:0,right:0,boxShadow:"0 2px 8px rgba(0,0,0,.2)",opacity:.9}}/>
+                <div style={{position:"absolute",width:3,height:18,background:"#37474F",left:"50%",top:"50%",transform:"translate(-50%,-50%)",borderRadius:99,zIndex:2}}>
+                  <div style={{position:"absolute",width:1,height:7,background:"#37474F",top:-7,left:0,borderRadius:99,transform:"rotate(-25deg)"}}/> 
+                  <div style={{position:"absolute",width:1,height:7,background:"#37474F",top:-7,right:-1,borderRadius:99,transform:"rotate(25deg)"}}/>
+                </div>
+              </div>
+            </div>
+          )
+        })}
+
+        {/* Faíscas mágicas / vagalumes */}
+        {saldoMes>200&&Array.from({length:Math.min(20,Math.floor(saldoMes/100))}).map((_,i)=>(
+          <div key={`sp${i}`} style={{position:"absolute",left:`${Math.random()*90}%`,top:`${120+Math.random()*180}px`,width:5,height:5,background:"radial-gradient(circle,#FFEE58,transparent 70%)",borderRadius:"50%",animation:`floatFirefly ${3+Math.random()*4}s ease-in-out infinite`,animationDelay:`${Math.random()*3}s`,boxShadow:"0 0 8px #FFEE58,0 0 14px rgba(255,238,88,.5)",zIndex:9}}/>
+        ))}
+
+        {/* Mensagem de início */}
+        {saldoMes<=0&&<div style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",textAlign:"center",background:"rgba(255,255,255,.96)",padding:"24px 32px",borderRadius:20,border:"3px solid #8B6914",boxShadow:"0 8px 32px rgba(0,0,0,.25)",maxWidth:280,zIndex:10}}>
+          <div style={{fontSize:48,marginBottom:8,animation:"bounce 2s ease-in-out infinite"}}>🌱</div>
+          <div style={{fontSize:16,fontWeight:700,color:"#2E7D32",marginBottom:8}}>Plante a primeira semente!</div>
+          <div style={{fontSize:12,color:"#555",lineHeight:1.6}}>Economize neste mês para seu jardim florescer.<br/><span style={{fontSize:10,color:"#888"}}>🌸 R$ 80 = 1 flor nova</span></div>
+        </div>}
+
+        <style>{`
+          @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+          @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+          @keyframes sparkle{0%,100%{opacity:0;transform:scale(0)}50%{opacity:1;transform:scale(1)}}
+          @keyframes floatCloud{0%,100%{transform:translateX(0)}50%{transform:translateX(18px)}}
+          @keyframes birdFly{0%{transform:translateX(0)}100%{transform:translateX(120vw)}}
+          @keyframes treeSway{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
+          @keyframes plantSway{0%,100%{transform:rotate(-2deg) scale(var(--s,1))}50%{transform:rotate(2deg) scale(var(--s,1))}}
+          @keyframes flutter{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.7)}}
+          @keyframes butterflyFly{0%,100%{transform:translate(0,0)}25%{transform:translate(50px,-30px)}50%{transform:translate(100px,10px)}75%{transform:translate(60px,30px)}}
+          @keyframes floatFirefly{0%,100%{transform:translate(0,0);opacity:.3}50%{transform:translate(-15px,-25px);opacity:1}}
+          @keyframes waterfall{0%{transform:translateY(0);opacity:1}100%{transform:translateY(60px);opacity:0}}
+          @keyframes fountain{0%,100%{transform:translateY(0);opacity:1}50%{transform:translateY(-16px);opacity:.4}}
+          @keyframes ripple{0%,100%{transform:scaleX(1);opacity:.5}50%{transform:scaleX(1.1);opacity:.3}}
+          @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+        `}</style>
+      </div>
+
+      {/* Stats */}
+      <div className="card" style={{marginTop:16}}>
+        <div className="sec">🌾 Elementos do Jardim · {`${tm.rec>0?"":" Nenhuma receita este mês"}`}Saldo este mês: {(tm.saldo).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}</div>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+          {[
+            {emoji:"🌸",label:"Flores",val:flores,max:24,desc:"R$ 80 cada",cor:"#FF4081"},
+            {emoji:"🦋",label:"Borboletas",val:borboletas,max:10,desc:"R$ 250 cada",cor:"#7C4DFF"},
+            {emoji:"🌳",label:"Árvores",val:arvores,max:6,desc:"R$ 500 cada",cor:"#2E7D32"},
+            {emoji:"🐦",label:"Pássaros",val:passaros,max:5,desc:"R$ 600 cada",cor:"#1565C0"},
+          ].map(e=>(
+            <div key={e.label} style={{background:`rgba(0,0,0,.15)`,borderRadius:12,padding:"11px 13px",border:`1px solid ${e.cor}25`}}>
+              <div style={{fontSize:10,color:"var(--mt)",marginBottom:4}}>{e.emoji} {e.label}</div>
+              <div style={{fontSize:22,fontWeight:800,color:e.cor}}>{e.val}<span style={{fontSize:10,color:"var(--mt)",fontWeight:400}}>/{e.max}</span></div>
+              <div style={{fontSize:9,color:"var(--mt)",marginTop:2}}>{e.desc}</div>
+              <div style={{background:"rgba(255,255,255,.08)",borderRadius:99,height:4,marginTop:6}}>
+                <div style={{background:e.cor,width:`${(e.val/e.max)*100}%`,height:"100%",borderRadius:99,boxShadow:`0 0 6px ${e.cor}`}}/>
               </div>
             </div>
           ))}
         </div>
-
-        {/* Dashboard Místico de Estatísticas */}
-        <div style={{
-          background:"linear-gradient(135deg,rgba(139,92,246,.15),rgba(167,139,250,.1))",
-          border:"1px solid rgba(167,139,250,.3)",
-          borderRadius:20,
-          padding:20,
-          position:"relative",
-          overflow:"hidden",
-          boxShadow:"0 8px 24px rgba(139,92,246,.2), inset 0 1px 0 rgba(255,255,255,.1)"
-        }}>
-          <div style={{
-            position:"absolute",
-            inset:0,
-            background:"radial-gradient(circle at 80% 20%, rgba(167,139,250,.1) 0%, transparent 50%)",
-            animation:"pulse-stats 4s ease-in-out infinite"
-          }}/>
-          
-          <div style={{position:"relative",zIndex:1}}>
-            <div style={{
-              fontSize:14,
-              fontWeight:800,
-              background:"linear-gradient(135deg,#A78BFA,#C4B5FD,#FFF)",
-              WebkitBackgroundClip:"text",
-              WebkitTextFillColor:"transparent",
-              marginBottom:16,
-              display:"flex",
-              alignItems:"center",
-              gap:8
-            }}>
-              <span>📊</span> Livro de Registros Místicos
-            </div>
-            
-            <div style={{
-              display:"grid",
-              gridTemplateColumns:isMobile?"repeat(2,1fr)":"repeat(4,1fr)",
-              gap:12
-            }}>
-              {[
-                {label:"Poder Total",value:criaturasEvoluidas.reduce((sum,c)=>sum+c.estagio.poder,0),cor:"#FCD34D",icon:"⚡"},
-                {label:"Criaturas",value:criaturas.length,cor:"#A78BFA",icon:"✨"},
-                {label:"Supremas",value:`${criaturasEvoluidas.filter(c=>!c.proximoEstagio).length}/${criaturas.length}`,cor:"#34D399",icon:"👑"},
-                {label:"Saldo Mês",value:fmt(saldoMes),cor:saldoMes>=0?"#10B981":"#EF4444",icon:"💰"}
-              ].map(stat=>(
-                <div key={stat.label} style={{
-                  background:"rgba(0,0,0,.3)",
-                  borderRadius:12,
-                  padding:"12px",
-                  border:"1px solid rgba(255,255,255,.1)",
-                  boxShadow:"inset 0 2px 4px rgba(0,0,0,.2)",
-                  transition:"transform 0.2s ease",
-                  cursor:"pointer"
-                }}
-                onMouseEnter={e=>e.currentTarget.style.transform="scale(1.05)"}
-                onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}
-                >
-                  <div style={{
-                    fontSize:10,
-                    color:"rgba(255,255,255,.6)",
-                    marginBottom:6,
-                    display:"flex",
-                    alignItems:"center",
-                    gap:4
-                  }}>
-                    <span>{stat.icon}</span>
-                    <span>{stat.label}</span>
-                  </div>
-                  <div style={{
-                    fontSize:20,
-                    fontWeight:800,
-                    color:stat.cor,
-                    textShadow:`0 0 15px ${stat.cor}`,
-                    fontFamily:"'Outfit',sans-serif"
-                  }}>
-                    {stat.value}
-                  </div>
-                </div>
-              ))}
-            </div>
+        <div style={{marginTop:12,padding:"10px 12px",background:"rgba(167,139,250,.06)",borderRadius:10,border:"1px solid rgba(167,139,250,.12)"}}>
+          <div style={{fontSize:10,fontWeight:700,color:"var(--pu)",marginBottom:5}}>🔓 Desbloqueios especiais</div>
+          <div style={{fontSize:10,color:"var(--mt)",lineHeight:1.8}}>
+            {[
+              {label:"Cerca de Madeira",min:200,ico:"🪵"},
+              {label:"Fonte Mágica",min:3000,ico:"⛲"},
+              {label:"Rio & Cascata",min:2500,ico:"💧"},
+              {label:"Arco-íris",min:4000,ico:"🌈"},
+            ].map(d=>(
+              <span key={d.label} style={{display:"inline-block",marginRight:12}}>{saldoMes>=d.min?"✅":"❌"} {d.ico} {d.label}{saldoMes<d.min&&` (faltam ${(d.min-saldoMes).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})})`}</span>
+            ))}
           </div>
         </div>
-
-        {/* CSS para Animações Mágicas */}
-        <style>{`
-          @keyframes float-slow {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
-          }
-          @keyframes float-creature-0 {
-            0%, 100% { transform: translateY(0px) rotate(-2deg); }
-            50% { transform: translateY(-12px) rotate(2deg); }
-          }
-          @keyframes float-creature-1 {
-            0%, 100% { transform: translateY(0px) rotate(2deg); }
-            50% { transform: translateY(-15px) rotate(-2deg); }
-          }
-          @keyframes float-creature-2 {
-            0%, 100% { transform: translateY(0px) rotate(-1deg); }
-            50% { transform: translateY(-10px) rotate(1deg); }
-          }
-          @keyframes float-particle {
-            0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.4; }
-            50% { transform: translateY(-30px) translateX(10px); opacity: 1; }
-          }
-          @keyframes sparkle-creature {
-            0%, 100% { opacity: 0; transform: scale(0); }
-            50% { opacity: 1; transform: scale(1); }
-          }
-          @keyframes rotate-aura {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-          @keyframes shimmer-gold {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 200% 50%; }
-          }
-          @keyframes shimmer-power {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 200% 50%; }
-          }
-          @keyframes shimmer-progress {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 200% 50%; }
-          }
-          @keyframes pulse-glow {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-          }
-          @keyframes glow-pulse {
-            0%, 100% { opacity: 1; text-shadow: 0 0 20px #F59E0B; }
-            50% { opacity: 0.8; text-shadow: 0 0 40px #F59E0B, 0 0 60px #FCD34D; }
-          }
-          @keyframes pulse-stats {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-          }
-        `}</style>
-      </>
-    )
+      </div>
+    </>)
   })()}
 </>}
+
     </>
   )
 
