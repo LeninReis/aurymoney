@@ -473,6 +473,8 @@ export default function AuryMoney() {
     const lastMonth = records.map(r=>r.date?.slice(0,7)).filter(Boolean).sort().reverse()[0]
     const result = []
     let ym = addMonths(thisMonth,1)
+    let saldoAcumulado = tm.saldo // Começa com o saldo do mês atual
+    
     while(ym <= lastMonth){
       const rs      = records.filter(r=>r.date?.startsWith(ym))
       const realExp = rs.filter(r=>r.type==="despesa").reduce((a,b)=>a+Number(b.value||0),0)
@@ -480,11 +482,24 @@ export default function AuryMoney() {
       const hasReal = rs.length>0
       const projExp = hasReal ? realExp : fixedExp
       const projRec = hasReal ? realRec : fixedRec
-      result.push({ ym, label:monthLabel(ym), projExp, projRec, saldo:projRec-projExp, hasReal })
+      
+      // Calcula o saldo do mês e acumula
+      const saldoMes = projRec - projExp
+      saldoAcumulado += saldoMes
+      
+      result.push({ 
+        ym, 
+        label: monthLabel(ym), 
+        projExp, 
+        projRec, 
+        saldo: saldoMes,
+        saldoAcumulado: saldoAcumulado, // Saldo acumulado até este mês
+        hasReal 
+      })
       ym = addMonths(ym,1)
     }
     return result
-  },[records])
+  },[records, thisMonth, tm.saldo])
 
   // ── Card balances ──────────────────────────────────────────────────────────
   const cardFaturaMonth = (cardKey, ym) =>
@@ -525,8 +540,34 @@ export default function AuryMoney() {
         await updateDoc(doc(db,"records",editId),{...form,value:parseFloat(form.value)})
         showToast("✓ Atualizado"); setEditId(null)
       } else {
+        // Salva o registro atual
         await addDoc(collection(db,"records"),entry)
-        showToast("✓ Salvo e sincronizado 🔄")
+        
+        // Se for recorrente, cria registros para os próximos 12 meses
+        if(form.recorrente) {
+          const baseDate = new Date(form.date)
+          const baseDay = baseDate.getDate()
+          
+          for(let i = 1; i <= 12; i++) {
+            const futureDate = new Date(baseDate)
+            futureDate.setMonth(futureDate.getMonth() + i)
+            
+            // Ajusta para o último dia do mês se necessário (ex: 31 de jan -> 28/29 de fev)
+            const maxDay = new Date(futureDate.getFullYear(), futureDate.getMonth() + 1, 0).getDate()
+            futureDate.setDate(Math.min(baseDay, maxDay))
+            
+            const futureEntry = {
+              ...entry,
+              date: futureDate.toISOString().slice(0, 10),
+              createdAt: serverTimestamp()
+            }
+            
+            await addDoc(collection(db,"records"), futureEntry)
+          }
+          showToast("✓ Registro recorrente criado para 12 meses! 🔄")
+        } else {
+          showToast("✓ Salvo e sincronizado 🔄")
+        }
       }
       setForm({type:"despesa",desc:"",value:"",category:"cartao",date:todayStr(),card:"nubank_l",shared:false,recorrente:false})
       setTab("registros")
@@ -745,17 +786,17 @@ Para REGISTRAR responda SOMENTE com JSON:
 
           {/* Projeção próximos meses */}
           <div className="card" style={{background:"linear-gradient(135deg,#14142a,#1a0f30)",border:"1px solid rgba(167,139,250,.15)"}}>
-            <div className="sec">Projeção — até o último registro</div>
+            <div className="sec">Projeção — saldo acumulado mês a mês</div>
             {projection.map((p,i)=>{
               const maxVal = Math.max(...projection.map(x=>x.projExp),totalRec,1)
               const pct    = Math.min((p.projExp/maxVal)*100,100)
-              const isRed  = p.saldo<0
+              const isRed  = p.saldoAcumulado < 0
+              const [mes, ano] = p.label.split(" ")
               return(
                 <div key={i} className="proj-row">
                   <div className="proj-month">
-                    <div style={{fontSize:11,fontWeight:700}}>{p.label.split(" ")[0]}</div>
-                    {p.hasReal&&<div style={{fontSize:8,color:"var(--gn)"}}>dados reais</div>}
-                    {!p.hasReal&&<div style={{fontSize:8,color:"var(--mt)"}}>projeção</div>}
+                    <div style={{fontSize:11,fontWeight:700}}>{mes}</div>
+                    <div style={{fontSize:8,color:"var(--mt)"}}>{ano}</div>
                   </div>
                   <div style={{flex:1}}>
                     <div className="proj-bar-wrap">
@@ -765,14 +806,19 @@ Para REGISTRAR responda SOMENTE com JSON:
                       Desp: {fmt(p.projExp)} · Rec: {fmt(p.projRec)}
                     </div>
                   </div>
-                  <div className="proj-val" style={{color:isRed?"var(--rd)":"var(--gn)"}}>
-                    {isRed&&"−"}{fmt(Math.abs(p.saldo))}
+                  <div className="proj-val">
+                    <div style={{fontSize:10,color:"var(--mt)",marginBottom:2}}>
+                      {p.hasReal ? "Real" : "Projeção"}
+                    </div>
+                    <div style={{color:isRed?"var(--rd)":"var(--gn)",fontWeight:700}}>
+                      {isRed&&"−"}{fmt(Math.abs(p.saldoAcumulado))}
+                    </div>
                   </div>
                 </div>
               )
             })}
-            <div style={{fontSize:10,color:"var(--mt)",marginTop:8,lineHeight:1.5}}>
-              * Meses com registros exibem valores exatos. Meses sem registro usam apenas os recorrentes cadastrados.
+            <div style={{fontSize:10,color:"var(--mt)",marginTop:8,lineHeight:1.5,padding:"8px 12px",background:"rgba(167,139,250,.05)",borderRadius:8}}>
+              💡 <strong>Saldo acumulado:</strong> Considera o saldo do mês anterior + receitas - despesas do mês atual. Meses com dados reais usam valores exatos; meses futuros projetam apenas recorrentes cadastrados.
             </div>
           </div>
 
