@@ -648,75 +648,50 @@ export default function AuryMoney() {
         {/* ── DASHBOARD ── */}
         {tab==="dashboard"&&(loading?<div className="ld"><div className="sp"/>Carregando...</div>:<>
 
-          {/* Hero saldo acumulado — principal */}
+          {/* Hero saldo */}
           <div className="hero">
-            <div className="h-lbl">💰 Saldo Acumulado · {monthLabel(thisMonth)}</div>
+            <div className="h-lbl">Saldo Acumulado · {monthLabel(thisMonth)}</div>
             <div className={`h-val ${agSaldoAcumulado>0?"pos":agSaldoAcumulado<0?"neg":"warn"}`}>{fmt(agSaldoAcumulado)}</div>
-            <div style={{fontSize:10,color:"var(--mt)",marginTop:4,marginBottom:10}}>Soma de todos os meses até hoje</div>
+            <div style={{marginTop:10,display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}>
+              <span style={{fontSize:10,color:"var(--mt)"}}>Saldo do mês:</span>
+              <span style={{fontSize:12,fontWeight:700,color:tm.saldo>=0?"var(--gn)":"var(--rd)"}}>{fmt(tm.saldo)}</span>
+              <span style={{fontSize:10,color:"var(--mt)",marginLeft:"auto"}}>Acumulado até hoje</span>
+            </div>
             <div className="pbar">
               <div className="pfill" style={{width:`${Math.min(100,Math.abs(agSaldoAcumulado/50))}%`,background:agSaldoAcumulado>=0?"linear-gradient(90deg,var(--gn),#059669)":"linear-gradient(90deg,var(--rd),#dc2626)"}}/>
             </div>
           </div>
 
-          {/* Mês vigente — visão hierárquica */}
-          <div className="card" style={{background:"linear-gradient(135deg,#0f0f20,#141428)",border:"1px solid rgba(167,139,250,.12)",marginBottom:10}}>
-            <div className="sec" style={{marginBottom:12}}>📅 Mês Vigente — {monthLabel(thisMonth)}</div>
+          {/* Totais do mês */}
+          <div className="g3">
+            <div className="mc"><div className="ml">↑ Receitas</div><div className="mv" style={{color:"var(--gn)"}}>{fmt(tm.rec)}</div></div>
+            <div className="mc"><div className="ml">↓ Despesas</div><div className="mv" style={{color:"var(--rd)"}}>{fmt(tm.exp)}</div></div>
+            <div className="mc"><div className="ml">Saldo do Mês</div><div className="mv" style={{color:tm.saldo>=0?"var(--gn)":"var(--rd)"}}>{fmt(tm.saldo)}</div></div>
+          </div>
 
-            {/* Linha 1: Receitas / Despesas / Saldo */}
-            <div className="g3" style={{marginBottom:10}}>
-              <div className="mc"><div className="ml">↑ Receitas</div><div className="mv" style={{color:"var(--gn)"}}>{fmt(tm.rec)}</div></div>
-              <div className="mc"><div className="ml">↓ Despesas</div><div className="mv" style={{color:"var(--rd)"}}>{fmt(tm.exp)}</div></div>
-              <div className="mc"><div className="ml">Saldo</div><div className="mv" style={{color:tm.saldo>=0?"var(--gn)":"var(--rd)"}}>{fmt(tm.saldo)}</div></div>
-            </div>
-
-            {/* Linha 2: % do mês vigente em destaque */}
-            {(()=>{
-              const pctMes   = tm.rec>0 ? Math.round((tm.exp/tm.rec)*100) : 0
-              const corMes   = pctMes<60?"var(--gn)":pctMes<80?"var(--yw)":"var(--rd)"
-              const statusMes= pctMes<60?"Ótimo 🎉":pctMes<70?"Bom ✅":pctMes<80?"Atenção ⚠️":"Crítico 🚨"
-              return(
-                <div style={{background:"rgba(255,255,255,.03)",border:"1px solid rgba(255,255,255,.06)",borderRadius:12,padding:"12px 14px",marginBottom:10}}>
-                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
-                    <div>
-                      <div style={{fontSize:9,color:"var(--mt)",letterSpacing:1.2,textTransform:"uppercase",marginBottom:2}}>% Gasto / Receita · Mês Atual</div>
-                      <div style={{display:"flex",alignItems:"baseline",gap:8}}>
-                        <div style={{fontSize:28,fontWeight:800,color:corMes,lineHeight:1}}>{pctMes}%</div>
-                        <div style={{fontSize:11,fontWeight:700,color:corMes}}>{statusMes}</div>
-                      </div>
-                    </div>
-                    <div style={{textAlign:"right"}}>
-                      <div style={{fontSize:9,color:"var(--mt)",marginBottom:2}}>Meta</div>
-                      <div style={{fontSize:13,fontWeight:700,color:"var(--gn)"}}>60%</div>
-                    </div>
-                  </div>
-                  <div style={{background:"rgba(255,255,255,.06)",borderRadius:99,height:8,overflow:"hidden",position:"relative"}}>
-                    <div style={{background:`linear-gradient(90deg,var(--gn),${corMes})`,width:`${Math.min(100,pctMes)}%`,height:"100%",borderRadius:99,transition:"width 1s ease",boxShadow:`0 0 8px ${corMes}`}}/>
-                    <div style={{position:"absolute",top:0,left:"60%",width:2,height:"100%",background:"rgba(255,255,255,.3)"}}/>
-                    <div style={{position:"absolute",top:0,left:"80%",width:2,height:"100%",background:"rgba(248,113,113,.5)"}}/>
-                  </div>
-                  <div style={{display:"flex",justifyContent:"space-between",fontSize:8,color:"rgba(255,255,255,.3)",marginTop:3}}>
-                    <span>0%</span><span style={{color:"var(--gn)"}}>60% meta</span><span style={{color:"var(--rd)"}}>80% risco</span><span>100%</span>
-                  </div>
-                </div>
-              )
-            })()}
-
-            {/* Linha 3: Acumulado + % acumulado — menor, secundário */}
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-              <div style={{background:"rgba(167,139,250,.06)",border:"1px solid rgba(167,139,250,.12)",borderRadius:12,padding:"10px 12px"}}>
-                <div style={{fontSize:9,color:"var(--mt)",marginBottom:3}}>💎 Saldo Acumulado</div>
+          {/* Totais Acumulados (todos os registros) */}
+          <div className="card" style={{background:"linear-gradient(135deg,#0f0f20,#141428)",border:"1px solid rgba(167,139,250,.12)"}}>
+            <div className="sec">📊 Totais Acumulados — Todos os Registros</div>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
+              <div style={{background:"rgba(52,211,153,.06)",border:"1px solid rgba(52,211,153,.15)",borderRadius:12,padding:"11px 12px"}}>
+                <div style={{fontSize:9,color:"var(--mt)",marginBottom:3}}>↑ Total Receitas</div>
+                <div style={{fontSize:15,fontWeight:700,color:"var(--gn)"}}>{fmt(totalRec)}</div>
+              </div>
+              <div style={{background:"rgba(248,113,113,.06)",border:"1px solid rgba(248,113,113,.15)",borderRadius:12,padding:"11px 12px"}}>
+                <div style={{fontSize:9,color:"var(--mt)",marginBottom:3}}>↓ Total Despesas</div>
+                <div style={{fontSize:15,fontWeight:700,color:"var(--rd)"}}>{fmt(totalExp)}</div>
+              </div>
+              <div style={{background:"rgba(167,139,250,.06)",border:"1px solid rgba(167,139,250,.15)",borderRadius:12,padding:"11px 12px"}}>
+                <div style={{fontSize:9,color:"var(--mt)",marginBottom:3}}>💰 Saldo Acumulado</div>
                 <div style={{fontSize:15,fontWeight:700,color:agSaldoAcumulado>=0?"var(--gn)":"var(--rd)"}}>{fmt(agSaldoAcumulado)}</div>
-                <div style={{fontSize:8,color:"var(--mt)",marginTop:2}}>todos os meses</div>
               </div>
-              <div style={{background:totalRec>0&&(totalExp/totalRec)<0.7?"rgba(52,211,153,.06)":totalRec>0&&(totalExp/totalRec)<0.85?"rgba(251,191,36,.06)":"rgba(248,113,113,.06)",border:`1px solid ${totalRec>0&&(totalExp/totalRec)<0.7?"rgba(52,211,153,.15)":totalRec>0&&(totalExp/totalRec)<0.85?"rgba(251,191,36,.15)":"rgba(248,113,113,.15)"}`,borderRadius:12,padding:"10px 12px"}}>
-                <div style={{fontSize:9,color:"var(--mt)",marginBottom:3}}>📊 % Gasto Acumulado</div>
+              <div style={{background:totalRec>0&&(totalExp/totalRec)<0.7?"rgba(52,211,153,.06)":totalRec>0&&(totalExp/totalRec)<0.85?"rgba(251,191,36,.06)":"rgba(248,113,113,.06)",border:`1px solid ${totalRec>0&&(totalExp/totalRec)<0.7?"rgba(52,211,153,.15)":totalRec>0&&(totalExp/totalRec)<0.85?"rgba(251,191,36,.15)":"rgba(248,113,113,.15)"}`,borderRadius:12,padding:"11px 12px"}}>
+                <div style={{fontSize:9,color:"var(--mt)",marginBottom:3}}>% Gasto / Receita</div>
                 <div style={{fontSize:15,fontWeight:700,color:totalRec>0&&(totalExp/totalRec)<0.7?"var(--gn)":totalRec>0&&(totalExp/totalRec)<0.85?"var(--yw)":"var(--rd)"}}>{totalRec>0?Math.round((totalExp/totalRec)*100):0}%</div>
-                <div style={{fontSize:8,color:"var(--mt)",marginTop:2}}>histórico total</div>
               </div>
             </div>
-
             {faltando>0&&(
-              <div style={{background:"rgba(248,113,113,.08)",border:"1px solid rgba(248,113,113,.2)",borderRadius:10,padding:"10px 12px",display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:10}}>
+              <div style={{background:"rgba(248,113,113,.08)",border:"1px solid rgba(248,113,113,.2)",borderRadius:10,padding:"10px 12px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                 <div>
                   <div style={{fontSize:11,fontWeight:700,color:"var(--rd)"}}>💸 Faltam para fechar o mês</div>
                   <div style={{fontSize:10,color:"var(--mt)",marginTop:2}}>Considere freelas ou renda extra</div>
@@ -968,27 +943,22 @@ export default function AuryMoney() {
             <div className="sec">⚗️ Poções da Sabedoria</div>
             <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"1fr 1fr",gap:12}}>
               
-              {/* Poção do Acúmulo */}
-              <div style={{background:"linear-gradient(135deg,rgba(52,211,153,.12),rgba(52,211,153,.05))",border:"1.5px solid rgba(52,211,153,.3)",borderRadius:16,padding:16,position:"relative",overflow:"hidden"}}>
-                <div style={{position:"absolute",top:-20,right:-20,width:80,height:80,background:"radial-gradient(circle,rgba(52,211,153,.2),transparent)",borderRadius:"50%"}}/>
+              {/* Poção da Disciplina */}
+              <div style={{background:"linear-gradient(135deg,rgba(76,175,80,.12),rgba(76,175,80,.05))",border:"1.5px solid rgba(76,175,80,.3)",borderRadius:16,padding:16,position:"relative",overflow:"hidden"}}>
+                <div style={{position:"absolute",top:-20,right:-20,width:80,height:80,background:"radial-gradient(circle,rgba(76,175,80,.2),transparent)",borderRadius:"50%"}}/>
                 <div style={{position:"relative",zIndex:1}}>
-                  <div style={{fontSize:32,marginBottom:8,filter:"drop-shadow(0 2px 8px rgba(52,211,153,.6))"}}>💰</div>
-                  <div style={{fontSize:14,fontWeight:700,color:"#34D399",marginBottom:4}}>Poção do Acúmulo</div>
-                  <div style={{fontSize:12,color:"rgba(255,255,255,.7)",marginBottom:12}}>Saldo acumulado no mês atual</div>
+                  <div style={{fontSize:32,marginBottom:8,filter:"drop-shadow(0 2px 8px rgba(76,175,80,.6))"}}>🧪</div>
+                  <div style={{fontSize:14,fontWeight:700,color:"#4CAF50",marginBottom:4}}>Poção da Disciplina</div>
+                  <div style={{fontSize:12,color:"rgba(255,255,255,.7)",marginBottom:12}}>Taxa de comprometimento da renda</div>
                   {(()=>{
-                    const meta = 1000
-                    const prog = Math.min(100,(tm.saldo/meta)*100)
-                    const cor  = tm.saldo<=0?"#F44336":tm.saldo<500?"#FF9800":tm.saldo<meta?"#8BC34A":"#34D399"
-                    const status = tm.saldo<=0?"Mês no vermelho 🚨":tm.saldo<500?"Acumulando 📈":tm.saldo<meta?"Quase lá ✨":"Meta atingida 🎉"
+                    const taxa = tm.rec>0?(tm.exp/tm.rec)*100:0
+                    const nivel = taxa<50?"Excelente":taxa<70?"Bom":taxa<85?"Atenção":"Crítico"
+                    const cor = taxa<50?"#4CAF50":taxa<70?"#8BC34A":taxa<85?"#FF9800":"#F44336"
                     return(<>
-                      <div style={{fontSize:24,fontWeight:800,color:cor,marginBottom:4}}>{fmt(tm.saldo)}</div>
-                      <div style={{fontSize:11,color:"rgba(255,255,255,.6)",marginBottom:10}}>Meta mensal: <strong style={{color:"#34D399"}}>{fmt(meta)}</strong> · <strong style={{color:cor}}>{status}</strong></div>
-                      <div style={{background:"rgba(0,0,0,.3)",borderRadius:99,height:6,position:"relative"}}>
-                        <div style={{background:`linear-gradient(90deg,${cor},${cor}dd)`,width:`${Math.max(0,prog)}%`,height:"100%",borderRadius:99,boxShadow:`0 0 8px ${cor}`,transition:"width 1s ease"}}/>
-                        <div style={{position:"absolute",top:0,left:"100%",marginLeft:-2,width:2,height:"100%",background:"rgba(52,211,153,.4)"}}/>
-                      </div>
-                      <div style={{display:"flex",justifyContent:"space-between",fontSize:9,color:"rgba(255,255,255,.4)",marginTop:4}}>
-                        <span>R$ 0</span><span style={{color:"#34D399"}}>meta R$ 1k</span>
+                      <div style={{fontSize:24,fontWeight:800,color:cor,marginBottom:8}}>{taxa.toFixed(1)}%</div>
+                      <div style={{fontSize:11,color:"rgba(255,255,255,.6)"}}>Status: <strong style={{color:cor}}>{nivel}</strong></div>
+                      <div style={{marginTop:12,background:"rgba(0,0,0,.3)",borderRadius:99,height:6}}>
+                        <div style={{background:`linear-gradient(90deg,${cor},${cor}dd)`,width:`${Math.min(100,taxa)}%`,height:"100%",borderRadius:99,boxShadow:`0 0 8px ${cor}`}}/>
                       </div>
                     </>)
                   })()}
@@ -1080,11 +1050,11 @@ export default function AuryMoney() {
           {/* Grimório de Conquistas */}
           <div className="card" style={{background:"linear-gradient(135deg,#2d1b4e,#1a0033)",border:"1px solid rgba(255,215,0,.2)",marginBottom:16}}>
             <div className="sec">📖 Grimório de Conquistas</div>
-            <div style={{fontSize:11,color:"rgba(255,255,255,.6)",marginBottom:16}}>12 medalhas — do iniciante ao lendário. Desbloqueie com suas conquistas financeiras reais.</div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,.6)",marginBottom:16}}>Desbloqueie medalhas através das suas conquistas financeiras</div>
             
             <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)",gap:12}}>
               
-              {/* 1. Primeira Semente — salvar qualquer coisa no mês */}
+              {/* Primeira Economia */}
               {(()=>{
                 const conquistada = tm.saldo > 0
                 return(
@@ -1092,64 +1062,25 @@ export default function AuryMoney() {
                     {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(76,175,80,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
                     <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(76,175,80,.6))":"grayscale(1) opacity(.3)"}}>🌱</div>
                     <div style={{fontSize:11,fontWeight:700,color:conquistada?"#4CAF50":"rgba(255,255,255,.4)",marginBottom:4}}>Primeira Semente</div>
-                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>Fechar o mês no positivo</div>
+                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>Economize neste mês</div>
                   </div>
                 )
               })()}
 
-              {/* 2. Mês Zerado — fechar sem déficit */}
-              {(()=>{
-                const conquistada = faltando===0&&tm.rec>0
-                return(
-                  <div style={{background:conquistada?"linear-gradient(135deg,rgba(56,189,248,.15),rgba(56,189,248,.05))":"rgba(255,255,255,.03)",border:`1.5px solid ${conquistada?"rgba(56,189,248,.4)":"rgba(255,255,255,.1)"}`,borderRadius:14,padding:14,textAlign:"center",position:"relative"}}>
-                    {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(56,189,248,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
-                    <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(56,189,248,.6))":"grayscale(1) opacity(.3)"}}>⚡</div>
-                    <div style={{fontSize:11,fontWeight:700,color:conquistada?"#38BDF8":"rgba(255,255,255,.4)",marginBottom:4}}>Mês Zerado</div>
-                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>Fechar sem déficit este mês</div>
-                  </div>
-                )
-              })()}
-
-              {/* 3. Escudo de 70% — gastos abaixo de 70% da renda */}
+              {/* Disciplina Férrea */}
               {(()=>{
                 const conquistada = tm.rec>0&&(tm.exp/tm.rec)<0.7
                 return(
                   <div style={{background:conquistada?"linear-gradient(135deg,rgba(3,169,244,.15),rgba(3,169,244,.05))":"rgba(255,255,255,.03)",border:`1.5px solid ${conquistada?"rgba(3,169,244,.4)":"rgba(255,255,255,.1)"}`,borderRadius:14,padding:14,textAlign:"center",position:"relative"}}>
                     {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(3,169,244,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
                     <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(3,169,244,.6))":"grayscale(1) opacity(.3)"}}>🛡️</div>
-                    <div style={{fontSize:11,fontWeight:700,color:conquistada?"#03A9F4":"rgba(255,255,255,.4)",marginBottom:4}}>Escudo de Aço</div>
-                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>Gastos {"<"} 70% da renda</div>
+                    <div style={{fontSize:11,fontWeight:700,color:conquistada?"#03A9F4":"rgba(255,255,255,.4)",marginBottom:4}}>Disciplina Férrea</div>
+                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>Gastos &lt; 70% renda</div>
                   </div>
                 )
               })()}
 
-              {/* 4. Guardião da Meta — gastos abaixo de 60% */}
-              {(()=>{
-                const conquistada = tm.rec>0&&(tm.exp/tm.rec)<0.6
-                return(
-                  <div style={{background:conquistada?"linear-gradient(135deg,rgba(0,200,150,.15),rgba(0,200,150,.05))":"rgba(255,255,255,.03)",border:`1.5px solid ${conquistada?"rgba(0,200,150,.4)":"rgba(255,255,255,.1)"}`,borderRadius:14,padding:14,textAlign:"center",position:"relative",overflow:"hidden"}}>
-                    {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(0,200,150,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
-                    <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(0,200,150,.6))":"grayscale(1) opacity(.3)"}}>🏆</div>
-                    <div style={{fontSize:11,fontWeight:700,color:conquistada?"#00C896":"rgba(255,255,255,.4)",marginBottom:4}}>Guardião da Meta</div>
-                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>Gastos {"<"} 60% da renda</div>
-                  </div>
-                )
-              })()}
-
-              {/* 5. Poupador de R$ 500 no mês */}
-              {(()=>{
-                const conquistada = tm.saldo >= 500
-                return(
-                  <div style={{background:conquistada?"linear-gradient(135deg,rgba(52,211,153,.15),rgba(52,211,153,.05))":"rgba(255,255,255,.03)",border:`1.5px solid ${conquistada?"rgba(52,211,153,.4)":"rgba(255,255,255,.1)"}`,borderRadius:14,padding:14,textAlign:"center",position:"relative"}}>
-                    {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(52,211,153,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
-                    <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(52,211,153,.6))":"grayscale(1) opacity(.3)"}}>🌿</div>
-                    <div style={{fontSize:11,fontWeight:700,color:conquistada?"var(--gn)":"rgba(255,255,255,.4)",marginBottom:4}}>Poupador Inicial</div>
-                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>R$ 500 de saldo no mês</div>
-                  </div>
-                )
-              })()}
-
-              {/* 6. Acumulador de R$ 1.000 no mês */}
+              {/* Acumulador */}
               {(()=>{
                 const conquistada = tm.saldo >= 1000
                 return(
@@ -1157,12 +1088,39 @@ export default function AuryMoney() {
                     {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(156,39,176,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
                     <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(156,39,176,.6))":"grayscale(1) opacity(.3)"}}>💎</div>
                     <div style={{fontSize:11,fontWeight:700,color:conquistada?"#9C27B0":"rgba(255,255,255,.4)",marginBottom:4}}>Acumulador</div>
-                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>R$ 1.000 de saldo no mês</div>
+                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>R$ 1.000 no mês</div>
                   </div>
                 )
               })()}
 
-              {/* 7. Sequência de Ouro — saldo positivo por 3 meses seguidos */}
+              {/* Mestre das Finanças */}
+              {(()=>{
+                const conquistada = tm.saldo >= 3000
+                return(
+                  <div style={{background:conquistada?"linear-gradient(135deg,rgba(255,193,7,.15),rgba(255,193,7,.05))":"rgba(255,255,255,.03)",border:`1.5px solid ${conquistada?"rgba(255,193,7,.4)":"rgba(255,255,255,.1)"}`,borderRadius:14,padding:14,textAlign:"center",position:"relative"}}>
+                    {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(255,193,7,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
+                    <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(255,193,7,.6))":"grayscale(1) opacity(.3)"}}>👑</div>
+                    <div style={{fontSize:11,fontWeight:700,color:conquistada?"#FFC107":"rgba(255,255,255,.4)",marginBottom:4}}>Mestre Alquimista</div>
+                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>R$ 3.000 no mês</div>
+                  </div>
+                )
+              })()}
+
+
+              {/* Guardião da Meta */}
+              {(()=>{
+                const conquistada = tm.rec>0&&(tm.exp/tm.rec)<0.6
+                return(
+                  <div style={{background:conquistada?"linear-gradient(135deg,rgba(0,200,150,.15),rgba(0,200,150,.05))":"rgba(255,255,255,.03)",border:`1.5px solid ${conquistada?"rgba(0,200,150,.4)":"rgba(255,255,255,.1)"}`,borderRadius:14,padding:14,textAlign:"center",position:"relative",overflow:"hidden"}}>
+                    {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(0,200,150,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
+                    <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(0,200,150,.6))":"grayscale(1) opacity(.3)"}}>🏆</div>
+                    <div style={{fontSize:11,fontWeight:700,color:conquistada?"#00C896":"rgba(255,255,255,.4)",marginBottom:4}}>Guardião da Meta</div>
+                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>Gastos &lt; 60% renda</div>
+                  </div>
+                )
+              })()}
+
+              {/* Saldo Positivo 3 meses */}
               {(()=>{
                 const ultimos3 = [addMonths(thisMonth,-2),addMonths(thisMonth,-1),thisMonth].map(m=>getMonthData(m).saldo)
                 const conquistada = ultimos3.every(s=>s>0)
@@ -1176,33 +1134,7 @@ export default function AuryMoney() {
                 )
               })()}
 
-              {/* 8. Receita Dominante — receita 2x maior que despesa */}
-              {(()=>{
-                const conquistada = tm.exp>0&&tm.rec>=tm.exp*2
-                return(
-                  <div style={{background:conquistada?"linear-gradient(135deg,rgba(251,191,36,.15),rgba(251,191,36,.05))":"rgba(255,255,255,.03)",border:`1.5px solid ${conquistada?"rgba(251,191,36,.4)":"rgba(255,255,255,.1)"}`,borderRadius:14,padding:14,textAlign:"center",position:"relative"}}>
-                    {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(251,191,36,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
-                    <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(251,191,36,.6))":"grayscale(1) opacity(.3)"}}>🚀</div>
-                    <div style={{fontSize:11,fontWeight:700,color:conquistada?"var(--yw)":"rgba(255,255,255,.4)",marginBottom:4}}>Receita Dominante</div>
-                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>Receita 2× maior que despesa</div>
-                  </div>
-                )
-              })()}
-
-              {/* 9. Mestre Alquimista — R$ 3.000 no mês */}
-              {(()=>{
-                const conquistada = tm.saldo >= 3000
-                return(
-                  <div style={{background:conquistada?"linear-gradient(135deg,rgba(255,193,7,.15),rgba(255,193,7,.05))":"rgba(255,255,255,.03)",border:`1.5px solid ${conquistada?"rgba(255,193,7,.4)":"rgba(255,255,255,.1)"}`,borderRadius:14,padding:14,textAlign:"center",position:"relative"}}>
-                    {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(255,193,7,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
-                    <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(255,193,7,.6))":"grayscale(1) opacity(.3)"}}>👑</div>
-                    <div style={{fontSize:11,fontWeight:700,color:conquistada?"#FFC107":"rgba(255,255,255,.4)",marginBottom:4}}>Mestre Alquimista</div>
-                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>R$ 3.000 de saldo no mês</div>
-                  </div>
-                )
-              })()}
-
-              {/* 10. Cofre Mágico — R$ 5.000 acumulados */}
+              {/* Cofre de 5k */}
               {(()=>{
                 const conquistada = agSaldoAcumulado>=5000
                 return(
@@ -1210,12 +1142,25 @@ export default function AuryMoney() {
                     {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(244,114,182,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
                     <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(244,114,182,.6))":"grayscale(1) opacity(.3)"}}>🏦</div>
                     <div style={{fontSize:11,fontWeight:700,color:conquistada?"#F472B6":"rgba(255,255,255,.4)",marginBottom:4}}>Cofre Mágico</div>
-                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>R$ 5.000 acumulados no total</div>
+                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>R$ 5.000 acumulados</div>
                   </div>
                 )
               })()}
 
-              {/* 11. Arquiteto da Riqueza — R$ 10.000 acumulados */}
+              {/* Zero dívida do mês */}
+              {(()=>{
+                const conquistada = faltando===0&&tm.rec>0
+                return(
+                  <div style={{background:conquistada?"linear-gradient(135deg,rgba(56,189,248,.15),rgba(56,189,248,.05))":"rgba(255,255,255,.03)",border:`1.5px solid ${conquistada?"rgba(56,189,248,.4)":"rgba(255,255,255,.1)"}`,borderRadius:14,padding:14,textAlign:"center",position:"relative"}}>
+                    {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(56,189,248,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
+                    <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(56,189,248,.6))":"grayscale(1) opacity(.3)"}}>⚡</div>
+                    <div style={{fontSize:11,fontWeight:700,color:conquistada?"#38BDF8":"rgba(255,255,255,.4)",marginBottom:4}}>Mês Zerado</div>
+                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>Fechou o mês sem déficit</div>
+                  </div>
+                )
+              })()}
+
+              {/* Grande Economizador 10k acumulado */}
               {(()=>{
                 const conquistada = agSaldoAcumulado>=10000
                 return(
@@ -1223,55 +1168,39 @@ export default function AuryMoney() {
                     {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(167,139,250,.4),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
                     <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(167,139,250,.8))":"grayscale(1) opacity(.3)"}}>💫</div>
                     <div style={{fontSize:11,fontWeight:700,color:conquistada?"var(--pu)":"rgba(255,255,255,.4)",marginBottom:4}}>Arquiteto da Riqueza</div>
-                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>R$ 10.000 acumulados no total</div>
+                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>R$ 10.000 acumulados</div>
                   </div>
                 )
               })()}
 
-              {/* 12. Lendário — acumulado de R$ 25.000 */}
+              {/* Taxa abaixo 50% */}
               {(()=>{
-                const conquistada = agSaldoAcumulado>=25000
+                const taxa = tm.rec>0?(tm.exp/tm.rec)*100:100
+                const conquistada = taxa<50&&tm.rec>0
                 return(
-                  <div style={{background:conquistada?"linear-gradient(135deg,rgba(255,215,0,.2),rgba(255,140,0,.08))":"rgba(255,255,255,.03)",border:`1.5px solid ${conquistada?"rgba(255,215,0,.5)":"rgba(255,255,255,.1)"}`,borderRadius:14,padding:14,textAlign:"center",position:"relative",overflow:"hidden"}}>
-                    {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(255,215,0,.4),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
-                    <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(255,215,0,.8))":"grayscale(1) opacity(.3)"}}>🌟</div>
-                    <div style={{fontSize:11,fontWeight:700,color:conquistada?"#FFD700":"rgba(255,255,255,.4)",marginBottom:4}}>Lendário</div>
-                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>R$ 25.000 acumulados no total</div>
+                  <div style={{background:conquistada?"linear-gradient(135deg,rgba(52,211,153,.15),rgba(52,211,153,.05))":"rgba(255,255,255,.03)",border:`1.5px solid ${conquistada?"rgba(52,211,153,.4)":"rgba(255,255,255,.1)"}`,borderRadius:14,padding:14,textAlign:"center",position:"relative"}}>
+                    {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(52,211,153,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
+                    <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(52,211,153,.6))":"grayscale(1) opacity(.3)"}}>🌿</div>
+                    <div style={{fontSize:11,fontWeight:700,color:conquistada?"var(--gn)":"rgba(255,255,255,.4)",marginBottom:4}}>Meio a Meio</div>
+                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>Gasto &lt; 50% da renda</div>
+                  </div>
+                )
+              })()}
+
+              {/* Receita dupla */}
+              {(()=>{
+                const conquistada = tm.exp>0&&tm.rec>=tm.exp*2
+                return(
+                  <div style={{background:conquistada?"linear-gradient(135deg,rgba(251,191,36,.15),rgba(251,191,36,.05))":"rgba(255,255,255,.03)",border:`1.5px solid ${conquistada?"rgba(251,191,36,.4)":"rgba(255,255,255,.1)"}`,borderRadius:14,padding:14,textAlign:"center",position:"relative"}}>
+                    {conquistada&&<div style={{position:"absolute",top:-10,right:-10,width:40,height:40,background:"radial-gradient(circle,rgba(251,191,36,.3),transparent)",borderRadius:"50%",animation:"pulse 2s infinite"}}/>}
+                    <div style={{fontSize:36,marginBottom:8,filter:conquistada?"drop-shadow(0 2px 8px rgba(251,191,36,.6))":"grayscale(1) opacity(.3)"}}>🚀</div>
+                    <div style={{fontSize:11,fontWeight:700,color:conquistada?"var(--yw)":"rgba(255,255,255,.4)",marginBottom:4}}>Dobro de Renda</div>
+                    <div style={{fontSize:9,color:"rgba(255,255,255,.5)"}}>Receita 2x maior que despesa</div>
                   </div>
                 )
               })()}
 
             </div>
-
-            {/* Barra de progresso geral */}
-            {(()=>{
-              const total = 12
-              const conquistadas = [
-                tm.saldo>0,
-                faltando===0&&tm.rec>0,
-                tm.rec>0&&(tm.exp/tm.rec)<0.7,
-                tm.rec>0&&(tm.exp/tm.rec)<0.6,
-                tm.saldo>=500,
-                tm.saldo>=1000,
-                [addMonths(thisMonth,-2),addMonths(thisMonth,-1),thisMonth].map(m=>getMonthData(m).saldo).every(s=>s>0),
-                tm.exp>0&&tm.rec>=tm.exp*2,
-                tm.saldo>=3000,
-                agSaldoAcumulado>=5000,
-                agSaldoAcumulado>=10000,
-                agSaldoAcumulado>=25000,
-              ].filter(Boolean).length
-              return(
-                <div style={{marginTop:16,padding:"12px 14px",background:"rgba(255,215,0,.05)",border:"1px solid rgba(255,215,0,.12)",borderRadius:12}}>
-                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
-                    <span style={{fontSize:11,fontWeight:700,color:"rgba(255,255,255,.7)"}}>Progresso do Grimório</span>
-                    <span style={{fontSize:12,fontWeight:800,color:"#FFD700"}}>{conquistadas}/{total}</span>
-                  </div>
-                  <div style={{background:"rgba(255,255,255,.07)",borderRadius:99,height:8,overflow:"hidden"}}>
-                    <div style={{background:"linear-gradient(90deg,#FFD700,#FFA000)",width:`${(conquistadas/total)*100}%`,height:"100%",borderRadius:99,boxShadow:"0 0 10px rgba(255,215,0,.5)",transition:"width 1s ease"}}/>
-                  </div>
-                </div>
-              )
-            })()}
           </div>
 
           {/* Caldeirão de Transmutação removido conforme solicitado */}
@@ -1695,22 +1624,11 @@ export default function AuryMoney() {
 
         {/* === TERRENO / GRAMA === */}
 
-        {/* Colinas ao fundo — zIndex baixo, atrás de tudo */}
-        <div style={{position:"absolute",bottom:195,left:"-5%",width:"40%",height:80,background:"rgba(56,142,60,.35)",borderRadius:"50%",filter:"blur(3px)",zIndex:1}}/>
-        <div style={{position:"absolute",bottom:190,right:"-5%",width:"50%",height:70,background:"rgba(46,125,50,.3)",borderRadius:"50%",filter:"blur(3px)",zIndex:1}}/>
+        {/* Colinas ao fundo */}
+        <div style={{position:"absolute",bottom:160,left:"-5%",width:"40%",height:100,background:"rgba(56,142,60,.35)",borderRadius:"50%",filter:"blur(3px)",zIndex:1}}/>
+        <div style={{position:"absolute",bottom:155,right:"-5%",width:"50%",height:90,background:"rgba(46,125,50,.3)",borderRadius:"50%",filter:"blur(3px)",zIndex:1}}/>
 
-        {/* Chão arado / terra — renderizado ANTES das plantas, serve como base */}
-        <div style={{position:"absolute",bottom:0,left:0,right:0,height:200,background:"linear-gradient(180deg,#5C8A2E 0%,#4CAF50 8%,#388E3C 18%,#8B6914 30%,#795548 55%,#6D4C41 100%)",zIndex:3}}>
-          {Array.from({length:8}).map((_,i)=>(
-            <div key={`s${i}`} style={{position:"absolute",bottom:10+i*18,left:0,right:0,height:3,background:"rgba(0,0,0,.12)",borderRadius:99}}/>
-          ))}
-          <div style={{position:"absolute",top:0,left:0,right:0,height:28,background:"linear-gradient(180deg,rgba(56,142,60,.9),transparent)",borderRadius:"4px 4px 0 0"}}/>
-          {Array.from({length:40}).map((_,i)=>(
-            <div key={`gr${i}`} style={{position:"absolute",bottom:160+[4,8,2,6,3,7,1,5][i%8],left:`${i*2.5}%`,width:3,height:10+[3,6,2,8,4,7,1,5][i%8],background:`hsl(${110+i%4*8},60%,${30+i%3*8}%)`,borderRadius:"50% 50% 0 0",transform:`rotate(${[-15,-8,5,12,-3,8,-12,3][i%8]}deg)`,opacity:.7}}/>
-          ))}
-        </div>
-
-        {/* Rio — ancorado no chão */}
+        {/* Rio */}
         {rio&&<div style={{position:"absolute",bottom:150,right:30,width:50,height:180,zIndex:4}}>
           <div style={{position:"absolute",top:0,width:50,height:60,background:"linear-gradient(135deg,#78909C,#90A4AE)",borderRadius:"12px 12px 4px 4px",boxShadow:"0 4px 8px rgba(0,0,0,.3)"}}>
             <div style={{position:"absolute",bottom:-2,left:0,right:0,height:10,background:"rgba(100,181,246,.6)",borderRadius:99}}/>
@@ -1721,8 +1639,8 @@ export default function AuryMoney() {
           <div style={{position:"absolute",top:115,left:-20,width:90,height:50,background:"linear-gradient(180deg,rgba(100,181,246,.5),rgba(79,195,247,.3))",borderRadius:"50%",animation:"ripple 3s ease-in-out infinite"}}/>
         </div>}
 
-        {/* Fonte mágica — pés no chão (bottom=200 = topo da terra) */}
-        {fonteMagica&&<div style={{position:"absolute",bottom:200,left:30,zIndex:6}}>
+        {/* Fonte mágica */}
+        {fonteMagica&&<div style={{position:"absolute",bottom:165,left:30,zIndex:6}}>
           <div style={{width:50,height:30,background:"linear-gradient(135deg,#78909C,#607D8B)",borderRadius:"50% 50% 30% 30%",boxShadow:"0 4px 12px rgba(0,0,0,.4)",border:"2px solid rgba(255,255,255,.2)"}}>
             <div style={{position:"absolute",top:-8,left:"50%",transform:"translateX(-50%)",width:10,height:20,background:"linear-gradient(90deg,#546E7A,#78909C)",borderRadius:"50% 50% 0 0"}}/>
           </div>
@@ -1731,36 +1649,56 @@ export default function AuryMoney() {
           ))}
         </div>}
 
-        {/* Cerca de madeira — estacas com pé em bottom=200 */}
+        {/* Cerca de madeira */}
         {saldoMes>200&&<>
           {Array.from({length:12}).map((_,i)=>(
-            <div key={`f${i}`} style={{position:"absolute",bottom:200,left:`${3+i*8.2}%`,zIndex:5}}>
-              <div style={{width:10,height:30,background:"linear-gradient(90deg,#8D6E63,#A1887F,#8D6E63)",borderRadius:"4px 4px 2px 2px",boxShadow:"2px 2px 4px rgba(0,0,0,.3)",position:"relative"}}>
+            <div key={`f${i}`} style={{position:"absolute",bottom:188,left:`${3+i*8.2}%`,zIndex:5,display:"flex",flexDirection:"column",alignItems:"center",gap:0}}>
+              <div style={{width:10,height:30,background:"linear-gradient(90deg,#8D6E63,#A1887F,#8D6E63)",borderRadius:"4px 4px 2px 2px",boxShadow:"2px 2px 4px rgba(0,0,0,.3)"}}>
                 <div style={{position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:0,height:0,borderLeft:"5px solid transparent",borderRight:"5px solid transparent",borderBottom:"8px solid #795548"}}/>
               </div>
             </div>
           ))}
-          <div style={{position:"absolute",bottom:226,left:"3%",right:"3%",height:5,background:"linear-gradient(90deg,#8D6E63,#A1887F,#8D6E63)",borderRadius:99,zIndex:4,boxShadow:"0 2px 4px rgba(0,0,0,.2)"}}/>
-          <div style={{position:"absolute",bottom:212,left:"3%",right:"3%",height:4,background:"linear-gradient(90deg,#795548,#8D6E63,#795548)",borderRadius:99,zIndex:4}}/>
+          {/* Régua horizontal da cerca - topo */}
+          <div style={{position:"absolute",bottom:214,left:"3%",right:"3%",height:5,background:"linear-gradient(90deg,#8D6E63,#A1887F,#8D6E63)",borderRadius:99,zIndex:4,boxShadow:"0 2px 4px rgba(0,0,0,.2)"}}/>
+          {/* Régua horizontal da cerca - base */}
+          <div style={{position:"absolute",bottom:200,left:"3%",right:"3%",height:4,background:"linear-gradient(90deg,#795548,#8D6E63,#795548)",borderRadius:99,zIndex:4}}/>
         </>}
 
-        {/* === PLANTAS — todas com transformOrigin bottom, plantadas no solo === */}
+        {/* Chão arado / terra */}
+        <div style={{position:"absolute",bottom:0,left:0,right:0,height:200,background:"linear-gradient(180deg,#5C8A2E 0%,#4CAF50 8%,#388E3C 18%,#8B6914 30%,#795548 55%,#6D4C41 100%)",zIndex:3}}>
+          {/* Sulcos da terra */}
+          {Array.from({length:8}).map((_,i)=>(
+            <div key={`s${i}`} style={{position:"absolute",bottom:10+i*18,left:0,right:0,height:3,background:"rgba(0,0,0,.12)",borderRadius:99}}/>
+          ))}
+          {/* Textura da grama no topo */}
+          <div style={{position:"absolute",top:0,left:0,right:0,height:24,background:"linear-gradient(180deg,rgba(56,142,60,.8),transparent)",borderRadius:"4px 4px 0 0"}}/>
+          {/* Gramíneas */}
+          {Array.from({length:40}).map((_,i)=>(
+            <div key={`gr${i}`} style={{position:"absolute",bottom:138+Math.random()*20,left:`${i*2.5}%`,width:3,height:12+Math.random()*10,background:`hsl(${110+Math.random()*30},60%,${30+Math.random()*20}%)`,borderRadius:"50% 50% 0 0",transform:`rotate(${-15+Math.random()*30}deg)`,opacity:.7}}/>
+          ))}
+        </div>
 
-        {/* ÁRVORES — tronco nasce do chão (bottom=200) */}
+        {/* === PLANTAS === */}
+
+        {/* ÁRVORES (grandes, acima da cerca, no fundo) */}
         {Array.from({length:arvores}).map((_,i)=>{
           const posX=[8,22,38,55,68,82][i]
           const hue=100+i*8
-          const treeH=90+i*10
+          const treeH=90+Math.random()*30
           return(
-            <div key={`av${i}`} style={{position:"absolute",bottom:200,left:`${posX}%`,zIndex:5,transformOrigin:"bottom center",animation:`treeSway ${4+i*.5}s ease-in-out infinite`,animationDelay:`${i*.3}s`}}>
+            <div key={`av${i}`} style={{position:"absolute",bottom:230,left:`${posX}%`,zIndex:5,animation:`treeSway ${4+i*.5}s ease-in-out infinite`,animationDelay:`${i*.3}s`,transformOrigin:"bottom center"}}>
+              {/* Tronco com textura */}
               <div style={{width:16,height:treeH*.4,background:"linear-gradient(90deg,#5D4037,#8D6E63,#5D4037)",margin:"0 auto",borderRadius:"4px 4px 2px 2px",position:"relative",boxShadow:"inset -3px 0 6px rgba(0,0,0,.3)"}}>
                 <div style={{position:"absolute",width:3,height:treeH*.2,background:"rgba(0,0,0,.15)",left:4,top:"20%",borderRadius:99}}/>
               </div>
+              {/* Copa em camadas */}
               <div style={{position:"relative",top:-20}}>
                 <div style={{width:70,height:55,background:`radial-gradient(circle at 40% 35%,hsl(${hue},55%,50%),hsl(${hue},50%,35%))`,borderRadius:"50% 50% 45% 45%",margin:"0 auto",boxShadow:`0 4px 12px rgba(0,0,0,.25),inset -8px -8px 16px rgba(0,0,0,.2)`,position:"relative"}}>
+                  {/* Reflexo de luz */}
                   <div style={{position:"absolute",top:8,left:12,width:20,height:14,background:"rgba(255,255,255,.15)",borderRadius:"50%",transform:"rotate(-20deg)"}}/>
-                  {i%2===0&&[0,1,2,3].map(j=>(
-                    <div key={j} style={{position:"absolute",width:8,height:8,background:"#FF5722",borderRadius:"50%",top:`${15+j*18}%`,left:`${12+j*18}%`,boxShadow:"0 2px 4px rgba(0,0,0,.3)"}}/>
+                  {/* Frutas/flores aleatórias */}
+                  {i%2===0&&Array.from({length:4}).map((_,j)=>(
+                    <div key={j} style={{position:"absolute",width:8,height:8,background:"#FF5722",borderRadius:"50%",top:`${15+Math.random()*50}%`,left:`${10+Math.random()*70}%`,boxShadow:"0 2px 4px rgba(0,0,0,.3)"}}/>
                   ))}
                 </div>
                 <div style={{width:55,height:42,background:`radial-gradient(circle at 40% 35%,hsl(${hue},60%,55%),hsl(${hue},55%,40%))`,borderRadius:"50%",margin:"-18px auto 0",boxShadow:`0 4px 8px rgba(0,0,0,.2),inset -6px -6px 12px rgba(0,0,0,.15)`}}/>
@@ -1770,29 +1708,34 @@ export default function AuryMoney() {
           )
         })}
 
-        {/* FLORES — caule nasce do solo (bottom=200), transformOrigin bottom */}
+        {/* FLORES em fileiras organizadas estilo Stardew */}
         {Array.from({length:flores}).map((_,i)=>{
           const col = i % 8
           const row = Math.floor(i / 8)
           const paleta = floresCores[col % floresCores.length]
-          const leftPct = 4 + col * 11.5
-          // Todas as flores têm raiz no nível da grama — bottom=200
-          const stemH = 36 + [0,8,4,12,2,10,6,14][col] // caules de alturas variadas mas raiz fixa
-          const sz = [0.85,0.95,0.8,1,0.9,0.88,0.92,0.85][col]
+          // Posição em fileiras na parte frontal do campo
+          const leftPct = 6 + col * 11.5
+          const bottomPx = 80 + row * 65
+          const sz = 0.75 + Math.random() * 0.25
 
           return(
-            <div key={`fl${i}`} style={{position:"absolute",bottom:200,left:`${leftPct}%`,zIndex:7+row,transformOrigin:"bottom center",transform:`scale(${sz})`,animation:`plantSway ${2.5+col*0.2}s ease-in-out infinite`,animationDelay:`${i*0.15}s`}}>
-              {/* Caule enraizado no solo */}
-              <div style={{width:5,height:stemH,background:"linear-gradient(90deg,#2E7D32,#43A047,#2E7D32)",margin:"0 auto",borderRadius:"2px 2px 0 0",position:"relative"}}>
-                <div style={{position:"absolute",width:13,height:7,background:"#4CAF50",borderRadius:"0 50% 50% 0",left:-13,top:stemH*.35,transform:"rotate(-20deg)"}}/>
-                <div style={{position:"absolute",width:13,height:7,background:"#388E3C",borderRadius:"50% 0 0 50%",right:-13,top:stemH*.55,transform:"rotate(20deg)"}}/>
+            <div key={`fl${i}`} style={{position:"absolute",bottom:bottomPx,left:`${leftPct}%`,zIndex:7+row,transform:`scale(${sz})`,transformOrigin:"bottom center",animation:`plantSway ${2.5+Math.random()*1.5}s ease-in-out infinite`,animationDelay:`${i*0.18}s`}}>
+              {/* Caule */}
+              <div style={{width:5,height:48,background:"linear-gradient(90deg,#2E7D32,#43A047,#2E7D32)",margin:"0 auto",borderRadius:"2px 2px 0 0",position:"relative"}}>
+                {/* Folhinhas */}
+                <div style={{position:"absolute",width:13,height:7,background:"#4CAF50",borderRadius:"0 50% 50% 0",left:-13,top:14,transform:"rotate(-20deg)",boxShadow:"inset 0 2px 3px rgba(0,0,0,.15)"}}/>
+                <div style={{position:"absolute",width:13,height:7,background:"#388E3C",borderRadius:"50% 0 0 50%",right:-13,top:24,transform:"rotate(20deg)"}}/>
               </div>
               {/* Flor */}
               <div style={{position:"relative",width:34,height:34,top:-10,left:"50%",transform:"translateX(-50%)"}}>
+                {/* Pétalas */}
                 {[0,51,102,153,204,255,306].map(ang=>(
-                  <div key={ang} style={{position:"absolute",width:12,height:18,background:`linear-gradient(135deg,${paleta.petala},${paleta.petala}BB)`,borderRadius:"50% 50% 40% 40%",top:"50%",left:"50%",transform:`translate(-50%,-50%) rotate(${ang}deg) translateY(-10px)`,boxShadow:`0 0 6px ${paleta.petala}40`,transformOrigin:"center bottom"}}/>
+                  <div key={ang} style={{position:"absolute",width:12,height:18,background:`linear-gradient(135deg,${paleta.petala},${paleta.petala}BB)`,borderRadius:"50% 50% 40% 40%",top:"50%",left:"50%",transform:`translate(-50%,-50%) rotate(${ang}deg) translateY(-10px)`,boxShadow:`0 0 6px ${paleta.petala}40,inset 0 2px 4px rgba(255,255,255,.2)`,transformOrigin:"center bottom"}}/>
                 ))}
-                <div style={{position:"absolute",width:13,height:13,background:`radial-gradient(circle,${paleta.centro},${paleta.centro}CC)`,borderRadius:"50%",top:"50%",left:"50%",transform:"translate(-50%,-50%)",zIndex:2,boxShadow:`0 0 8px ${paleta.centro}80`,border:"1px solid rgba(255,255,255,.3)"}}/>
+                {/* Centro */}
+                <div style={{position:"absolute",width:13,height:13,background:`radial-gradient(circle,${paleta.centro},${paleta.centro}CC)`,borderRadius:"50%",top:"50%",left:"50%",transform:"translate(-50%,-50%)",zIndex:2,boxShadow:`0 0 8px ${paleta.centro}80,inset 0 -2px 3px rgba(0,0,0,.2)`,border:"1px solid rgba(255,255,255,.3)"}}/>
+                {/* Brilho sutil */}
+                <div style={{position:"absolute",width:40,height:40,background:`radial-gradient(circle,${paleta.petala}15,transparent 70%)`,borderRadius:"50%",top:"50%",left:"50%",transform:"translate(-50%,-50%)",pointerEvents:"none"}}/>
               </div>
             </div>
           )
@@ -1890,8 +1833,195 @@ export default function AuryMoney() {
   })()}
 </>}
 
+        {/* ── AGENDA FINANCEIRA ── */}
+        {tab==="agenda"&&<>
+          <div className="month-sel">
+            <button className="mbtn" onClick={()=>setAgMonth(addMonths(agMonth,-1))}>‹</button>
+            <div style={{fontSize:13,fontWeight:700}}>{monthLabel(agMonth)}</div>
+            <button className="mbtn" onClick={()=>setAgMonth(addMonths(agMonth,1))}>›</button>
+          </div>
 
+          {/* Resumo do mês selecionado */}
+          <div className="g3">
+            <div className="mc"><div className="ml">Receitas</div><div className="mv" style={{color:"var(--gn)"}}>{fmt(agData.rec)}</div></div>
+            <div className="mc"><div className="ml">Despesas</div><div className="mv" style={{color:"var(--rd)"}}>{fmt(agData.exp)}</div></div>
+            <div className="mc">
+              <div className="ml">Saldo do Mês</div>
+              <div className="mv" style={{color:agData.saldo>=0?"var(--gn)":"var(--rd)"}}>{fmt(agData.saldo)}</div>
+            </div>
+          </div>
 
+          {/* Card de Saldo Acumulado */}
+          <div className="hero" style={{marginTop:12}}>
+            <div style={{position:"relative",zIndex:1}}>
+              <div className="h-lbl">💰 Saldo Acumulado até {monthLabel(agMonth)}</div>
+              <div className={`h-val ${agSaldoAcumulado>=0?"pos":"neg"}`}>{fmt(agSaldoAcumulado)}</div>
+              <div style={{fontSize:11,color:"var(--mt)",marginTop:6,lineHeight:1.5}}>
+                {agSaldoAcumulado >= 0 
+                  ? "Dinheiro que você terá disponível neste mês considerando todos os meses anteriores 🎉"
+                  : "Déficit acumulado até este mês — precisa de renda extra para zerar 🚨"
+                }
+              </div>
+            </div>
+          </div>
+
+          {agData.saldo<0&&(
+            <div className="alrt danger">
+              <div className="alrt-ico">🚨</div>
+              <div>
+                <div className="alrt-title" style={{color:"var(--rd)"}}>Mês no vermelho — faltam {fmt(Math.abs(agData.saldo))}</div>
+                <div className="alrt-text">Precisam de renda extra pra fechar este mês no zero.</div>
+              </div>
+            </div>
+          )}
+
+          {/* Vencimentos */}
+          <div className="sec">Vencimentos dos Cartões</div>
+          {Object.entries(CARDS).map(([k,c])=>{
+            const fat=cardFaturaMonth(k,agMonth), days=daysUntil(c.venc), urgent=days<=5&&fat>0
+            return(
+              <div key={k} className="vc" style={{background:c.bg,border:`1.5px solid ${urgent?"var(--rd)":c.color+"22"}`}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
+                  <div style={{display:"flex",gap:10,alignItems:"center"}}>
+                    <div style={{width:38,height:38,borderRadius:11,background:`${c.color}18`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:800,color:c.color}}>{c.logo}</div>
+                    <div>
+                      <div style={{fontWeight:700,fontSize:14}}>{c.name} <span style={{fontSize:11,color:"var(--mt)"}}>· {c.owner}</span></div>
+                      <div style={{fontSize:9,color:"var(--mt)"}}>Fecha dia {c.fech} · Vence dia {c.venc}</div>
+                    </div>
+                  </div>
+                  <div className="vc-badge" style={{background:urgent?"rgba(248,113,113,.15)":days<=10?"rgba(251,191,36,.15)":"rgba(52,211,153,.15)",color:urgent?"var(--rd)":days<=10?"var(--yw)":"var(--gn)"}}>
+                    {days}d
+                  </div>
+                </div>
+                <div style={{display:"flex",gap:6}}>
+                  {[["FATURA",fat,c.color],["VENCIMENTO","Dia "+c.venc,urgent?"var(--rd)":"var(--tx)"]].map(([l,v,cl])=>(
+                    <div key={l} style={{flex:1,background:"rgba(255,255,255,.04)",borderRadius:9,padding:"7px 9px"}}>
+                      <div style={{fontSize:8,color:"var(--mt)",marginBottom:2}}>{l}</div>
+                      <div style={{fontSize:13,fontWeight:700,color:cl}}>{typeof v==="number"?fmt(v):v}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+
+          {/* Lançamentos do mês */}
+          <div className="sec" style={{marginTop:4}}>Lançamentos — {monthLabel(agMonth)}</div>
+          {records.filter(r=>r.date?.startsWith(agMonth)).length===0
+            ?<div className="empty"><div style={{fontSize:32,marginBottom:8}}>📭</div>Nenhum lançamento neste mês</div>
+            :records.filter(r=>r.date?.startsWith(agMonth)).map(r=>{
+              const cat=CAT_MAP[r.category], card=CARDS[r.card]
+              return(
+                <div key={r.id} style={{display:"flex",gap:10,marginBottom:7}}>
+                  <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}>
+                    <div style={{width:8,height:8,borderRadius:"50%",background:r.type==="receita"?"var(--gn)":"var(--rd)",marginTop:7,flexShrink:0}}/>
+                    <div style={{width:1,flex:1,background:"var(--bd)",marginTop:2}}/>
+                  </div>
+                  <div style={{flex:1,background:"var(--sf)",borderRadius:12,padding:"9px 12px",border:"1px solid var(--bd)"}}>
+                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
+                      <div style={{flex:1,minWidth:0}}>
+                        <div style={{fontSize:13,fontWeight:600,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{r.desc}</div>
+                        <div style={{fontSize:9,color:"var(--mt)",marginTop:2,display:"flex",gap:6,flexWrap:"wrap"}}>
+                          <span>{r.date}</span>
+                          {card&&<span style={{color:card.color}}>{card.name} · {card.owner}</span>}
+                          {cat&&<span style={{color:CAT_COLOR[r.category]}}>{cat.emoji} {cat.label}</span>}
+                        </div>
+                      </div>
+                      <div style={{fontSize:13,fontWeight:700,color:r.type==="receita"?"var(--gn)":"var(--rd)",flexShrink:0,marginLeft:8}}>
+                        {r.type==="receita"?"+":"-"}{fmt(r.value)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })
+          }
+        </>}
+
+        {/* ── REGISTROS ── */}
+        {tab==="registros"&&<>
+          <div className="pt">Todos os Lançamentos</div>
+          <div style={{display:"flex",gap:8,marginBottom:14,flexWrap:"wrap"}}>
+            <select className="fi" value={fType} onChange={e=>setFType(e.target.value)} style={{flex:"1 1 120px"}}>
+              <option value="todos">Todos os tipos</option>
+              <option value="receita">↑ Receitas</option>
+              <option value="despesa">↓ Despesas</option>
+            </select>
+            <select className="fi" value={fCard} onChange={e=>setFCard(e.target.value)} style={{flex:"1 1 140px"}}>
+              <option value="todos">Todos os cartões</option>
+              {Object.values(CARDS).filter((c,i,a)=>a.findIndex(x=>x.name===c.name)===i).map(c=><option key={c.name} value={c.name}>{c.name}</option>)}
+              {Object.values(CARDS).filter((c,i,a)=>a.findIndex(x=>x.owner===c.owner)===i).map(c=><option key={c.owner} value={c.owner}>{c.owner}</option>)}
+            </select>
+            <select className="fi" value={fCat} onChange={e=>setFCat(e.target.value)} style={{flex:"1 1 140px"}}>
+              <option value="todos">Todas categorias</option>
+              {[...CATS.despesa,...CATS.receita].map(c=><option key={c.id} value={c.id}>{c.label}</option>)}
+            </select>
+          </div>
+          {filtered.length===0?<div className="empty"><div style={{fontSize:32,marginBottom:8}}>🔍</div>Nenhum registro encontrado</div>:filtered.map(r=><RecItem key={r.id} r={r}/>)}
+        </>}
+
+        {/* ── ADICIONAR / EDITAR ── */}
+        {tab==="adicionar"&&<>
+          <div className="pt">{editId?"Editar Registro":"Novo Registro"}</div>
+          <div className="ttgl">
+            {["despesa","receita"].map(t=>(
+              <button key={t} className={`tb ${form.type===t?(t==="receita"?"on-r":"on-d"):""}`}
+                onClick={()=>{setF("type",t);setF("category",t==="receita"?"salario":"cartao")}}>
+                {t==="receita"?"↑ Receita":"↓ Despesa"}
+              </button>
+            ))}
+          </div>
+          <div style={{marginBottom:13}}>
+            <label className="fl">Categoria</label>
+            <div className="cat-grid">
+              {CATS[form.type].map(c=>(
+                <div key={c.id} className={`cat-opt ${form.category===c.id?"sel":""}`} onClick={()=>setF("category",c.id)}>
+                  <div className="cat-em">{c.emoji}</div>
+                  <div className="cat-nm">{c.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{marginBottom:12}}>
+            <label className="fl">Cartão / Banco</label>
+            <div className="bgrid">
+              {Object.entries(CARDS).map(([k,c])=>(
+                <div key={k} className={`bo ${form.card===k?"sel":""}`}
+                  style={form.card===k?{borderColor:c.color+"55",background:c.bg}:{}}
+                  onClick={()=>setF("card",k)}>
+                  <div className="bo-logo" style={{background:`${c.color}18`,color:c.color}}>{c.logo}</div>
+                  <div className="bo-nm" style={form.card===k?{color:"var(--tx)"}:{}}>{c.name}<br/><span style={{fontSize:9,opacity:.6}}>{c.owner}</span></div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{marginBottom:12}}>
+            <label className="fl">Data</label>
+            <input className="fi" type="date" value={form.date} onChange={e=>setF("date",e.target.value)}/>
+          </div>
+          <div style={{marginBottom:12}}>
+            <label className="fl">Descrição {form.category==="cartao"&&<span style={{fontSize:9,color:"var(--gn)",fontWeight:400}}>← gerada automaticamente</span>}</label>
+            <input className="fi" placeholder="Descrição do lançamento..." value={form.desc} onChange={e=>setF("desc",e.target.value)}/>
+          </div>
+          <div style={{marginBottom:14}}>
+            <label className="fl">Valor (R$)</label>
+            <input className="fi" type="number" placeholder="0,00" value={form.value} onChange={e=>setF("value",e.target.value)}/>
+          </div>
+          <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:16}}>
+            <div className="trow">
+              <div><div style={{fontSize:13,fontWeight:600}}>Conta conjunta do casal</div><div style={{fontSize:10,color:"var(--mt)"}}>Lançamento compartilhado</div></div>
+              <div className={`tgl ${form.shared?"on":"off"}`} onClick={()=>setF("shared",!form.shared)}><div className="tgd"/></div>
+            </div>
+            <div className="trow">
+              <div><div style={{fontSize:13,fontWeight:600}}>↻ Se repete todo mês</div><div style={{fontSize:10,color:"var(--mt)"}}>Mensalidade, salário fixo etc.</div></div>
+              <div className={`tgl ${form.recorrente?"on-g":"off"}`} onClick={()=>setF("recorrente",!form.recorrente)}><div className="tgd"/></div>
+            </div>
+          </div>
+          <button className="sbtn" onClick={handleSave}>{editId?"💾 Salvar Alterações":"✦ Adicionar"}</button>
+          {editId&&<button className="cbtn" onClick={()=>{setEditId(null);setForm({type:"despesa",desc:"",value:"",category:"cartao",date:todayStr(),card:"nubank_l",shared:false,recorrente:false})}}>Cancelar</button>}
+        </>}
+
+    </>
   )
 
   return(
