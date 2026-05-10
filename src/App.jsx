@@ -1890,8 +1890,7 @@ export default function AuryMoney() {
   })()}
 </>}
 
-
-
+    </>
   )
 
   return(
