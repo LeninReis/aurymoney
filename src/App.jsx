@@ -1377,8 +1377,10 @@ export default function AuryMoney() {
             <div className="mc"><div className="ml">Receitas</div><div className="mv" style={{color:"var(--gn)"}}>{fmt(agData.rec)}</div></div>
             <div className="mc"><div className="ml">Despesas</div><div className="mv" style={{color:"var(--rd)"}}>{fmt(agData.exp)}</div></div>
             <div className="mc">
-              <div className="ml">Saldo do Mês</div>
-              <div className="mv" style={{color:agData.saldo>=0?"var(--gn)":"var(--rd)"}}>{fmt(agData.saldo)}</div>
+              <div className="ml">% Gasto</div>
+              <div className="mv" style={{color:agData.rec>0&&(agData.exp/agData.rec)<0.7?"var(--gn)":agData.rec>0&&(agData.exp/agData.rec)<0.85?"var(--yw)":"var(--rd)"}}>
+                {agData.rec>0?Math.round((agData.exp/agData.rec)*100):0}%
+              </div>
             </div>
           </div>
 
