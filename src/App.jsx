@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, useMemo } from "react"
-import { CreatureScene } from "./Creatures"
 import { initializeApp } from "firebase/app"
 import {
   getFirestore, collection, onSnapshot, addDoc,
@@ -24,6 +23,7 @@ const CARDS = {
   nubank_e:      { name:"Nubank",       owner:"Evelyn", color:"#C084FC", bg:"#160822", logo:"Nu", venc:17, fech:10 },
   mercadopago_e: { name:"Mercado Pago", owner:"Evelyn", color:"#38BDF8", bg:"#061422", logo:"MP", venc:18, fech:11 },
   picpay_e:      { name:"PicPay",       owner:"Evelyn", color:"#34D399", bg:"#061810", logo:"PP", venc:20, fech:13 },
+  c6_e:          { name:"C6 Bank",      owner:"Evelyn", color:"#64748B", bg:"#0f1419", logo:"C6", venc:20, fech:13 },
 }
 
 // Bancos para registros de receitas/pix (sem crédito)
@@ -33,6 +33,7 @@ const BANKS = {
   nubank_e:      { name:"Nubank (Evelyn)",         color:"#C084FC" },
   mercadopago_e: { name:"Mercado Pago (Evelyn)",   color:"#38BDF8" },
   picpay_e:      { name:"PicPay (Evelyn)",         color:"#34D399" },
+  c6_e:          { name:"C6 Bank (Evelyn)",         color:"#64748B" },
 }
 
 const CATS = {
@@ -382,6 +383,129 @@ html,body{background:var(--bg);min-height:100vh;font-family:'Outfit',sans-serif}
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function AuryMoney() {
   const isMobile = useIsMobile()
+  
+  // Sistema de senha
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [passwordInput, setPasswordInput] = useState("")
+  const [passwordError, setPasswordError] = useState(false)
+  
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault()
+    if (passwordInput === "120625") {
+      setIsAuthenticated(true)
+      setPasswordError(false)
+      // Salva no sessionStorage para manter durante a sessão
+      sessionStorage.setItem("aurymoney_auth", "true")
+    } else {
+      setPasswordError(true)
+      setPasswordInput("")
+    }
+  }
+  
+  // Verifica se já está autenticado na sessão
+  useEffect(() => {
+    if (sessionStorage.getItem("aurymoney_auth") === "true") {
+      setIsAuthenticated(true)
+    }
+  }, [])
+  
+  // Tela de login
+  if (!isAuthenticated) {
+    return (
+      <div style={{
+        minHeight:"100vh",
+        display:"flex",
+        alignItems:"center",
+        justifyContent:"center",
+        background:"linear-gradient(135deg, #0f0f20 0%, #1a1a2e 50%, #0f0f20 100%)",
+        padding:20
+      }}>
+        <div style={{
+          background:"linear-gradient(135deg, rgba(167,139,250,.08), rgba(124,58,237,.05))",
+          border:"1px solid rgba(167,139,250,.2)",
+          borderRadius:24,
+          padding:isMobile?32:48,
+          maxWidth:420,
+          width:"100%",
+          boxShadow:"0 20px 60px rgba(0,0,0,.5)"
+        }}>
+          <div style={{textAlign:"center",marginBottom:32}}>
+            <div style={{fontSize:48,marginBottom:16}}>💜</div>
+            <div style={{fontSize:28,fontWeight:800,background:"linear-gradient(135deg,#A78BFA,#F472B6)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",marginBottom:8}}>
+              Aury Money
+            </div>
+            <div style={{fontSize:13,color:"rgba(255,255,255,.5)"}}>
+              Sistema de Gestão Financeira
+            </div>
+          </div>
+          
+          <form onSubmit={handlePasswordSubmit}>
+            <div style={{marginBottom:24}}>
+              <label style={{display:"block",fontSize:12,fontWeight:600,color:"rgba(255,255,255,.7)",marginBottom:8,letterSpacing:0.5}}>
+                SENHA DE ACESSO
+              </label>
+              <input
+                type="password"
+                value={passwordInput}
+                onChange={(e) => {
+                  setPasswordInput(e.target.value)
+                  setPasswordError(false)
+                }}
+                placeholder="Digite a senha"
+                autoFocus
+                style={{
+                  width:"100%",
+                  padding:"14px 16px",
+                  background:"rgba(0,0,0,.3)",
+                  border:passwordError?"1px solid #EF4444":"1px solid rgba(255,255,255,.1)",
+                  borderRadius:12,
+                  fontSize:16,
+                  color:"#fff",
+                  outline:"none",
+                  transition:"all 0.2s",
+                  letterSpacing:8,
+                  textAlign:"center"
+                }}
+              />
+              {passwordError && (
+                <div style={{marginTop:8,fontSize:11,color:"#EF4444",textAlign:"center",fontWeight:600}}>
+                  ❌ Senha incorreta. Tente novamente.
+                </div>
+              )}
+            </div>
+            
+            <button
+              type="submit"
+              style={{
+                width:"100%",
+                padding:"14px 16px",
+                background:"linear-gradient(135deg, #A78BFA, #8B5CF6)",
+                border:"none",
+                borderRadius:12,
+                fontSize:14,
+                fontWeight:700,
+                color:"#fff",
+                cursor:"pointer",
+                transition:"all 0.2s",
+                letterSpacing:1,
+                boxShadow:"0 4px 12px rgba(167,139,250,.3)"
+              }}
+              onMouseEnter={(e) => e.target.style.transform = "translateY(-2px)"}
+              onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
+            >
+              ENTRAR
+            </button>
+          </form>
+          
+          <div style={{marginTop:24,textAlign:"center",fontSize:10,color:"rgba(255,255,255,.3)"}}>
+            Lenin & Evelyn ❤️
+          </div>
+        </div>
+      </div>
+    )
+  }
+  
+  // App normal após autenticação
   const [tab, setTab]       = useState("dashboard")
   const [records, setRecs]  = useState([])
   const [loading, setLoad]  = useState(true)
@@ -639,7 +763,6 @@ export default function AuryMoney() {
     {id:"agenda",   lbl:"Agenda", ico:"📅"},
     {id:"registros",lbl:"Registros",ico:"☰"},
     {id:"adicionar",lbl:editId?"Editar":"Novo",ico:"+"},
-    {id:"jardim",   lbl:"Criaturas",ico:"✨"},
   ]
 
   // ── Content JSX ────────────────────────────────────────────────────────────
@@ -1487,38 +1610,142 @@ export default function AuryMoney() {
 
         {/* ── REGISTROS ── */}
         {tab==="registros"&&<>
-          <div className="filters">
-            {[["todos","Todos"],["receita","Receitas"],["despesa","Despesas"]].map(([v,l])=>(
-              <button key={v} className={`fb ${fType===v?"on":""}`} onClick={()=>setFType(v)}>{l}</button>
-            ))}
-            {["Nubank","Inter","Mercado Pago","PicPay"].map(name=>{
-              const color = Object.values(CARDS).find(c=>c.name===name)?.color
-              return (
-                <button key={name} className={`fb ${fCard===name?"on":""}`}
-                  style={fCard===name?{background:color,borderColor:"transparent"}:{}}
-                  onClick={()=>setFCard(fCard===name?"todos":name)}>{name}</button>
+          <div style={{marginBottom:16}}>
+            <div className="pt">📊 Registros Financeiros</div>
+            <div style={{fontSize:11,color:"var(--mt)",lineHeight:1.6,marginBottom:12}}>
+              Visualize e organize seus lançamentos por categoria
+            </div>
+          </div>
+
+          {/* Resumo Geral com Percentuais */}
+          <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)",gap:12,marginBottom:20}}>
+            <div style={{background:"linear-gradient(135deg,rgba(52,211,153,.1),rgba(16,185,129,.05))",border:"1px solid rgba(52,211,153,.25)",borderRadius:16,padding:16}}>
+              <div style={{fontSize:10,color:"rgba(52,211,153,.8)",letterSpacing:1,textTransform:"uppercase",marginBottom:6,fontWeight:600}}>↑ RECEITAS</div>
+              <div style={{fontSize:24,fontWeight:800,color:"var(--gn)",marginBottom:4}}>{fmt(filtered.filter(r=>r.type==="receita").reduce((a,b)=>a+Number(b.value||0),0))}</div>
+              <div style={{fontSize:10,color:"rgba(52,211,153,.7)",fontWeight:600}}>
+                {filtered.filter(r=>r.type==="receita").length} lançamentos
+              </div>
+            </div>
+            <div style={{background:"linear-gradient(135deg,rgba(248,113,113,.1),rgba(239,68,68,.05))",border:"1px solid rgba(248,113,113,.25)",borderRadius:16,padding:16}}>
+              <div style={{fontSize:10,color:"rgba(248,113,113,.8)",letterSpacing:1,textTransform:"uppercase",marginBottom:6,fontWeight:600}}>↓ DESPESAS</div>
+              <div style={{fontSize:24,fontWeight:800,color:"var(--rd)",marginBottom:4}}>{fmt(filtered.filter(r=>r.type==="despesa").reduce((a,b)=>a+Number(b.value||0),0))}</div>
+              <div style={{fontSize:10,color:"rgba(248,113,113,.7)",fontWeight:600}}>
+                {filtered.filter(r=>r.type==="despesa").length} lançamentos
+              </div>
+            </div>
+            <div style={{background:"linear-gradient(135deg,rgba(139,92,246,.1),rgba(124,58,237,.05))",border:"1px solid rgba(139,92,246,.25)",borderRadius:16,padding:16}}>
+              <div style={{fontSize:10,color:"rgba(139,92,246,.8)",letterSpacing:1,textTransform:"uppercase",marginBottom:6,fontWeight:600}}>% GASTO</div>
+              <div style={{fontSize:24,fontWeight:800,color:(()=>{
+                const rec=filtered.filter(r=>r.type==="receita").reduce((a,b)=>a+Number(b.value||0),0)
+                const exp=filtered.filter(r=>r.type==="despesa").reduce((a,b)=>a+Number(b.value||0),0)
+                return rec>0&&(exp/rec)<0.7?"var(--gn)":rec>0&&(exp/rec)<0.85?"var(--yw)":"var(--rd)"
+              })(),marginBottom:4}}>
+                {(()=>{
+                  const rec=filtered.filter(r=>r.type==="receita").reduce((a,b)=>a+Number(b.value||0),0)
+                  const exp=filtered.filter(r=>r.type==="despesa").reduce((a,b)=>a+Number(b.value||0),0)
+                  return rec>0?Math.round((exp/rec)*100):0
+                })()}%
+              </div>
+              <div style={{fontSize:10,color:"rgba(139,92,246,.7)",fontWeight:600}}>
+                do que você recebe
+              </div>
+            </div>
+          </div>
+
+          {/* Filtros Organizados */}
+          <div style={{marginBottom:20}}>
+            <div style={{fontSize:12,fontWeight:700,color:"var(--tx)",marginBottom:10}}>🔍 Filtros</div>
+            <div className="filters">
+              {[["todos","Todos"],["receita","↑ Receitas"],["despesa","↓ Despesas"]].map(([v,l])=>(
+                <button key={v} className={`fb ${fType===v?"on":""}`} onClick={()=>setFType(v)}>{l}</button>
+              ))}
+              {["Nubank","Inter","C6 Bank","Mercado Pago","PicPay"].map(name=>{
+                const color = Object.values(CARDS).find(c=>c.name===name)?.color
+                return (
+                  <button key={name} className={`fb ${fCard===name?"on":""}`}
+                    style={fCard===name?{background:color,borderColor:"transparent"}:{}}
+                    onClick={()=>setFCard(fCard===name?"todos":name)}>{name}</button>
+                )
+              })}
+              {["Lenin","Evelyn"].map(owner=>(
+                <button key={owner} className={`fb ${fCard===owner?"on":""}`}
+                  style={fCard===owner?{background:owner==="Lenin"?"#A78BFA":"#F472B6",borderColor:"transparent"}:{}}
+                  onClick={()=>setFCard(fCard===owner?"todos":owner)}>{owner}</button>
+              ))}
+            </div>
+          </div>
+
+          {loading?<div className="ld"><div className="sp"/>Carregando...</div>
+          :filtered.length===0?<div className="empty"><div style={{fontSize:32,marginBottom:8}}>📭</div>Nenhum registro encontrado</div>
+          :<>
+            {/* Agrupamento por Categoria com Hierarquia */}
+            {[...CATS.despesa,...CATS.receita].map(cat=>{
+              const catFiltered = filtered.filter(r=>r.category===cat.id)
+              if(catFiltered.length===0) return null
+              
+              const catTotal = catFiltered.reduce((a,b)=>a+Number(b.value||0),0)
+              const totalGeral = filtered.reduce((a,b)=>a+Number(b.value||0),0)
+              const catPercentual = totalGeral>0?Math.round((catTotal/Math.abs(totalGeral))*100):0
+              const isReceita = catFiltered[0]?.type === "receita"
+              
+              return(
+                <div key={cat.id} style={{marginBottom:20}}>
+                  {/* Header da Categoria */}
+                  <div style={{
+                    background:isReceita?"linear-gradient(135deg,rgba(52,211,153,.15),rgba(16,185,129,.08))":"linear-gradient(135deg,rgba(248,113,113,.15),rgba(239,68,68,.08))",
+                    border:`1px solid ${isReceita?"rgba(52,211,153,.3)":"rgba(248,113,113,.3)"}`,
+                    borderRadius:14,
+                    padding:"14px 16px",
+                    marginBottom:10,
+                    display:"flex",
+                    justifyContent:"space-between",
+                    alignItems:"center"
+                  }}>
+                    <div style={{display:"flex",alignItems:"center",gap:10}}>
+                      <div style={{fontSize:24}}>{cat.emoji}</div>
+                      <div>
+                        <div style={{fontSize:14,fontWeight:700,color:"var(--tx)",marginBottom:2}}>{cat.label}</div>
+                        <div style={{fontSize:10,color:"var(--mt)"}}>{catFiltered.length} lançamento{catFiltered.length>1?"s":""}</div>
+                      </div>
+                    </div>
+                    <div style={{textAlign:"right"}}>
+                      <div style={{fontSize:18,fontWeight:800,color:isReceita?"var(--gn)":"var(--rd)",marginBottom:2}}>{fmt(catTotal)}</div>
+                      <div style={{fontSize:11,fontWeight:700,color:isReceita?"rgba(52,211,153,.8)":"rgba(248,113,113,.8)"}}>
+                        {catPercentual}% do total
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Itens da Categoria */}
+                  <div style={{paddingLeft:isMobile?8:20}}>
+                    {catFiltered.map(r=><RecItem key={r.id} r={r}/>)}
+                  </div>
+                </div>
               )
             })}
-            {["Lenin","Evelyn"].map(owner=>(
-              <button key={owner} className={`fb ${fCard===owner?"on":""}`}
-                style={fCard===owner?{background:owner==="Lenin"?"#A78BFA":"#F472B6",borderColor:"transparent"}:{}}
-                onClick={()=>setFCard(fCard===owner?"todos":owner)}>{owner}</button>
-            ))}
-            {[...CATS.despesa,...CATS.receita].map(c=>(
-              <button key={c.id} className={`fb ${fCat===c.id?"on":""}`} onClick={()=>setFCat(fCat===c.id?"todos":c.id)}>{c.emoji} {c.label.split("/")[0]}</button>
-            ))}
-          </div>
-          {loading?<div className="ld"><div className="sp"/>Carregando...</div>
-          :filtered.length===0?<div className="empty"><div style={{fontSize:32,marginBottom:8}}>📭</div>Nenhum registro</div>
-          :<>
-            {filtered.filter(r=>r.recorrente).length>0&&<>
-              <div className="rgl">↻ Recorrentes — {fmt(filtered.filter(r=>r.recorrente).reduce((a,b)=>a+Number(b.value||0),0))}</div>
-              {filtered.filter(r=>r.recorrente).map(r=><RecItem key={r.id} r={r}/>)}
-            </>}
-            {filtered.filter(r=>!r.recorrente).length>0&&<>
-              <div className="rgl">⚡ Avulsas</div>
-              {filtered.filter(r=>!r.recorrente).map(r=><RecItem key={r.id} r={r}/>)}
-            </>}
+
+            {/* Resumo Final */}
+            <div style={{
+              background:"linear-gradient(135deg,rgba(139,92,246,.12),rgba(124,58,237,.06))",
+              border:"1px solid rgba(139,92,246,.3)",
+              borderRadius:16,
+              padding:20,
+              marginTop:24
+            }}>
+              <div style={{fontSize:13,fontWeight:700,color:"#A78BFA",marginBottom:12,display:"flex",alignItems:"center",gap:8}}>
+                <span>📈</span> Resumo Total
+              </div>
+              <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(2,1fr)",gap:12}}>
+                <div>
+                  <div style={{fontSize:10,color:"var(--mt)",marginBottom:4}}>Total de Registros</div>
+                  <div style={{fontSize:20,fontWeight:800,color:"var(--tx)"}}>{filtered.length}</div>
+                </div>
+                <div>
+                  <div style={{fontSize:10,color:"var(--mt)",marginBottom:4}}>Recorrentes</div>
+                  <div style={{fontSize:20,fontWeight:800,color:"var(--tx)"}}>{filtered.filter(r=>r.recorrente).length}</div>
+                </div>
+              </div>
+            </div>
           </>}
         </>}
 
@@ -1582,232 +1809,6 @@ export default function AuryMoney() {
           <button className="sbtn" onClick={handleSave}>{editId?"💾 Salvar Alterações":"✦ Adicionar"}</button>
           {editId&&<button className="cbtn" onClick={()=>{setEditId(null);setForm({type:"despesa",desc:"",value:"",category:"cartao",date:todayStr(),card:"nubank_l",shared:false,recorrente:false})}}>Cancelar</button>}
         </>}
-
-{tab==="jardim"&&<>
-  <div style={{marginBottom:20}}>
-    <div className="pt" style={{background:"linear-gradient(135deg,#A78BFA,#F472B6,#FBBF24)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",fontSize:22}}>✨ Centro de Criaturas Místicas</div>
-    <div style={{fontSize:11,color:"var(--mt)",lineHeight:1.6}}>
-      Suas criaturas mágicas evoluem conforme sua prosperidade cresce 🐉🦉🐱🔥
-    </div>
-  </div>
-
-  {(()=>{
-    const saldoMes = Math.max(0, tm.saldo)
-    
-    // Sistema de criaturas
-    const criaturas = [
-      {
-        nome: "Dragão",
-        estagios: [
-          {min:0,    max:500,  nome:"Ovo de Dragão",    emoji:"🥚", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Aguardando o calor..."},
-          {min:500,  max:1500, nome:"Filhote de Dragão",emoji:"🦎", poder:15,  cor:"#F59E0B", cor2:"#D97706", desc:"Soltando faíscas"},
-          {min:1500, max:3500, nome:"Dragão Juvenil",   emoji:"🐲", poder:45,  cor:"#EF4444", cor2:"#DC2626", desc:"Voando alto"},
-          {min:3500, max:999999,nome:"Dragão Ancião",   emoji:"🐉", poder:100, cor:"#7C3AED", cor2:"#6D28D9", desc:"Guardião supremo"}
-        ]
-      },
-      {
-        nome: "Coruja",
-        estagios: [
-          {min:0,    max:400,  nome:"Ovo de Coruja",   emoji:"🥚", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"No ninho quente"},
-          {min:400,  max:1200, nome:"Corujinha",       emoji:"🐣", poder:12,  cor:"#A78BFA", cor2:"#8B5CF6", desc:"Aprendendo a voar"},
-          {min:1200, max:2800, nome:"Coruja Sábia",    emoji:"🦉", poder:40,  cor:"#6366F1", cor2:"#4F46E5", desc:"Vê no escuro"},
-          {min:2800, max:999999,nome:"Coruja Mística", emoji:"🔮", poder:85,  cor:"#14B8A6", cor2:"#0D9488", desc:"Portal da sabedoria"}
-        ]
-      },
-      {
-        nome: "Gato",
-        estagios: [
-          {min:0,    max:300,  nome:"Ovo Felino",    emoji:"🥚", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Ronronando"},
-          {min:300,  max:1000, nome:"Gatinho",       emoji:"🐱", poder:10,  cor:"#F472B6", cor2:"#EC4899", desc:"Brincalhão"},
-          {min:1000, max:2500, nome:"Gato Mágico",   emoji:"😺", poder:35,  cor:"#8B5CF6", cor2:"#7C3AED", desc:"Traz sorte"},
-          {min:2500, max:999999,nome:"Gato Cósmico", emoji:"🌟", poder:75,  cor:"#F59E0B", cor2:"#D97706", desc:"Entre dimensões"}
-        ]
-      },
-      {
-        nome: "Fênix",
-        estagios: [
-          {min:0,    max:800,  nome:"Cinzas",         emoji:"🌫️", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Renascimento"},
-          {min:800,  max:2000, nome:"Chama Nascente", emoji:"🕯️", poder:20,  cor:"#FBBF24", cor2:"#F59E0B", desc:"Primeira chama"},
-          {min:2000, max:4000, nome:"Fênix Flamejante",emoji:"🔥", poder:60,  cor:"#EF4444", cor2:"#DC2626", desc:"Fogo sagrado"},
-          {min:4000, max:999999,nome:"Fênix Imortal",  emoji:"✨", poder:120, cor:"#F97316", cor2:"#EA580C", desc:"Eternidade"}
-        ]
-      }
-    ]
-
-    const criaturasEvoluidas = criaturas.map(criatura => {
-      const estagio = criatura.estagios.find(e => saldoMes >= e.min && saldoMes < e.max) || criatura.estagios[criatura.estagios.length - 1]
-      const estagioIdx = criatura.estagios.indexOf(estagio)
-      const progresso = estagio.max === 999999 ? 100 : Math.min(100, ((saldoMes - estagio.min) / (estagio.max - estagio.min)) * 100)
-      const proximoEstagio = estagioIdx < criatura.estagios.length - 1 ? criatura.estagios[estagioIdx + 1] : null
-      
-      return { ...criatura, estagio, estagioIdx, progresso, proximoEstagio }
-    })
-
-    // Cenários
-    const cenarios = [
-      {min:0,    max:1000, nome:"Caverna dos Sonhos",  emoji:"🕳️", bg:"linear-gradient(135deg,#1e1b4b,#0f172a)", desc:"Refúgio tranquilo"},
-      {min:1000, max:2500, nome:"Floresta Encantada",  emoji:"🌲", bg:"linear-gradient(135deg,#064e3b,#022c22)", desc:"Sussurros antigos"},
-      {min:2500, max:4500, nome:"Vale das Estrelas",   emoji:"⭐", bg:"linear-gradient(135deg,#1e3a8a,#1e40af)", desc:"Céu tocando a terra"},
-      {min:4500, max:999999,nome:"Palácio de Cristal", emoji:"🏰", bg:"linear-gradient(135deg,#581c87,#6b21a8)", desc:"Reino da prosperidade"}
-    ]
-    
-    const cenario = cenarios.find(c => saldoMes >= c.min && saldoMes < c.max) || cenarios[cenarios.length - 1]
-    const cenarioIdx = cenarios.indexOf(cenario)
-    const progCenario = cenario.max === 999999 ? 100 : Math.min(100, ((saldoMes - cenario.min) / (cenario.max - cenario.min)) * 100)
-    const proxCenario = cenarioIdx < cenarios.length - 1 ? cenarios[cenarioIdx + 1] : null
-
-    return(
-      <>
-        {/* Ambiente Interativo com Criaturas */}
-        <CreatureHabitat 
-          criaturas={criaturasEvoluidas}
-          cenario={cenario}
-          saldoMes={saldoMes}
-        />
-
-        {/* Barra de progresso do cenário */}
-        <div style={{background:"rgba(17,24,39,.95)",border:"1px solid rgba(255,255,255,.1)",borderRadius:16,padding:20,marginTop:20,marginBottom:20}}>
-          <div style={{fontSize:13,fontWeight:700,color:"#A78BFA",marginBottom:12,textAlign:"center"}}>
-            🏰 {cenario.nome}
-          </div>
-          {proxCenario && (
-            <>
-              <div style={{background:"rgba(0,0,0,.4)",borderRadius:99,height:10,overflow:"hidden",marginBottom:8,border:"1px solid rgba(255,255,255,.1)"}}>
-                <div style={{background:"linear-gradient(90deg,#FCD34D,#F59E0B)",width:`${progCenario}%`,height:"100%",borderRadius:99,boxShadow:"0 0 15px #F59E0B",transition:"width 1s ease"}}/>
-              </div>
-              <div style={{fontSize:10,textAlign:"center",color:"rgba(255,255,255,.7)",fontWeight:600}}>
-                Faltam {fmt(proxCenario.min - saldoMes)} para {proxCenario.emoji} {proxCenario.nome}
-              </div>
-            </>
-          )}
-          {!proxCenario && (
-            <div style={{fontSize:12,textAlign:"center",color:"#FCD34D",fontWeight:800}}>✨ Reino Máximo! ✨</div>
-          )}
-        </div>
-
-        {/* Grid de Criaturas */}
-        <div style={{display:"grid",gridTemplateColumns:isMobile?"1fr":"repeat(2,1fr)",gap:16,marginBottom:20}}>
-          {criaturasEvoluidas.map((criatura) => (
-            <div key={criatura.nome} style={{
-              background:"linear-gradient(135deg,rgba(17,24,39,.95),rgba(31,41,55,.9))",
-              border:`2px solid ${criatura.estagio.cor}`,
-              borderRadius:20,
-              padding:20,
-              position:"relative",
-              overflow:"hidden",
-              boxShadow:`0 8px 32px ${criatura.estagio.cor}60`,
-              transition:"transform 0.3s ease",
-              cursor:"pointer"
-            }}
-            onMouseEnter={e=>e.currentTarget.style.transform="translateY(-4px)"}
-            onMouseLeave={e=>e.currentTarget.style.transform="translateY(0)"}
-            >
-              {/* Aura */}
-              <div style={{
-                position:"absolute",
-                inset:-30,
-                background:`radial-gradient(circle, ${criatura.estagio.cor}20 0%, transparent 70%)`,
-                animation:"pulse 3s ease-in-out infinite"
-              }}/>
-              
-              <div style={{position:"relative",zIndex:1}}>
-                {/* Criatura SVG Animada */}
-                <div style={{marginBottom:16}}>
-                  <CreatureScene 
-                    creature={criatura.nome} 
-                    stage={criatura.estagio}
-                    color={criatura.estagio.cor}
-                    color2={criatura.estagio.cor2 || criatura.estagio.cor}
-                  />
-                </div>
-                
-                {/* Nome */}
-                <div style={{textAlign:"center",marginBottom:12,padding:"10px 14px",background:`${criatura.estagio.cor}20`,borderRadius:12,border:`1px solid ${criatura.estagio.cor}40`}}>
-                  <div style={{fontSize:16,fontWeight:800,color:criatura.estagio.cor,marginBottom:4,letterSpacing:0.5}}>
-                    {criatura.estagio.nome}
-                  </div>
-                  <div style={{fontSize:10,color:"rgba(255,255,255,.7)",fontStyle:"italic"}}>
-                    {criatura.estagio.desc}
-                  </div>
-                </div>
-
-                {/* Barra de Poder */}
-                <div style={{marginBottom:12}}>
-                  <div style={{fontSize:10,color:"var(--mt)",marginBottom:6,display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                    <span style={{display:"flex",alignItems:"center",gap:4}}>⚡ <span style={{fontWeight:600}}>Poder</span></span>
-                    <span style={{fontWeight:800,fontSize:15,color:criatura.estagio.cor,textShadow:`0 0 10px ${criatura.estagio.cor}`}}>{criatura.estagio.poder}</span>
-                  </div>
-                  <div style={{background:"rgba(0,0,0,.6)",borderRadius:99,height:8,overflow:"hidden",border:"1px solid rgba(255,255,255,.1)"}}>
-                    <div style={{background:`linear-gradient(90deg,${criatura.estagio.cor},${criatura.estagio.cor}dd)`,width:`${criatura.estagio.poder}%`,height:"100%",borderRadius:99,boxShadow:`0 0 15px ${criatura.estagio.cor}`,transition:"width 1s ease"}}/>
-                  </div>
-                </div>
-
-                {/* Progresso */}
-                {criatura.proximoEstagio ? (
-                  <div style={{background:"rgba(16,185,129,.12)",borderRadius:12,padding:"10px 12px",border:"1px solid rgba(16,185,129,.3)"}}>
-                    <div style={{fontSize:10,color:"#6EE7B7",marginBottom:6,fontWeight:600}}>
-                      🌟 Próxima: {criatura.proximoEstagio.nome}
-                    </div>
-                    <div style={{background:"rgba(0,0,0,.4)",borderRadius:99,height:6,overflow:"hidden",marginBottom:6}}>
-                      <div style={{background:"linear-gradient(90deg,#10B981,#34D399)",width:`${criatura.progresso}%`,height:"100%",borderRadius:99,boxShadow:"0 0 10px #10B981",transition:"width 1s ease"}}/>
-                    </div>
-                    <div style={{fontSize:10,color:"#6EE7B7",fontWeight:700,display:"flex",justifyContent:"space-between"}}>
-                      <span>{criatura.progresso.toFixed(0)}%</span>
-                      <span>Faltam {fmt(criatura.proximoEstagio.min - saldoMes)}</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div style={{background:"linear-gradient(135deg,rgba(251,191,36,.25),rgba(245,158,11,.15))",border:"1px solid rgba(251,191,36,.4)",borderRadius:12,padding:"12px",textAlign:"center",boxShadow:"0 4px 12px rgba(251,191,36,.2)"}}>
-                    <div style={{fontSize:12,fontWeight:800,color:"#FCD34D",textShadow:"0 0 10px #F59E0B",letterSpacing:1}}>
-                      👑 FORMA SUPREMA! 👑
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Dashboard */}
-        <div style={{background:"linear-gradient(135deg,rgba(139,92,246,.15),rgba(167,139,250,.1))",border:"1px solid rgba(167,139,250,.3)",borderRadius:20,padding:20,boxShadow:"0 8px 24px rgba(139,92,246,.2)"}}>
-          <div style={{fontSize:13,fontWeight:800,color:"#A78BFA",marginBottom:16,display:"flex",alignItems:"center",gap:8}}>
-            <span>📊</span> Registro Místico
-          </div>
-          
-          <div style={{display:"grid",gridTemplateColumns:isMobile?"repeat(2,1fr)":"repeat(4,1fr)",gap:12}}>
-            {[
-              {label:"Poder Total",value:criaturasEvoluidas.reduce((sum,c)=>sum+c.estagio.poder,0),cor:"#FCD34D",icon:"⚡"},
-              {label:"Criaturas",value:criaturas.length,cor:"#A78BFA",icon:"✨"},
-              {label:"Supremas",value:`${criaturasEvoluidas.filter(c=>!c.proximoEstagio).length}/${criaturas.length}`,cor:"#34D399",icon:"👑"},
-              {label:"Saldo Mês",value:fmt(saldoMes),cor:saldoMes>=0?"#10B981":"#EF4444",icon:"💰"}
-            ].map(stat=>(
-              <div key={stat.label} style={{background:"rgba(0,0,0,.3)",borderRadius:12,padding:"12px",border:"1px solid rgba(255,255,255,.1)",transition:"transform 0.2s",cursor:"pointer"}}
-              onMouseEnter={e=>e.currentTarget.style.transform="scale(1.05)"}
-              onMouseLeave={e=>e.currentTarget.style.transform="scale(1)"}>
-                <div style={{fontSize:10,color:"rgba(255,255,255,.6)",marginBottom:6,display:"flex",alignItems:"center",gap:4}}>
-                  <span>{stat.icon}</span><span>{stat.label}</span>
-                </div>
-                <div style={{fontSize:19,fontWeight:800,color:stat.cor,textShadow:`0 0 15px ${stat.cor}`,fontFamily:"'Outfit',sans-serif"}}>{stat.value}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* CSS Animations */}
-        <style>{`
-          @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-12px); }
-          }
-          @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-          }
-        `}</style>
-      </>
-    )
-  })()}
-</>}
 
     </>
   )
