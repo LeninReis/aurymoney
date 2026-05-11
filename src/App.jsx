@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react"
+import { CreatureScene } from "./Creatures"
 import { initializeApp } from "firebase/app"
 import {
   getFirestore, collection, onSnapshot, addDoc,
@@ -1596,37 +1597,37 @@ export default function AuryMoney() {
       {
         nome: "Dragão",
         estagios: [
-          {min:0,    max:500,  nome:"Ovo de Dragão",    emoji:"🥚", poder:0,   cor:"#9CA3AF", desc:"Aguardando o calor..."},
-          {min:500,  max:1500, nome:"Filhote de Dragão",emoji:"🦎", poder:15,  cor:"#F59E0B", desc:"Soltando faíscas"},
-          {min:1500, max:3500, nome:"Dragão Juvenil",   emoji:"🐲", poder:45,  cor:"#EF4444", desc:"Voando alto"},
-          {min:3500, max:999999,nome:"Dragão Ancião",   emoji:"🐉", poder:100, cor:"#7C3AED", desc:"Guardião supremo"}
+          {min:0,    max:500,  nome:"Ovo de Dragão",    emoji:"🥚", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Aguardando o calor..."},
+          {min:500,  max:1500, nome:"Filhote de Dragão",emoji:"🦎", poder:15,  cor:"#F59E0B", cor2:"#D97706", desc:"Soltando faíscas"},
+          {min:1500, max:3500, nome:"Dragão Juvenil",   emoji:"🐲", poder:45,  cor:"#EF4444", cor2:"#DC2626", desc:"Voando alto"},
+          {min:3500, max:999999,nome:"Dragão Ancião",   emoji:"🐉", poder:100, cor:"#7C3AED", cor2:"#6D28D9", desc:"Guardião supremo"}
         ]
       },
       {
         nome: "Coruja",
         estagios: [
-          {min:0,    max:400,  nome:"Ovo de Coruja",   emoji:"🥚", poder:0,   cor:"#9CA3AF", desc:"No ninho quente"},
-          {min:400,  max:1200, nome:"Corujinha",       emoji:"🐣", poder:12,  cor:"#A78BFA", desc:"Aprendendo a voar"},
-          {min:1200, max:2800, nome:"Coruja Sábia",    emoji:"🦉", poder:40,  cor:"#6366F1", desc:"Vê no escuro"},
-          {min:2800, max:999999,nome:"Coruja Mística", emoji:"🔮", poder:85,  cor:"#14B8A6", desc:"Portal da sabedoria"}
+          {min:0,    max:400,  nome:"Ovo de Coruja",   emoji:"🥚", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"No ninho quente"},
+          {min:400,  max:1200, nome:"Corujinha",       emoji:"🐣", poder:12,  cor:"#A78BFA", cor2:"#8B5CF6", desc:"Aprendendo a voar"},
+          {min:1200, max:2800, nome:"Coruja Sábia",    emoji:"🦉", poder:40,  cor:"#6366F1", cor2:"#4F46E5", desc:"Vê no escuro"},
+          {min:2800, max:999999,nome:"Coruja Mística", emoji:"🔮", poder:85,  cor:"#14B8A6", cor2:"#0D9488", desc:"Portal da sabedoria"}
         ]
       },
       {
         nome: "Gato",
         estagios: [
-          {min:0,    max:300,  nome:"Ovo Felino",    emoji:"🥚", poder:0,   cor:"#9CA3AF", desc:"Ronronando"},
-          {min:300,  max:1000, nome:"Gatinho",       emoji:"🐱", poder:10,  cor:"#F472B6", desc:"Brincalhão"},
-          {min:1000, max:2500, nome:"Gato Mágico",   emoji:"😺", poder:35,  cor:"#8B5CF6", desc:"Traz sorte"},
-          {min:2500, max:999999,nome:"Gato Cósmico", emoji:"🌟", poder:75,  cor:"#F59E0B", desc:"Entre dimensões"}
+          {min:0,    max:300,  nome:"Ovo Felino",    emoji:"🥚", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Ronronando"},
+          {min:300,  max:1000, nome:"Gatinho",       emoji:"🐱", poder:10,  cor:"#F472B6", cor2:"#EC4899", desc:"Brincalhão"},
+          {min:1000, max:2500, nome:"Gato Mágico",   emoji:"😺", poder:35,  cor:"#8B5CF6", cor2:"#7C3AED", desc:"Traz sorte"},
+          {min:2500, max:999999,nome:"Gato Cósmico", emoji:"🌟", poder:75,  cor:"#F59E0B", cor2:"#D97706", desc:"Entre dimensões"}
         ]
       },
       {
         nome: "Fênix",
         estagios: [
-          {min:0,    max:800,  nome:"Cinzas",         emoji:"🌫️", poder:0,   cor:"#9CA3AF", desc:"Renascimento"},
-          {min:800,  max:2000, nome:"Chama Nascente", emoji:"🕯️", poder:20,  cor:"#FBBF24", desc:"Primeira chama"},
-          {min:2000, max:4000, nome:"Fênix Flamejante",emoji:"🔥", poder:60,  cor:"#EF4444", desc:"Fogo sagrado"},
-          {min:4000, max:999999,nome:"Fênix Imortal",  emoji:"✨", poder:120, cor:"#F97316", desc:"Eternidade"}
+          {min:0,    max:800,  nome:"Cinzas",         emoji:"🌫️", poder:0,   cor:"#9CA3AF", cor2:"#6B7280", desc:"Renascimento"},
+          {min:800,  max:2000, nome:"Chama Nascente", emoji:"🕯️", poder:20,  cor:"#FBBF24", cor2:"#F59E0B", desc:"Primeira chama"},
+          {min:2000, max:4000, nome:"Fênix Flamejante",emoji:"🔥", poder:60,  cor:"#EF4444", cor2:"#DC2626", desc:"Fogo sagrado"},
+          {min:4000, max:999999,nome:"Fênix Imortal",  emoji:"✨", poder:120, cor:"#F97316", cor2:"#EA580C", desc:"Eternidade"}
         ]
       }
     ]
@@ -1655,38 +1656,31 @@ export default function AuryMoney() {
 
     return(
       <>
-        {/* Cenário Místico */}
-        <div style={{
-          background:cenario.bg,
-          border:"1px solid rgba(255,255,255,.2)",
-          borderRadius:20,
-          padding:isMobile?20:32,
-          marginBottom:24,
-          position:"relative",
-          overflow:"hidden",
-          boxShadow:"0 10px 40px rgba(0,0,0,.6)"
-        }}>
-          <div style={{position:"relative",zIndex:1}}>
-            <div style={{fontSize:64,textAlign:"center",marginBottom:12,filter:"drop-shadow(0 0 20px rgba(255,255,255,.3))"}}>
-              <span style={{display:"inline-block",animation:"float 3s ease-in-out infinite"}}>{cenario.emoji}</span>
-            </div>
-            <div style={{fontSize:20,fontWeight:800,textAlign:"center",color:"#FFF",marginBottom:6,textShadow:"0 2px 10px rgba(0,0,0,.5)"}}>{cenario.nome}</div>
-            <div style={{fontSize:11,textAlign:"center",color:"rgba(255,255,255,.8)",marginBottom:16,fontStyle:"italic"}}>{cenario.desc}</div>
-            
-            {proxCenario && (
-              <div style={{maxWidth:400,margin:"0 auto"}}>
-                <div style={{background:"rgba(0,0,0,.4)",borderRadius:99,height:10,overflow:"hidden",marginBottom:8,border:"1px solid rgba(255,255,255,.1)"}}>
-                  <div style={{background:"linear-gradient(90deg,#FCD34D,#F59E0B)",width:`${progCenario}%`,height:"100%",borderRadius:99,boxShadow:"0 0 15px #F59E0B",transition:"width 1s ease"}}/>
-                </div>
-                <div style={{fontSize:10,textAlign:"center",color:"rgba(255,255,255,.7)",fontWeight:600}}>
-                  Faltam {fmt(proxCenario.min - saldoMes)} para {proxCenario.emoji} {proxCenario.nome}
-                </div>
-              </div>
-            )}
-            {!proxCenario && (
-              <div style={{fontSize:13,textAlign:"center",color:"#FCD34D",fontWeight:800,textShadow:"0 0 20px #F59E0B"}}>✨ Reino Máximo Alcançado! ✨</div>
-            )}
+        {/* Ambiente Interativo com Criaturas */}
+        <CreatureHabitat 
+          criaturas={criaturasEvoluidas}
+          cenario={cenario}
+          saldoMes={saldoMes}
+        />
+
+        {/* Barra de progresso do cenário */}
+        <div style={{background:"rgba(17,24,39,.95)",border:"1px solid rgba(255,255,255,.1)",borderRadius:16,padding:20,marginTop:20,marginBottom:20}}>
+          <div style={{fontSize:13,fontWeight:700,color:"#A78BFA",marginBottom:12,textAlign:"center"}}>
+            🏰 {cenario.nome}
           </div>
+          {proxCenario && (
+            <>
+              <div style={{background:"rgba(0,0,0,.4)",borderRadius:99,height:10,overflow:"hidden",marginBottom:8,border:"1px solid rgba(255,255,255,.1)"}}>
+                <div style={{background:"linear-gradient(90deg,#FCD34D,#F59E0B)",width:`${progCenario}%`,height:"100%",borderRadius:99,boxShadow:"0 0 15px #F59E0B",transition:"width 1s ease"}}/>
+              </div>
+              <div style={{fontSize:10,textAlign:"center",color:"rgba(255,255,255,.7)",fontWeight:600}}>
+                Faltam {fmt(proxCenario.min - saldoMes)} para {proxCenario.emoji} {proxCenario.nome}
+              </div>
+            </>
+          )}
+          {!proxCenario && (
+            <div style={{fontSize:12,textAlign:"center",color:"#FCD34D",fontWeight:800}}>✨ Reino Máximo! ✨</div>
+          )}
         </div>
 
         {/* Grid de Criaturas */}
@@ -1715,15 +1709,14 @@ export default function AuryMoney() {
               }}/>
               
               <div style={{position:"relative",zIndex:1}}>
-                {/* Emoji grande animado */}
-                <div style={{
-                  fontSize:80,
-                  textAlign:"center",
-                  marginBottom:16,
-                  filter:`drop-shadow(0 0 20px ${criatura.estagio.cor})`,
-                  animation:"float 3s ease-in-out infinite"
-                }}>
-                  {criatura.estagio.emoji}
+                {/* Criatura SVG Animada */}
+                <div style={{marginBottom:16}}>
+                  <CreatureScene 
+                    creature={criatura.nome} 
+                    stage={criatura.estagio}
+                    color={criatura.estagio.cor}
+                    color2={criatura.estagio.cor2 || criatura.estagio.cor}
+                  />
                 </div>
                 
                 {/* Nome */}
