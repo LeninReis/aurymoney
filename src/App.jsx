@@ -384,12 +384,7 @@ html,body{background:var(--bg);min-height:100vh;font-family:'Outfit',sans-serif}
 export default function AuryMoney() {
   const isMobile = useIsMobile()
   
-  // Sistema de senha
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [passwordInput, setPasswordInput] = useState("")
-  const [passwordError, setPasswordError] = useState(false)
-  
-  // Estados do app (devem estar sempre no topo, mesmo antes do if)
+  // Estados do app
   const [tab, setTab]       = useState("dashboard")
   const [records, setRecs]  = useState([])
   const [loading, setLoad]  = useState(true)
@@ -403,132 +398,11 @@ export default function AuryMoney() {
   const [fCard, setFCard] = useState("todos")
   const [fCat,  setFCat]  = useState("todos")
   const [toast, setToast] = useState("")
-  
-  const handlePasswordSubmit = (e) => {
-    e.preventDefault()
-    if (passwordInput === "120625") {
-      setIsAuthenticated(true)
-      setPasswordError(false)
-      // Salva no sessionStorage para manter durante a sessão
-      sessionStorage.setItem("aurymoney_auth", "true")
-    } else {
-      setPasswordError(true)
-      setPasswordInput("")
-    }
-  }
-  
-  // Verifica se já está autenticado na sessão
-  useEffect(() => {
-    if (sessionStorage.getItem("aurymoney_auth") === "true") {
-      setIsAuthenticated(true)
-    }
-  }, [])
-  
-  // Tela de login
-  if (!isAuthenticated) {
-    return (
-      <div style={{
-        minHeight:"100vh",
-        display:"flex",
-        alignItems:"center",
-        justifyContent:"center",
-        background:"linear-gradient(135deg, #0f0f20 0%, #1a1a2e 50%, #0f0f20 100%)",
-        padding:20
-      }}>
-        <div style={{
-          background:"linear-gradient(135deg, rgba(167,139,250,.08), rgba(124,58,237,.05))",
-          border:"1px solid rgba(167,139,250,.2)",
-          borderRadius:24,
-          padding:isMobile?32:48,
-          maxWidth:420,
-          width:"100%",
-          boxShadow:"0 20px 60px rgba(0,0,0,.5)"
-        }}>
-          <div style={{textAlign:"center",marginBottom:32}}>
-            <div style={{fontSize:48,marginBottom:16}}>💜</div>
-            <div style={{fontSize:28,fontWeight:800,background:"linear-gradient(135deg,#A78BFA,#F472B6)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",marginBottom:8}}>
-              Aury Money
-            </div>
-            <div style={{fontSize:13,color:"rgba(255,255,255,.5)"}}>
-              Sistema de Gestão Financeira
-            </div>
-          </div>
-          
-          <form onSubmit={handlePasswordSubmit}>
-            <div style={{marginBottom:24}}>
-              <label style={{display:"block",fontSize:12,fontWeight:600,color:"rgba(255,255,255,.7)",marginBottom:8,letterSpacing:0.5}}>
-                SENHA DE ACESSO
-              </label>
-              <input
-                type="password"
-                value={passwordInput}
-                onChange={(e) => {
-                  setPasswordInput(e.target.value)
-                  setPasswordError(false)
-                }}
-                placeholder="Digite a senha"
-                autoFocus
-                style={{
-                  width:"100%",
-                  padding:"14px 16px",
-                  background:"rgba(0,0,0,.3)",
-                  border:passwordError?"1px solid #EF4444":"1px solid rgba(255,255,255,.1)",
-                  borderRadius:12,
-                  fontSize:16,
-                  color:"#fff",
-                  outline:"none",
-                  transition:"all 0.2s",
-                  letterSpacing:8,
-                  textAlign:"center"
-                }}
-              />
-              {passwordError && (
-                <div style={{marginTop:8,fontSize:11,color:"#EF4444",textAlign:"center",fontWeight:600}}>
-                  ❌ Senha incorreta. Tente novamente.
-                </div>
-              )}
-            </div>
-            
-            <button
-              type="submit"
-              style={{
-                width:"100%",
-                padding:"14px 16px",
-                background:"linear-gradient(135deg, #A78BFA, #8B5CF6)",
-                border:"none",
-                borderRadius:12,
-                fontSize:14,
-                fontWeight:700,
-                color:"#fff",
-                cursor:"pointer",
-                transition:"all 0.2s",
-                letterSpacing:1,
-                boxShadow:"0 4px 12px rgba(167,139,250,.3)"
-              }}
-              onMouseEnter={(e) => e.target.style.transform = "translateY(-2px)"}
-              onMouseLeave={(e) => e.target.style.transform = "translateY(0)"}
-            >
-              ENTRAR
-            </button>
-          </form>
-          
-          <div style={{marginTop:24,textAlign:"center",fontSize:10,color:"rgba(255,255,255,.3)"}}>
-            Lenin & Evelyn ❤️
-          </div>
-        </div>
-      </div>
-    )
-  }
-  
-  // App normal continua abaixo...
 
   useEffect(() => {
-    // Só conecta ao Firebase se estiver autenticado
-    if (!isAuthenticated) return
-    
     const q = query(collection(db,"records"), orderBy("createdAt","desc"))
     return onSnapshot(q, snap => { setRecs(snap.docs.map(d=>({id:d.id,...d.data()}))); setLoad(false) })
-  }, [isAuthenticated])
+  }, [])
 
   // Auto-fill descrição apenas quando trocar cartão ou data (não interfere com digitação)
   const prevCardRef = useRef(form.card)
