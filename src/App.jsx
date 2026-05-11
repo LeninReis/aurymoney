@@ -389,6 +389,21 @@ export default function AuryMoney() {
   const [passwordInput, setPasswordInput] = useState("")
   const [passwordError, setPasswordError] = useState(false)
   
+  // Estados do app (devem estar sempre no topo, mesmo antes do if)
+  const [tab, setTab]       = useState("dashboard")
+  const [records, setRecs]  = useState([])
+  const [loading, setLoad]  = useState(true)
+  const [editId, setEditId] = useState(null)
+  const [agMonth, setAgMonth] = useState(curMonth())
+  const [form, setForm] = useState({
+    type:"despesa", desc:"", value:"", category:"cartao",
+    date:todayStr(), card:"nubank_l", shared:false, recorrente:false,
+  })
+  const [fType, setFType] = useState("todos")
+  const [fCard, setFCard] = useState("todos")
+  const [fCat,  setFCat]  = useState("todos")
+  const [toast, setToast] = useState("")
+  
   const handlePasswordSubmit = (e) => {
     e.preventDefault()
     if (passwordInput === "120625") {
@@ -505,20 +520,7 @@ export default function AuryMoney() {
     )
   }
   
-  // App normal após autenticação
-  const [tab, setTab]       = useState("dashboard")
-  const [records, setRecs]  = useState([])
-  const [loading, setLoad]  = useState(true)
-  const [editId, setEditId] = useState(null)
-  const [agMonth, setAgMonth] = useState(curMonth())
-  const [form, setForm] = useState({
-    type:"despesa", desc:"", value:"", category:"cartao",
-    date:todayStr(), card:"nubank_l", shared:false, recorrente:false,
-  })
-  const [fType, setFType] = useState("todos")
-  const [fCard, setFCard] = useState("todos")
-  const [fCat,  setFCat]  = useState("todos")
-  const [toast, setToast] = useState("")
+  // App normal continua abaixo...
 
   useEffect(() => {
     const q = query(collection(db,"records"), orderBy("createdAt","desc"))
