@@ -523,9 +523,12 @@ export default function AuryMoney() {
   // App normal continua abaixo...
 
   useEffect(() => {
+    // Só conecta ao Firebase se estiver autenticado
+    if (!isAuthenticated) return
+    
     const q = query(collection(db,"records"), orderBy("createdAt","desc"))
     return onSnapshot(q, snap => { setRecs(snap.docs.map(d=>({id:d.id,...d.data()}))); setLoad(false) })
-  }, [])
+  }, [isAuthenticated])
 
   // Auto-fill descrição apenas quando trocar cartão ou data (não interfere com digitação)
   const prevCardRef = useRef(form.card)
